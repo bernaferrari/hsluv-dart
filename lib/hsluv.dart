@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+import 'dart:math' as math;
 
 import 'geometry.dart';
 
@@ -45,7 +45,7 @@ class Hsluv {
   static List<Line> getBounds(double L) {
     List<Line> result = [];
 
-    double sub1 = Math.pow(L + 16, 3) / 1560896;
+    double sub1 = math.pow(L + 16, 3) / 1560896;
     double sub2 = sub1 > epsilon ? sub1 : L / kappa;
 
     for (int c = 0; c < 3; c++) {
@@ -78,21 +78,21 @@ class Hsluv {
 
     for (Line bound in bounds) {
       double length = Geometry.distanceLineFromOrigin(bound);
-      min = Math.min(min, length);
+      min = math.min(min, length);
     }
 
     return min;
   }
 
   static double maxChromaForLH(double L, double H) {
-    double hrad = H / 360 * Math.pi * 2;
+    double hrad = H / 360 * math.pi * 2;
     List<Line> bounds = getBounds(L);
     double min = double.infinity;
 
     for (Line bound in bounds) {
       double length = Geometry.lengthOfRayUntilIntersect(hrad, bound);
       if (length >= 0) {
-        min = Math.min(min, length);
+        min = math.min(min, length);
       }
     }
 
@@ -114,13 +114,13 @@ class Hsluv {
     if (c <= 0.0031308) {
       return 12.92 * c;
     } else {
-      return 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
+      return 1.055 * math.pow(c, 1 / 2.4) - 0.055;
     }
   }
 
   static double toLinear(double c) {
     if (c > 0.04045) {
-      return Math.pow((c + 0.055) / (1 + 0.055), 2.4);
+      return math.pow((c + 0.055) / (1 + 0.055), 2.4);
     } else {
       return c / 12.92;
     }
@@ -162,7 +162,7 @@ class Hsluv {
     if (Y <= epsilon) {
       return (Y / refY) * kappa;
     } else {
-      return 116 * Math.pow(Y / refY, 1.0 / 3.0) - 16;
+      return 116 * math.pow(Y / refY, 1.0 / 3.0) - 16;
     }
   }
 
@@ -170,7 +170,7 @@ class Hsluv {
     if (L <= 8) {
       return refY * L / kappa;
     } else {
-      return refY * Math.pow((L + 16) / 116, 3);
+      return refY * math.pow((L + 16) / 116, 3);
     }
   }
 
@@ -236,15 +236,15 @@ class Hsluv {
     double U = tuple[1];
     double V = tuple[2];
 
-    double C = Math.sqrt(U * U + V * V);
+    double C = math.sqrt(U * U + V * V);
     double H;
 
     // Greys: disambiguate hue
     if (C < 0.00000001) {
       H = 0;
     } else {
-      double Hrad = Math.atan2(V, U);
-      H = (Hrad * 180.0) / Math.pi;
+      double hRad = math.atan2(V, U);
+      H = (hRad * 180.0) / math.pi;
 
       if (H < 0) {
         H = 360 + H;
@@ -261,9 +261,9 @@ class Hsluv {
     double C = tuple[1];
     double H = tuple[2];
 
-    double Hrad = H / 360.0 * 2 * Math.pi;
-    double U = Math.cos(Hrad) * C;
-    double V = Math.sin(Hrad) * C;
+    double hRad = H / 360.0 * 2 * math.pi;
+    double U = math.cos(hRad) * C;
+    double V = math.sin(hRad) * C;
 
     return [L, U, V];
   }

@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+import 'dart:math' as math;
 
 // converted from https://github.com/hsluv/hsluv
 
@@ -28,12 +28,12 @@ class Geometry {
   }
 
   static double distanceFromOrigin(Point point) {
-    return Math.sqrt(Math.pow(point.x, 2) + Math.pow(point.y, 2));
+    return math.sqrt(math.pow(point.x, 2) + math.pow(point.y, 2));
   }
 
   static double distanceLineFromOrigin(Line line) {
-// https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
-    return line.intercept.abs() / Math.sqrt(Math.pow(line.slope, 2) + 1);
+    // https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
+    return line.intercept.abs() / math.sqrt(math.pow(line.slope, 2) + 1);
   }
 
   static Line perpendicularThroughPoint(Line line, Point point) {
@@ -43,32 +43,30 @@ class Geometry {
   }
 
   static double angleFromOrigin(Point point) {
-    return Math.atan2(point.y, point.x);
+    return math.atan2(point.y, point.x);
   }
 
   static double normalizeAngle(double angle) {
-    var m = 2 * Math.pi;
+    var m = 2 * math.pi;
     return ((angle % m) + m) % m;
   }
 
   static double lengthOfRayUntilIntersect(double theta, Line line) {
-/*
-        theta  -- angle of ray starting at (0, 0)
-        m, b   -- slope and intercept of line
-        x1, y1 -- coordinates of intersection
-        len    -- length of ray until it intersects with line
-
-        b + m * x1        = y1
-        len              >= 0
-        len * cos(theta)  = x1
-        len * sin(theta)  = y1
-
-
-        b + m * (len * cos(theta)) = len * sin(theta)
-        b = len * sin(hrad) - m * len * cos(theta)
-        b = len * (sin(hrad) - m * cos(hrad))
-        len = b / (sin(hrad) - m * cos(hrad))
-        */
-    return line.intercept / (Math.sin(theta) - line.slope * Math.cos(theta));
+    /// theta  -- angle of ray starting at (0, 0)
+    /// m, b   -- slope and intercept of line
+    /// x1, y1 -- coordinates of intersection
+    /// len    -- length of ray until it intersects with line
+    ///
+    /// b + m * x1        = y1
+    /// len              >= 0
+    /// len * cos(theta)  = x1
+    /// len * sin(theta)  = y1
+    ///
+    ///
+    /// b + m * (len * cos(theta)) = len * sin(theta)
+    /// b = len * sin(hrad) - m * len * cos(theta)
+    /// b = len * (sin(hrad) - m * cos(hrad))
+    /// len = b / (sin(hrad) - m * cos(hrad))
+    return line.intercept / (math.sin(theta) - line.slope * math.cos(theta));
   }
 }

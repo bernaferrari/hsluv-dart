@@ -21,7 +21,7 @@ class HSLuvColor {
         assert(lightness >= 0.0),
         assert(lightness <= 100.0);
 
-  /// Creates an [HSLColor] from an RGB [Color].
+  /// Creates an [HSLuvColor] from an RGB [Color].
   ///
   /// This constructor does not necessarily round-trip with [toColor] because
   /// of floating-point imprecision.
