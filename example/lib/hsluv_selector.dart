@@ -8,16 +8,25 @@ import 'package:hsluv/flutter/hsluvcolor.dart';
 import 'package:infinite_listview/infinite_listview.dart';
 import 'package:material/blocs/blocs.dart';
 import 'package:material/colors_repository.dart';
+import 'package:material/hsinter.dart';
 import 'package:material/util/constants.dart';
 import 'package:material/util/hsluv_tiny.dart';
 import 'package:material/util/selected.dart';
+import 'package:material/util/tiny_color.dart';
 import 'package:material/widgets/loading_indicator.dart';
 
 import 'blocs/slider_color/slider_color.dart';
 import 'util/constants.dart';
 
-class HSLuvSelector extends StatelessWidget {
-  const HSLuvSelector({this.color, this.toneSize = 20});
+enum ColorKind { HSLUV, HSV }
+
+const hueStr = "Hue";
+const satStr = "Saturation";
+const valueStr = "Value";
+const lightStr = "Lightness";
+
+class HSVSelector extends StatelessWidget {
+  const HSVSelector({this.color, this.toneSize = 20, this.hueSize = 90});
 
   // initial color
   final Color color;
@@ -25,28 +34,61 @@ class HSLuvSelector extends StatelessWidget {
   // maximum number of items
   final int toneSize;
 
+  // maximum number of items
+  final int hueSize;
+
   @override
   Widget build(BuildContext context) {
-    return HSLuvSelectorGeneric(
+    return HSGenericScreen(
       color: color,
-      valueKey: "HSLuv",
-      fetchHue: () => hsluvAlternatives(color, 90),
+      kind: "HSV",
+      fetchHue: () => alternatives(color, hueSize),
       fetchSat: (Color c) =>
-          hsluvTones(c, toneSize, 95 / toneSize, 5).convertList(),
+          tonesHSV(c, toneSize, 0.9 / toneSize, 0.1).convertList(),
       fetchLight: (Color c) =>
-          hsluvLightness(c, toneSize, 95 / toneSize, 0).convertList(),
-      hueTitle: "Hue",
-      satTitle: "Saturation",
-      lightTitle: "Lightness",
+          valueVariation(c, toneSize, 0.9 / toneSize, 0.1).convertList(),
+      hueTitle: hueStr,
+      satTitle: satStr,
+      lightTitle: valueStr,
       toneSize: toneSize,
     );
   }
 }
 
-class HSLuvSelectorGeneric extends StatefulWidget {
-  const HSLuvSelectorGeneric({
+class HSLuvSelector extends StatelessWidget {
+  const HSLuvSelector({this.color, this.toneSize = 20, this.hueSize = 90});
+
+  // initial color
+  final Color color;
+
+  // maximum number of items
+  final int toneSize;
+
+  // maximum number of items
+  final int hueSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return HSGenericScreen(
+      color: color,
+      kind: "HSLuv",
+      fetchHue: () => hsluvAlternatives(color, hueSize),
+      fetchSat: (Color c) =>
+          hsluvTones(c, toneSize, 95 / toneSize, 5).convertList(),
+      fetchLight: (Color c) =>
+          hsluvLightness(c, toneSize, 95 / toneSize, 0).convertList(),
+      hueTitle: hueStr,
+      satTitle: satStr,
+      lightTitle: lightStr,
+      toneSize: toneSize,
+    );
+  }
+}
+
+class HSGenericScreen extends StatefulWidget {
+  const HSGenericScreen({
     this.color,
-    this.valueKey,
+    this.kind,
     this.fetchHue,
     this.fetchSat,
     this.fetchLight,
@@ -57,7 +99,7 @@ class HSLuvSelectorGeneric extends StatefulWidget {
   });
 
   final Color color;
-  final String valueKey;
+  final String kind;
   final List<Color> Function() fetchHue;
   final List<ColorWithLum> Function(Color) fetchSat;
   final List<ColorWithLum> Function(Color) fetchLight;
@@ -68,10 +110,10 @@ class HSLuvSelectorGeneric extends StatefulWidget {
   final String lightTitle;
 
   @override
-  _HSLuvSelectorGenericState createState() => _HSLuvSelectorGenericState();
+  _HSGenericScreenState createState() => _HSGenericScreenState();
 }
 
-class _HSLuvSelectorGenericState extends State<HSLuvSelectorGeneric> {
+class _HSGenericScreenState extends State<HSGenericScreen> {
   double addValue = 0.0;
   double addSaturation = 0.0;
   bool satSelected = false;
@@ -82,7 +124,7 @@ class _HSLuvSelectorGenericState extends State<HSLuvSelectorGeneric> {
   void initState() {
     super.initState();
     expanded = PageStorage.of(context)
-            .readState(context, identifier: ValueKey(widget.valueKey)) ??
+            .readState(context, identifier: ValueKey<String>(widget.kind)) ??
         0;
   }
 
@@ -92,11 +134,11 @@ class _HSLuvSelectorGenericState extends State<HSLuvSelectorGeneric> {
 
   void modifyAndSaveExpanded(int updatedValue) {
     expanded = updatedValue;
-    PageStorage.of(context)
-        .writeState(context, expanded, identifier: ValueKey(widget.valueKey));
+    PageStorage.of(context).writeState(context, expanded,
+        identifier: ValueKey<String>(widget.kind));
   }
 
-  List<ColorWithLum> fetchHueForHSLuv() {
+  List<ColorWithLum> parseHue() {
     // fetch the hue. If we call this inside the BlocBuilder,
     // we will lose the list position because it will refresh every time.
     final List<Color> hue = widget.fetchHue();
@@ -108,10 +150,11 @@ class _HSLuvSelectorGenericState extends State<HSLuvSelectorGeneric> {
     // apply the diff to the hue.
     return hue
         .map((Color c) {
-          final hsluv = HSLuvColor.fromColor(c);
-          final valueDiff = interval(hsluv.lightness - addValue, 0.0, 100.0);
-          final satDiff =
-              interval(hsluv.saturation - addSaturation, 0.0, 100.0);
+          final HSInterColor hsluv = HSInterColor.fromColor(c, widget.kind);
+          final double valueDiff =
+              interval(hsluv.lightness - addValue, 0.0, hsluv.maxValue);
+          final double satDiff =
+              interval(hsluv.saturation - addSaturation, 0.0, hsluv.maxValue);
 
           return hsluv
               .withSaturation(satDiff)
@@ -124,84 +167,68 @@ class _HSLuvSelectorGenericState extends State<HSLuvSelectorGeneric> {
 
   @override
   Widget build(BuildContext context) {
-    // todo HSV
-    final hue = fetchHueForHSLuv();
-
+    final hue = parseHue();
     final hueLen = hue.length;
-
-    // todo HSV
-    final originalColor = HSLuvColor.fromColor(widget.color);
+    final originalColor = HSInterColor.fromColor(widget.color, widget.kind);
 
     return BlocBuilder<SliderColorBloc, SliderColorState>(
-        builder: (context, state) {
+        builder: (BuildContext context, SliderColorState state) {
       if (state is SliderColorLoading) {
         return const Scaffold(body: Center(child: LoadingIndicator()));
       }
 
-      final rgbColor = (state as SliderColorLoaded).rgbColor;
+      final Color rgbColor = (state as SliderColorLoaded).rgbColor;
 
-      final tones = widget.fetchSat(rgbColor);
-      final values = widget.fetchLight(rgbColor);
+      final List<ColorWithLum> tones = widget.fetchSat(rgbColor);
+      final List<ColorWithLum> values = widget.fetchLight(rgbColor);
 
-      final borderColor = (rgbColor.computeLuminance() > kLumContrast)
+      final Color borderColor = (rgbColor.computeLuminance() > kLumContrast)
           ? Colors.black.withOpacity(0.40)
           : Colors.white.withOpacity(0.40);
 
-      final hueWidget = Column(
-        children: <Widget>[
-          cardTitle(widget.hueTitle, 0),
-          Expanded(child: Card(
-            child: InfiniteListView.builder(
-              itemBuilder: (context, index) {
-                // mirror the index value, so that ListView works in both ways.
-                final correctIndex = index.abs() % hueLen;
+      final Widget hueWidget = ExpandableColorBar(
+          pageKey: widget.kind,
+          title: widget.hueTitle,
+          expanded: expanded,
+          sectionIndex: 0,
+          listSize: hueLen,
+          isInfinite: true,
+          colorsList: hue,
+          onTitlePressed: () {
+            setState(() {
+              modifyAndSaveExpanded(0);
+            });
+          },
+          onColorPressed: (Color c) {
+            setState(() {
+              modifyAndSaveExpanded(0);
+            });
+            colorSelected(context, c);
+          });
 
-                return ColorCompareWidgetDetails(
-                  hue[correctIndex],
-                  compactText: expanded == 0,
-                  category: widget.hueTitle,
-                  onPressed: () {
-                    setState(() {
-                      modifyAndSaveExpanded(0);
-                    });
-                    colorSelected(context, hue[correctIndex].color);
-                  },
-                );
-              },
-            ),
-          )),
-        ],
-      );
-
-      final satWidget = Column(
-        children: <Widget>[
-          cardTitle(widget.satTitle, 1),
-          Expanded(
-            child: Card(
-              child: ListView.builder(
-                itemCount: widget.toneSize,
-                itemBuilder: (context, index) {
-                  return ColorCompareWidgetDetails(
-                    tones[index],
-                    compactText: expanded == 1,
-                    category: widget.satTitle,
-                    onPressed: () {
-                      setState(() {
-                        modifyAndSaveExpanded(1);
-                        addSaturation = originalColor.saturation -
-                            HSLuvColor.fromColor(tones[index].color).saturation;
-                      });
-                      colorSelected(context, tones[index].color);
-                    },
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
-      );
+      final satWidget = ExpandableColorBar(
+          pageKey: widget.kind,
+          title: widget.satTitle,
+          expanded: expanded,
+          sectionIndex: 1,
+          listSize: widget.toneSize,
+          colorsList: tones,
+          onTitlePressed: () {
+            setState(() {
+              modifyAndSaveExpanded(1);
+            });
+          },
+          onColorPressed: (Color c) {
+            setState(() {
+              modifyAndSaveExpanded(1);
+              addSaturation = originalColor.saturation -
+                  HSInterColor.fromColor(c, widget.kind).saturation;
+            });
+            colorSelected(context, c);
+          });
 
       final valueWidget = ExpandableColorBar(
+        pageKey: widget.kind,
         title: widget.lightTitle,
         expanded: expanded,
         sectionIndex: 2,
@@ -216,13 +243,13 @@ class _HSLuvSelectorGenericState extends State<HSLuvSelectorGeneric> {
           setState(() {
             modifyAndSaveExpanded(2);
             addValue = originalColor.lightness -
-                HSLuvColor.fromColor(c).lightness;
+                HSInterColor.fromColor(c, widget.kind).lightness;
           });
           colorSelected(context, c);
         },
       );
 
-      final widgets = [hueWidget, satWidget, valueWidget];
+      final List<Widget> widgets = <Widget>[hueWidget, satWidget, valueWidget];
 
       return Theme(
         data: ThemeData.from(
@@ -250,13 +277,13 @@ class _HSLuvSelectorGenericState extends State<HSLuvSelectorGeneric> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     const SizedBox(width: 8),
-                    for (int i = 0; i < 3; i++) ...[
+                    for (int i = 0; i < 3; i++) ...<Widget>[
                       const SizedBox(width: 8),
                       Flexible(
                         flex: (i == expanded) ? 1 : 0,
                         child: LayoutBuilder(
                           // thanks Remi Rousselet for the idea!
-                          builder: (ctx, builder) {
+                          builder: (BuildContext ctx, BoxConstraints builder) {
                             return AnimatedContainer(
                               width: (i == expanded) ? builder.maxWidth : 64,
                               duration: const Duration(milliseconds: 250),
@@ -298,26 +325,21 @@ class _HSLuvSelectorGenericState extends State<HSLuvSelectorGeneric> {
   }
 }
 
-class ExpandableColorBar extends StatelessWidget {
-  const ExpandableColorBar({
+class _ExpandableTitle extends StatelessWidget {
+  const _ExpandableTitle({
     this.title,
     this.expanded,
-    this.sectionIndex,
-    this.listSize = 0,
-    this.colorsList,
+    this.index,
     this.onTitlePressed,
-    this.onColorPressed,
   });
 
   final Function onTitlePressed;
-  final Function(Color) onColorPressed;
-  final List<ColorWithLum> colorsList;
   final String title;
   final int expanded;
-  final int sectionIndex;
-  final int listSize;
+  final int index;
 
-  Widget cardTitle(String title, int index) {
+  @override
+  Widget build(BuildContext context) {
     return FlatButton(
       onPressed: onTitlePressed,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -328,27 +350,69 @@ class ExpandableColorBar extends StatelessWidget {
       ),
     );
   }
+}
+
+class ExpandableColorBar extends StatelessWidget {
+  const ExpandableColorBar({
+    this.pageKey,
+    this.title,
+    this.expanded,
+    this.sectionIndex,
+    this.listSize,
+    this.colorsList,
+    this.onTitlePressed,
+    this.onColorPressed,
+    this.isInfinite = false,
+  });
+
+  final Function onTitlePressed;
+  final Function(Color) onColorPressed;
+  final List<ColorWithLum> colorsList;
+  final String title;
+  final String pageKey;
+  final int expanded;
+  final int sectionIndex;
+  final int listSize;
+  final bool isInfinite;
 
   @override
   Widget build(BuildContext context) {
-    final Function(BuildContext, int) itemBuilder = (context, index) {
-      return ColorCompareWidgetDetails(
-        colorsList[index],
-        compactText: expanded == sectionIndex,
-        category: title,
-        onPressed: () => onColorPressed(colorsList[index].color),
-      );
-    };
-
     return Column(children: <Widget>[
-      cardTitle(title, sectionIndex),
+      _ExpandableTitle(
+        title: title,
+        index: sectionIndex,
+        expanded: expanded,
+        onTitlePressed: onTitlePressed,
+      ),
       Expanded(
         child: Card(
-          child: listSize == 0
-              ? InfiniteListView.builder(itemBuilder: itemBuilder)
+          child: isInfinite
+              ? InfiniteListView.builder(
+                  key: PageStorageKey<String>("$pageKey $sectionIndex"),
+                  itemBuilder: (BuildContext context, int absoluteIndex) {
+                    final int index = absoluteIndex.abs() % listSize;
+
+                    return ColorCompareWidgetDetails(
+                      kind: pageKey,
+                      colorLum: colorsList[index],
+                      compactText: expanded == sectionIndex,
+                      category: title,
+                      onPressed: () => onColorPressed(colorsList[index].color),
+                    );
+                  },
+                )
               : ListView.builder(
                   itemCount: listSize,
-                  itemBuilder: itemBuilder,
+                  key: PageStorageKey<String>("$pageKey $sectionIndex"),
+                  itemBuilder: (BuildContext context, int index) {
+                    return ColorCompareWidgetDetails(
+                      kind: pageKey,
+                      colorLum: colorsList[index],
+                      compactText: expanded == sectionIndex,
+                      category: title,
+                      onPressed: () => onColorPressed(colorsList[index].color),
+                    );
+                  },
                 ),
         ),
       ),
@@ -357,17 +421,19 @@ class ExpandableColorBar extends StatelessWidget {
 }
 
 class ColorCompareWidgetDetails extends StatelessWidget {
-  const ColorCompareWidgetDetails(
-    this.colorLum, {
+  const ColorCompareWidgetDetails({
+    this.colorLum,
     this.onPressed,
     this.compactText = true,
     this.category = "",
+    this.kind,
   });
 
   final ColorWithLum colorLum;
   final Function onPressed;
   final bool compactText;
   final String category;
+  final String kind;
 
   @override
   Widget build(BuildContext context) {
@@ -375,16 +441,14 @@ class ColorCompareWidgetDetails extends StatelessWidget {
         ? Colors.white.withOpacity(0.87)
         : Colors.black87;
 
-    String writtenValue;
-    if (category == "Saturation") {
-      writtenValue =
-          "${(HSLuvColor.fromColor(colorLum.color).saturation).round()}%";
-    } else if (category == "Lightness") {
-      writtenValue =
-          "${(HSLuvColor.fromColor(colorLum.color).lightness).round()}%";
-    } else if (category == "Hue") {
-      writtenValue = "${(HSLuvColor.fromColor(colorLum.color).hue).round()}";
-    }
+    final HSInterColor inter = HSInterColor.fromColor(colorLum.color, kind);
+
+    final String writtenValue = when<String>({
+      () => category == hueStr: () => inter.hue.round().toString(),
+      () => category == satStr: () => "${inter.outputSaturation()}%",
+      () => category == lightStr || category == valueStr: () =>
+          "${inter.outputLightness()}%",
+    });
 
     final Widget cornerText = Text(
       writtenValue,
@@ -395,7 +459,7 @@ class ColorCompareWidgetDetails extends StatelessWidget {
     );
 
     final Widget centeredText =
-        richTextColorToHSV(context, colorLum.color, textColor, category);
+        richTextColorToHSV(context, inter, textColor, category[0]);
 
     return Padding(
       padding: EdgeInsets.zero,
@@ -418,33 +482,37 @@ class ColorCompareWidgetDetails extends StatelessWidget {
   TextStyle themedHSVSpan(
       TextStyle theme, Color textColor, bool isHighlighted) {
     return theme.copyWith(
-        fontWeight: isHighlighted ? FontWeight.w700 : FontWeight.w400,
-        color: textColor.withOpacity(isHighlighted ? 1 : 0.5));
+      fontWeight: isHighlighted ? FontWeight.w700 : FontWeight.w400,
+      color: textColor.withOpacity(isHighlighted ? 1 : 0.5),
+    );
   }
 
-  Widget richTextColorToHSV(
-      BuildContext context, Color color, Color textColor, String category) {
-    final hsv = HSLuvColor.fromColor(color);
+  Widget richTextColorToHSV(BuildContext context, HSInterColor hsi,
+      Color textColor, String category) {
     final TextStyle theme = Theme.of(context).textTheme.caption.copyWith(
           fontFamily: "B612Mono",
         );
 
-    // todo HSV
+    final String letterLorV = when({
+      () => kind == "HSLuv": () => "L",
+      () => kind == "HSV": () => "V",
+    });
+
     return RichText(
       overflow: TextOverflow.ellipsis,
       text: TextSpan(
         children: <TextSpan>[
           TextSpan(
-            text: "H:${hsv.hue.round()} ",
+            text: "H:${hsi.hue.round()} ",
             style: themedHSVSpan(theme, textColor, category == "H"),
           ),
           TextSpan(
-            text: 'S:${(hsv.saturation).round()}% ',
+            text: 'S:${hsi.outputSaturation()}% ',
             style: themedHSVSpan(theme, textColor, category == "S"),
           ),
           TextSpan(
-            text: 'L:${(hsv.lightness).round()}%',
-            style: themedHSVSpan(theme, textColor, category == "L"),
+            text: '$letterLorV:${hsi.outputLightness()}%',
+            style: themedHSVSpan(theme, textColor, category == letterLorV),
           ),
         ],
       ),
@@ -464,4 +532,13 @@ class ColorCompareWidgetDetails extends StatelessWidget {
   String colorToRGB(Color color) {
     return "R:${color.red} G:${color.green} B:${color.blue}";
   }
+}
+
+T when<T>(Map<bool Function(), T Function()> conditions, {T orElse()}) {
+  for (final dynamic entry in conditions.entries) {
+    if (entry.key()) {
+      return entry.value();
+    }
+  }
+  return orElse();
 }

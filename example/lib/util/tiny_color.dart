@@ -156,7 +156,7 @@ List<Color> tonesHSV(Color color,
     list.add(hsv.withSaturation(sat).toColor());
   }
 
-  return list;
+  return list.reversed.toList();
 }
 
 List<Color> alternative(Color color, [int n = 6, double step = 10]) {
@@ -241,7 +241,7 @@ List<Color> valueVariation(Color color,
     ret.add(hsv.withValue(darkness).toColor());
   }
 
-  return ret;
+  return ret.reversed.toList();
 }
 
 List<Color> analogous(Color color, [int results = 3, int slices = 6]) {

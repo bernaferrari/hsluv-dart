@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +13,6 @@ import 'package:material/widgets/loading_indicator.dart';
 
 import 'blocs/slider_color/slider_color.dart';
 import 'hsluv_selector.dart';
-import 'hsv_selector.dart';
 import 'util/constants.dart';
 
 class ColorHome extends StatefulWidget {
@@ -168,7 +167,7 @@ class _ColorHomeState extends State<ColorHome> {
                   tabs: [
                     Tab(
                       icon: Transform.rotate(
-                          angle: 0.5 * Math.pi,
+                          angle: 0.5 * math.pi,
                           child: Icon(FeatherIcons.sliders)),
                     ),
                     const Tab(icon: Text("HSLuv")),
@@ -181,7 +180,7 @@ class _ColorHomeState extends State<ColorHome> {
                     children: [
                       ColorSliders(rgb, hsv, hsl),
                       HSLuvSelector(color: widget.initialColor),
-                      BetterColorSelector(color: widget.initialColor),
+                      HSVSelector(color: widget.initialColor),
                       AboutScreen(),
                     ],
                   ),
