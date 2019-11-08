@@ -116,7 +116,9 @@ List<Color> nTrad(Color color, [int n = 6]) {
   return [for (; n > 0; n--) hsl.withHue((hue + div * n) % 360).toColor()];
 }
 
-List<Color> alternatives(Color color, [int n = 6]) {
+// get variation in Hue.
+// HSLColor and HSVColor will produce the same result.
+List<Color> hueVariations(Color color, [int n = 6]) {
   final HSLColor hsl = HSLColor.fromColor(color);
 
   final int div = (360 / n).round();
@@ -226,7 +228,7 @@ List<Color> darkShade(Color color,
   return ret;
 }
 
-List<Color> valueVariation(Color color,
+List<Color> valueVariations(Color color,
     [int n = 6, double step = 0.05, double start = 0.0]) {
   final HSVColor hsv = HSVColor.fromColor(color);
   double darkness = start;

@@ -7,7 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hsluv/flutter/hsluvcolor.dart';
 import 'package:infinite_listview/infinite_listview.dart';
 import 'package:material/blocs/blocs.dart';
-import 'package:material/colors_repository.dart';
 import 'package:material/hsinter.dart';
 import 'package:material/util/constants.dart';
 import 'package:material/util/hsluv_tiny.dart';
@@ -16,9 +15,11 @@ import 'package:material/util/tiny_color.dart';
 import 'package:material/widgets/loading_indicator.dart';
 
 import 'blocs/slider_color/slider_color.dart';
+import 'color_with_inter.dart';
 import 'util/constants.dart';
 
-enum ColorKind { HSLUV, HSV }
+const hsvStr = "HSV";
+const hsluvStr = "HSLuv";
 
 const hueStr = "Hue";
 const satStr = "Saturation";
@@ -39,14 +40,16 @@ class HSVSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const String kind = hsvStr;
+
     return HSGenericScreen(
       color: color,
-      kind: "HSV",
-      fetchHue: () => alternatives(color, hueSize),
+      kind: kind,
+      fetchHue: () => hueVariations(color, hueSize),
       fetchSat: (Color c) =>
-          tonesHSV(c, toneSize, 0.9 / toneSize, 0.1).convertList(),
-      fetchLight: (Color c) =>
-          valueVariation(c, toneSize, 0.9 / toneSize, 0.1).convertList(),
+          tonesHSV(c, toneSize, 0.9 / toneSize, 0.1).convertToInter(kind),
+      fetchLight: (Color c) => valueVariations(c, toneSize, 0.9 / toneSize, 0.1)
+          .convertToInter(kind),
       hueTitle: hueStr,
       satTitle: satStr,
       lightTitle: valueStr,
@@ -69,14 +72,16 @@ class HSLuvSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const String kind = hsluvStr;
+
     return HSGenericScreen(
       color: color,
-      kind: "HSLuv",
+      kind: kind,
       fetchHue: () => hsluvAlternatives(color, hueSize),
       fetchSat: (Color c) =>
-          hsluvTones(c, toneSize, 95 / toneSize, 5).convertList(),
+          hsluvTones(c, toneSize, 95 / toneSize, 5).convertToInter(kind),
       fetchLight: (Color c) =>
-          hsluvLightness(c, toneSize, 95 / toneSize, 0).convertList(),
+          hsluvLightness(c, toneSize, 95 / toneSize, 0).convertToInter(kind),
       hueTitle: hueStr,
       satTitle: satStr,
       lightTitle: lightStr,
@@ -101,8 +106,8 @@ class HSGenericScreen extends StatefulWidget {
   final Color color;
   final String kind;
   final List<Color> Function() fetchHue;
-  final List<ColorWithLum> Function(Color) fetchSat;
-  final List<ColorWithLum> Function(Color) fetchLight;
+  final List<ColorWithInter> Function(Color) fetchSat;
+  final List<ColorWithInter> Function(Color) fetchLight;
 
   final int toneSize;
   final String hueTitle;
@@ -138,31 +143,28 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
         identifier: ValueKey<String>(widget.kind));
   }
 
-  List<ColorWithLum> parseHue() {
+  List<ColorWithInter> parseHue() {
     // fetch the hue. If we call this inside the BlocBuilder,
     // we will lose the list position because it will refresh every time.
     final List<Color> hue = widget.fetchHue();
 
     if (addValue == 0 && addSaturation == 0) {
-      return hue.convertList();
+      return hue.convertToInter(widget.kind);
     }
 
     // apply the diff to the hue.
-    return hue
-        .map((Color c) {
-          final HSInterColor hsluv = HSInterColor.fromColor(c, widget.kind);
-          final double valueDiff =
-              interval(hsluv.lightness - addValue, 0.0, hsluv.maxValue);
-          final double satDiff =
-              interval(hsluv.saturation - addSaturation, 0.0, hsluv.maxValue);
+    return hue.map((Color c) {
+      final HSInterColor hsluv = HSInterColor.fromColor(c, widget.kind);
+      final double valueDiff =
+          interval(hsluv.lightness - addValue, 0.0, hsluv.maxValue);
+      final double satDiff =
+          interval(hsluv.saturation - addSaturation, 0.0, hsluv.maxValue);
 
-          return hsluv
-              .withSaturation(satDiff)
-              .withLightness(valueDiff)
-              .toColor();
-        })
-        .toList()
-        .convertList();
+      final HSInterColor updated =
+          hsluv.withSaturation(satDiff).withLightness(valueDiff);
+
+      return ColorWithInter(updated.toColor(), updated);
+    }).toList();
   }
 
   @override
@@ -179,8 +181,9 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
 
       final Color rgbColor = (state as SliderColorLoaded).rgbColor;
 
-      final List<ColorWithLum> tones = widget.fetchSat(rgbColor);
-      final List<ColorWithLum> values = widget.fetchLight(rgbColor);
+      // in the ideal the world they could be calculated in the Bloc &/or in parallel.
+      final List<ColorWithInter> tones = widget.fetchSat(rgbColor);
+      final List<ColorWithInter> values = widget.fetchLight(rgbColor);
 
       final Color borderColor = (rgbColor.computeLuminance() > kLumContrast)
           ? Colors.black.withOpacity(0.40)
@@ -367,7 +370,7 @@ class ExpandableColorBar extends StatelessWidget {
 
   final Function onTitlePressed;
   final Function(Color) onColorPressed;
-  final List<ColorWithLum> colorsList;
+  final List<ColorWithInter> colorsList;
   final String title;
   final String pageKey;
   final int expanded;
@@ -394,7 +397,7 @@ class ExpandableColorBar extends StatelessWidget {
 
                     return ColorCompareWidgetDetails(
                       kind: pageKey,
-                      colorLum: colorsList[index],
+                      color: colorsList[index],
                       compactText: expanded == sectionIndex,
                       category: title,
                       onPressed: () => onColorPressed(colorsList[index].color),
@@ -407,7 +410,7 @@ class ExpandableColorBar extends StatelessWidget {
                   itemBuilder: (BuildContext context, int index) {
                     return ColorCompareWidgetDetails(
                       kind: pageKey,
-                      colorLum: colorsList[index],
+                      color: colorsList[index],
                       compactText: expanded == sectionIndex,
                       category: title,
                       onPressed: () => onColorPressed(colorsList[index].color),
@@ -422,14 +425,14 @@ class ExpandableColorBar extends StatelessWidget {
 
 class ColorCompareWidgetDetails extends StatelessWidget {
   const ColorCompareWidgetDetails({
-    this.colorLum,
+    this.color,
     this.onPressed,
     this.compactText = true,
     this.category = "",
     this.kind,
   });
 
-  final ColorWithLum colorLum;
+  final ColorWithInter color;
   final Function onPressed;
   final bool compactText;
   final String category;
@@ -437,11 +440,11 @@ class ColorCompareWidgetDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color textColor = (colorLum.lum < kLumContrast)
+    final Color textColor = (color.lum < kLumContrast)
         ? Colors.white.withOpacity(0.87)
         : Colors.black87;
 
-    final HSInterColor inter = HSInterColor.fromColor(colorLum.color, kind);
+    final HSInterColor inter = color.inter;
 
     final String writtenValue = when<String>({
       () => category == hueStr: () => inter.hue.round().toString(),
@@ -467,11 +470,11 @@ class ColorCompareWidgetDetails extends StatelessWidget {
         height: 56,
         child: MaterialButton(
           elevation: 0,
-          color: colorLum.color,
+          color: color.color,
           shape: const RoundedRectangleBorder(),
           onPressed: onPressed ??
               () {
-                colorSelected(context, colorLum.color);
+                colorSelected(context, color.color);
               },
           child: compactText ? centeredText : cornerText,
         ),
@@ -494,8 +497,8 @@ class ColorCompareWidgetDetails extends StatelessWidget {
         );
 
     final String letterLorV = when({
-      () => kind == "HSLuv": () => "L",
-      () => kind == "HSV": () => "V",
+      () => kind == hsluvStr: () => "L",
+      () => kind == hsvStr: () => "V",
     });
 
     return RichText(
