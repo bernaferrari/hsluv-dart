@@ -27,7 +27,7 @@ dependencies:
   equatable: ^0.6.1
   rxdart: ^0.22.6
   flutter_feather_icons: ^1.0.3
-  infinite_listview: ^1.0.1
+  infinite_listview: ^1.0.1+1
   url_launcher: ^5.2.5
 
 dev_dependencies:
