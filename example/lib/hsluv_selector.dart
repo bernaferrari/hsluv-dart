@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hsluv/flutter/hsluvcolor.dart';
+import 'package:hsluvsample/blocs/blocs.dart';
+import 'package:hsluvsample/hsinter.dart';
+import 'package:hsluvsample/util/constants.dart';
+import 'package:hsluvsample/util/hsluv_tiny.dart';
+import 'package:hsluvsample/util/selected.dart';
+import 'package:hsluvsample/util/tiny_color.dart';
+import 'package:hsluvsample/widgets/loading_indicator.dart';
 import 'package:infinite_listview/infinite_listview.dart';
-import 'package:material/blocs/blocs.dart';
-import 'package:material/hsinter.dart';
-import 'package:material/util/constants.dart';
-import 'package:material/util/hsluv_tiny.dart';
-import 'package:material/util/selected.dart';
-import 'package:material/util/tiny_color.dart';
-import 'package:material/widgets/loading_indicator.dart';
 
 import 'blocs/slider_color/slider_color.dart';
 import 'color_with_inter.dart';
@@ -422,18 +422,24 @@ class ExpandableColorBar extends StatelessWidget {
                     );
                   },
                 )
-              : ListView.builder(
-                  itemCount: listSize,
-                  key: PageStorageKey<String>("$pageKey $sectionIndex"),
-                  itemBuilder: (BuildContext context, int index) {
-                    return ColorCompareWidgetDetails(
-                      kind: pageKey,
-                      color: colorsList[index],
-                      compactText: expanded == sectionIndex,
-                      category: title,
-                      onPressed: () => onColorPressed(colorsList[index].color),
-                    );
-                  },
+              : MediaQuery.removePadding(
+                  // this is necessary on iOS, else there will be a bottom padding.
+                  removeBottom: true,
+                  context: context,
+                  child: ListView.builder(
+                    itemCount: listSize,
+                    key: PageStorageKey<String>("$pageKey $sectionIndex"),
+                    itemBuilder: (BuildContext context, int index) {
+                      return ColorCompareWidgetDetails(
+                        kind: pageKey,
+                        color: colorsList[index],
+                        compactText: expanded == sectionIndex,
+                        category: title,
+                        onPressed: () =>
+                            onColorPressed(colorsList[index].color),
+                      );
+                    },
+                  ),
                 ),
         ),
       ),

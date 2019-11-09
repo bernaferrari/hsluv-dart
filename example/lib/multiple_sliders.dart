@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:material/widgets/dismiss_keyboard_on_scroll.dart';
-import 'package:material/widgets/loading_indicator.dart';
+import 'package:hsluvsample/widgets/dismiss_keyboard_on_scroll.dart';
+import 'package:hsluvsample/widgets/loading_indicator.dart';
 
 import 'blocs/slider_color/slider_color.dart';
 

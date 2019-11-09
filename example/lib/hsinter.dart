@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hsluv/flutter/hsluvcolor.dart';
-import 'package:material/hsluv_selector.dart';
+import 'package:hsluvsample/hsluv_selector.dart';
 
 @immutable
 class HSInterColor {

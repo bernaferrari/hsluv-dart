@@ -1,4 +1,4 @@
-package com.bernaferrari.material.material
+package com.bernaferrari.hsluvsample
 
 import android.os.Bundle
 

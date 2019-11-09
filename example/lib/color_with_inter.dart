@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:material/hsinter.dart';
-import 'package:material/util/color_util.dart';
+import 'package:hsluvsample/hsinter.dart';
+import 'package:hsluvsample/util/color_util.dart';
 
 extension ListConversion<T> on List<Color> {
   List<ColorWithInter> convertToInter(String kind) =>

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:material/blocs/slider_color/slider_color_state.dart';
+import 'package:hsluvsample/blocs/slider_color/slider_color_state.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'slider_color_event.dart';

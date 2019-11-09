@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:hsluv/flutter/hsluvcolor.dart';
-import 'package:material/widgets/slider_that_works.dart';
+import 'package:hsluvsample/widgets/slider_that_works.dart';
 
 class RGBSlider extends StatefulWidget {
   const RGBSlider({Key key, this.color, this.onChanged}) : super(key: key);
@@ -313,8 +313,6 @@ class _HSLuvSliderState extends State<HSLuvSlider> {
     valueL = hsl.lightness;
     updateColorLists();
 
-    print("valueH $valueH valueS $valueS valueL $valueL");
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -333,7 +331,6 @@ class _HSLuvSliderState extends State<HSLuvSlider> {
         ColorSlider("Saturation", valueS / 100, "${valueS.round()}", colorS,
             (double value) {
           setState(() {
-            print("valueS $valueS | value: $value");
             valueS = value * 100;
             updateColorLists();
             widget.onChanged(valueH, valueS, valueL);

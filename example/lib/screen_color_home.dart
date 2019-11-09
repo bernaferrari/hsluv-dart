@@ -5,12 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hsluv/flutter/hsluvcolor.dart';
-import 'package:material/multiple_sliders.dart';
-import 'package:material/screen_about.dart';
-import 'package:material/util/color_util.dart';
-import 'package:material/util/selected.dart';
-import 'package:material/widgets/color_sliders.dart';
-import 'package:material/widgets/loading_indicator.dart';
+import 'package:hsluvsample/multiple_sliders.dart';
+import 'package:hsluvsample/screen_about.dart';
+import 'package:hsluvsample/util/color_util.dart';
+import 'package:hsluvsample/util/selected.dart';
+import 'package:hsluvsample/widgets/color_sliders.dart';
+import 'package:hsluvsample/widgets/loading_indicator.dart';
 
 import 'blocs/slider_color/slider_color.dart';
 import 'hsluv_selector.dart';

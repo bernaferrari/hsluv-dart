@@ -3,23 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:material/widgets/dismiss_keyboard_on_scroll.dart';
+import 'package:hsluvsample/widgets/dismiss_keyboard_on_scroll.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      key: const PageStorageKey("about"),
-      children: [
-        const Padding(padding: EdgeInsets.all(4)),
-        Card(
-          margin: const EdgeInsets.only(left: 16, right: 16, top: 8),
-          child: _ContactInfo(),
-        ),
-        GDPR(),
-        const Padding(padding: EdgeInsets.all(4)),
-      ],
+    return Center(
+      child: ListView(
+        key: const PageStorageKey("about"),
+        shrinkWrap: true,
+        children: [
+          const Padding(padding: EdgeInsets.all(4)),
+          Card(
+            margin: const EdgeInsets.only(left: 16, right: 16, top: 8),
+            child: _ContactInfo(),
+          ),
+          GDPR(),
+          const Padding(padding: EdgeInsets.all(4)),
+        ],
+      ),
     );
   }
 }
@@ -38,10 +41,7 @@ class GDPR extends StatelessWidget {
               const SizedBox(width: 16),
               Text("Privacy Policy",
                   textAlign: TextAlign.center,
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .title),
+                  style: Theme.of(context).textTheme.title),
             ],
           ),
           const Padding(
@@ -74,7 +74,7 @@ class _ContactInfo extends StatelessWidget {
     return Column(
       children: <Widget>[
         const SizedBox(height: 16),
-        Text("Color Studio",
+        Text("HSLuv sample",
             textAlign: TextAlign.center,
             style: Theme.of(context)
                 .textTheme
@@ -83,17 +83,11 @@ class _ContactInfo extends StatelessWidget {
         const SizedBox(height: 8),
         Text("Designed & developed by Bernardo Ferrari.",
             textAlign: TextAlign.center,
-            style: Theme
-                .of(context)
-                .textTheme
-                .subtitle),
+            style: Theme.of(context).textTheme.subtitle),
         const SizedBox(height: 8),
         Text("This app is open source",
             textAlign: TextAlign.center,
-            style: Theme
-                .of(context)
-                .textTheme
-                .caption),
+            style: Theme.of(context).textTheme.caption),
         const SizedBox(height: 8),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
