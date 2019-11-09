@@ -40,9 +40,12 @@ class ColorSliders extends StatelessWidget {
 
   Widget wrapInCard(Widget picker) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16), // 84
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24)
+      ),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: Padding(
-        padding: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
         child: picker,
       ),
     );

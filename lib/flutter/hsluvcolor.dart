@@ -98,5 +98,5 @@ class HSLuvColor {
   int get hashCode => hashValues(hue, saturation, lightness);
 
   @override
-  String toString() => '$runtimeType($hue, $saturation, $lightness)';
+  String toString() => 'H:$hue S:$saturation L:$lightness)';
 }

@@ -107,5 +107,12 @@ class HSInterColor {
   int get hashCode => hashValues(hue, saturation, lightness);
 
   @override
-  String toString() => '$runtimeType($hue, $saturation, $lightness)';
+  String toString() {
+    return when({
+      () => kind == "HSLuv": () =>
+          "H:${hue.toInt()} S:${outputSaturation()} L:${outputLightness()}",
+      () => kind == "HSV": () =>
+          "H: ${hue.toInt()} S:${outputSaturation()} V:${outputLightness()}",
+    });
+  }
 }

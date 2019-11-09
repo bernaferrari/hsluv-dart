@@ -1,8 +1,10 @@
 import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:hsluv/flutter/hsluvcolor.dart';
 import 'package:material/widgets/slider_that_works.dart';
 
 class RGBSlider extends StatefulWidget {
@@ -60,7 +62,7 @@ class _RGBSliderState extends State<RGBSlider> {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         ColorSlider("Red", valueRed / 255, "$valueRed", colorRed,
-                (double value) {
+            (double value) {
           setState(() {
             valueRed = (value * 255).round();
             updateColorLists();
@@ -68,7 +70,7 @@ class _RGBSliderState extends State<RGBSlider> {
           });
         }),
         ColorSlider("Green", valueGreen / 255, "$valueGreen", colorGreen,
-                (double value) {
+            (double value) {
           setState(() {
             valueGreen = (value * 255).round();
             updateColorLists();
@@ -76,7 +78,7 @@ class _RGBSliderState extends State<RGBSlider> {
           });
         }),
         ColorSlider("Blue", valueBlue / 255, "$valueBlue", colorBlue,
-                (double value) {
+            (double value) {
           setState(() {
             valueBlue = (value * 255).round();
             updateColorLists();
@@ -123,11 +125,11 @@ class _HSVSliderState extends State<HSVSlider> {
     ];
     colorS = [
       HSVColor.fromAHSV(1, vh, 0, vb).toColor(),
-      HSVColor.fromAHSV(1, vh, 1.0, vb).toColor()
+      HSVColor.fromAHSV(1, vh, 1.0, vb).toColor(),
     ];
     colorB = [
       HSVColor.fromAHSV(1, vh, vs, 0).toColor(),
-      HSVColor.fromAHSV(1, vh, vs, 1).toColor()
+      HSVColor.fromAHSV(1, vh, vs, 1).toColor(),
     ];
   }
 
@@ -143,24 +145,24 @@ class _HSVSliderState extends State<HSVSlider> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ColorSlider("Hue", valueH / 360, "${valueH.round()}°", colorH,
-                (double value) {
+        ColorSlider("Hue", valueH / 360, "${valueH.round()}", colorH,
+            (double value) {
           setState(() {
             valueH = value * 360;
             updateColorLists();
             widget.onChanged(valueH, valueS, valueB);
           });
         }),
-        ColorSlider("Saturation", valueS, "${(valueS * 100).round()}%", colorS,
-                (double value) {
+        ColorSlider("Saturation", valueS, "${(valueS * 100).round()}", colorS,
+            (double value) {
           setState(() {
             valueS = value;
             updateColorLists();
             widget.onChanged(valueH, valueS, valueB);
           });
         }),
-        ColorSlider("Value", valueB, "${(valueB * 100).round()}%", colorB,
-                (double value) {
+        ColorSlider("Value", valueB, "${(valueB * 100).round()}", colorB,
+            (double value) {
           setState(() {
             valueB = value;
             updateColorLists();
@@ -207,12 +209,12 @@ class _HSLSliderState extends State<HSLSlider> {
     ];
     colorS = [
       HSLColor.fromAHSL(1, vh, 0, vl).toColor(),
-      HSLColor.fromAHSL(1, vh, 1.0, vl).toColor()
+      HSLColor.fromAHSL(1, vh, 1.0, vl).toColor(),
     ];
     colorL = [
       HSLColor.fromAHSL(1, vh, vs, 0).toColor(),
       HSLColor.fromAHSL(1, vh, vs, 0.5).toColor(),
-      HSLColor.fromAHSL(1, vh, vs, 1).toColor()
+      HSLColor.fromAHSL(1, vh, vs, 1).toColor(),
     ];
   }
 
@@ -229,24 +231,24 @@ class _HSLSliderState extends State<HSLSlider> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ColorSlider("Hue", valueH / 360, "${valueH.round()}°", colorH,
-                (double value) {
+        ColorSlider("Hue", valueH / 360, "${valueH.round()}", colorH,
+            (double value) {
           setState(() {
             valueH = value * 360;
             updateColorLists();
             widget.onChanged(valueH, valueS, valueL);
           });
         }),
-        ColorSlider("Saturation", valueS, "${(valueS * 100).round()}%", colorS,
-                (double value) {
+        ColorSlider("Saturation", valueS, "${(valueS * 100).round()}", colorS,
+            (double value) {
           setState(() {
             valueS = value;
             updateColorLists();
             widget.onChanged(valueH, valueS, valueL);
           });
         }),
-        ColorSlider("Lightness", valueL, "${(valueL * 100).round()}%", colorL,
-                (double value) {
+        ColorSlider("Lightness", valueL, "${(valueL * 100).round()}", colorL,
+            (double value) {
           setState(() {
             valueL = value;
             updateColorLists();
@@ -258,12 +260,104 @@ class _HSLSliderState extends State<HSLSlider> {
   }
 }
 
+class HSLuvSlider extends StatefulWidget {
+  const HSLuvSlider({Key key, this.color, this.onChanged}) : super(key: key);
+
+  final Function(double, double, double) onChanged;
+  final HSLuvColor color;
+
+  @override
+  _HSLuvSliderState createState() => _HSLuvSliderState();
+}
+
+class _HSLuvSliderState extends State<HSLuvSlider> {
+  double valueH = 0.0;
+  double valueS = 0.0;
+  double valueL = 0.0;
+
+  var colorH = [Colors.black, const Color(0xFFFF0000)];
+  var colorS = [Colors.black, const Color(0xFFFF0000)];
+  var colorL = [Colors.black, const Color(0xFFFF0000)];
+
+  void updateColorLists() {
+    final vh = valueH;
+    final vs = valueS;
+    final vl = valueL;
+
+    colorH = [
+      HSLuvColor.fromHSL(0, vs, vl).toColor(),
+      HSLuvColor.fromHSL(60, vs, vl).toColor(),
+      HSLuvColor.fromHSL(120, vs, vl).toColor(),
+      HSLuvColor.fromHSL(180, vs, vl).toColor(),
+      HSLuvColor.fromHSL(240, vs, vl).toColor(),
+      HSLuvColor.fromHSL(300, vs, vl).toColor(),
+      HSLuvColor.fromHSL(360, vs, vl).toColor(),
+    ];
+    colorS = [
+      HSLuvColor.fromHSL(vh, 0.0, vl).toColor(),
+      HSLuvColor.fromHSL(vh, 100.0, vl).toColor(),
+    ];
+    colorL = [
+      HSLuvColor.fromHSL(vh, vs, 0).toColor(),
+      HSLuvColor.fromHSL(vh, vs, 50).toColor(),
+      HSLuvColor.fromHSL(vh, vs, 100).toColor(),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hsl = widget.color;
+
+    valueH = hsl.hue;
+    valueS = hsl.saturation;
+    valueL = hsl.lightness;
+    updateColorLists();
+
+    print("valueH $valueH valueS $valueS valueL $valueL");
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        // when max value is 360, it occasionally jumps to 0 because of
+        // its own nature. Keeping <= 359 should be unnoticeable.
+        // The math.min will avoid 360 / 359 situations where value will be >= 1.0.
+        ColorSlider(
+            "Hue", math.min(valueH / 359, 1.0), "${valueH.round()}", colorH,
+            (double value) {
+          setState(() {
+            valueH = value * 359;
+            updateColorLists();
+            widget.onChanged(valueH, valueS, valueL);
+          });
+        }),
+        ColorSlider("Saturation", valueS / 100, "${valueS.round()}", colorS,
+            (double value) {
+          setState(() {
+            print("valueS $valueS | value: $value");
+            valueS = value * 100;
+            updateColorLists();
+            widget.onChanged(valueH, valueS, valueL);
+          });
+        }),
+        ColorSlider("Lightness", valueL / 100, "${valueL.round()}", colorL,
+            (double value) {
+          setState(() {
+            valueL = value * 100;
+            updateColorLists();
+            widget.onChanged(valueH, valueS, valueL);
+          });
+        }),
+      ],
+    );
+  }
+}
+
 class GradientRoundedRectSliderTrackShape extends SliderTrackShape
     with BaseSliderTrackShape {
-  final List<Color> colors;
-
   /// Create a slider track that draws two rectangles with rounded outer edges.
   const GradientRoundedRectSliderTrackShape(this.colors);
+
+  final List<Color> colors;
 
   @override
   void paint(
@@ -314,8 +408,8 @@ class GradientRoundedRectSliderTrackShape extends SliderTrackShape
     final Paint activePaint = Paint()
       ..shader = gradient.createShader(trackRect);
 
-    Paint leftTrackPaint = activePaint;
-    Paint rightTrackPaint = activePaint;
+    final Paint leftTrackPaint = activePaint;
+    final Paint rightTrackPaint = activePaint;
 
     // The arc rects create a semi-circle with radius equal to track height.
     // The 0.3 is necessary for unknown reasons, else there is a small line that shows up.
@@ -344,8 +438,8 @@ class GradientRoundedRectSliderTrackShape extends SliderTrackShape
 }
 
 class ColorSlider extends StatelessWidget {
-  const ColorSlider(this.title, this.value, this.strValue, this.colorList,
-      this.onChanged);
+  const ColorSlider(
+      this.title, this.value, this.strValue, this.colorList, this.onChanged);
 
   final String title;
   final double value;
@@ -355,53 +449,103 @@ class ColorSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: SliderTheme(
-            data: SliderThemeData(
-              trackHeight: 12,
-              thumbColor:
-              Theme
-                  .of(context)
-                  .colorScheme
-                  .onSurface
-                  .withOpacity(0.7),
-              trackShape: GradientRoundedRectSliderTrackShape(colorList),
-              thumbShape: const RoundSliderThumbShape(),
-            ),
-            child: Slider2(
-              value: value,
-              onChanged: onChanged,
-            ),
-          ),
-        ),
-        Text(
-          "${title.substring(0, 1)}: ",
-          style: Theme
-              .of(context)
-              .textTheme
-              .body2
-              .copyWith(
-            fontFamily: "B612Mono",
-          ),
-        ),
-        SizedBox(
-          width: 46,
-          child: Text(
-            strValue,
-            textAlign: TextAlign.center,
-            style: Theme
-                .of(context)
-                .textTheme
-                .body2
-                .copyWith(
-              fontFamily: "B612Mono",
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-      ],
+    return SliderTheme(
+      data: SliderThemeData(
+        trackHeight: 40,
+        thumbColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+        trackShape: GradientRoundedRectSliderTrackShape(colorList),
+        thumbShape: RoundSliderThumbShape2(strValue: strValue),
+      ),
+      child: Slider2(
+        value: value,
+        onChanged: onChanged,
+      ),
     );
+  }
+}
+
+class RoundSliderThumbShape2 extends SliderComponentShape {
+  /// Create a slider thumb that draws a circle.
+  const RoundSliderThumbShape2({
+    this.enabledThumbRadius = 20.0,
+    this.disabledThumbRadius,
+    this.strValue,
+  });
+
+  final String strValue;
+
+  /// The preferred radius of the round thumb shape when the slider is enabled.
+  ///
+  /// If it is not provided, then the material default of 10 is used.
+  final double enabledThumbRadius;
+
+  /// The preferred radius of the round thumb shape when the slider is disabled.
+  ///
+  /// If no disabledRadius is provided, then it is equal to the
+  /// [enabledThumbRadius]
+  final double disabledThumbRadius;
+
+  double get _disabledThumbRadius => disabledThumbRadius ?? enabledThumbRadius;
+
+  @override
+  Size getPreferredSize(bool isEnabled, bool isDiscrete) {
+    return Size.fromRadius(
+        isEnabled == true ? enabledThumbRadius : _disabledThumbRadius);
+  }
+
+  @override
+  void paint(
+    PaintingContext context,
+    Offset center, {
+    Animation<double> activationAnimation,
+    @required Animation<double> enableAnimation,
+    bool isDiscrete,
+    TextPainter labelPainter,
+    RenderBox parentBox,
+    @required SliderThemeData sliderTheme,
+    TextDirection textDirection,
+    double value,
+  }) {
+    assert(context != null);
+    assert(center != null);
+    assert(enableAnimation != null);
+    assert(sliderTheme != null);
+    assert(sliderTheme.disabledThumbColor != null);
+    assert(sliderTheme.thumbColor != null);
+
+    final Canvas canvas = context.canvas;
+    final Tween<double> radiusTween = Tween<double>(
+      begin: _disabledThumbRadius,
+      end: enabledThumbRadius,
+    );
+    final ColorTween colorTween = ColorTween(
+      begin: sliderTheme.disabledThumbColor,
+      end: sliderTheme.thumbColor,
+    );
+    canvas.drawCircle(
+      center,
+      radiusTween.evaluate(enableAnimation),
+      Paint()..color = colorTween.evaluate(enableAnimation),
+    );
+
+    final textStyle =
+        TextStyle(color: Colors.black, fontSize: 14, fontFamily: "B612Mono");
+    final textSpan = TextSpan(
+      text: strValue,
+      style: textStyle,
+    );
+    final textPainter = TextPainter(
+      text: textSpan,
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout(
+      minWidth: 0,
+      maxWidth: 256,
+    );
+
+    center.translate(textPainter.width / 2, textPainter.height / 2);
+
+    textPainter.paint(canvas,
+        center.translate(-textPainter.width / 2, -textPainter.height / 2));
   }
 }

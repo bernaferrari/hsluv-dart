@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hsluv/flutter/hsluvcolor.dart';
 import 'package:material/multiple_sliders.dart';
 import 'package:material/screen_about.dart';
 import 'package:material/util/color_util.dart';
@@ -70,10 +71,10 @@ class _ColorHomeState extends State<ColorHome> {
             BlocProvider.of<SliderColorBloc>(context).add(MoveRGB(r, g, b));
           });
 
-      final hsl = HSLSlider(
-          color: (state as SliderColorLoaded).hslColor,
+      final hsl = HSLuvSlider(
+          color: HSLuvColor.fromColor((state as SliderColorLoaded).rgbColor),
           onChanged: (h, s, l) {
-            _bloc.add(MoveHSL(h, s, l));
+            _bloc.add(MoveColor(HSLuvColor.fromHSL(h, s, l).toColor(), false));
           });
 
       final hsv = HSVSlider(
