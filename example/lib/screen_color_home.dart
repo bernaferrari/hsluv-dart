@@ -26,19 +26,16 @@ class ColorHome extends StatefulWidget {
 
 class _ColorHomeState extends State<ColorHome> {
   TextEditingController _textEditingController;
-  SliderColorBloc _bloc;
 
   @override
   void initState() {
     super.initState();
     _textEditingController = TextEditingController();
-    _bloc = BlocProvider.of<SliderColorBloc>(context);
   }
 
   @override
   void dispose() {
     _textEditingController.dispose();
-    _bloc.close();
     super.dispose();
   }
 
@@ -59,6 +56,7 @@ class _ColorHomeState extends State<ColorHome> {
         final clrStr = colorToStr(color);
         // without this, the cursor will be on the first position, not on last,
         // when keyboard is opened.
+        // this is also where the controller is updated.
         if (_textEditingController.text != clrStr) {
           _textEditingController.text = clrStr;
         }
@@ -73,13 +71,13 @@ class _ColorHomeState extends State<ColorHome> {
       final hsl = HSLuvSlider(
           color: (state as SliderColorLoaded).hsluvColor,
           onChanged: (h, s, l) {
-            _bloc.add(MoveHSLuv(h, s, l));
+            BlocProvider.of<SliderColorBloc>(context).add(MoveHSLuv(h, s, l));
           });
 
       final hsv = HSVSlider(
           color: (state as SliderColorLoaded).hsvColor,
           onChanged: (h, s, v) {
-            _bloc.add(MoveHSV(h, s, v));
+            BlocProvider.of<SliderColorBloc>(context).add(MoveHSV(h, s, v));
           });
 
       final contrastedColor = (color.computeLuminance() > kLumContrast)
@@ -92,11 +90,17 @@ class _ColorHomeState extends State<ColorHome> {
         data: ThemeData.from(
           // todo it would be nice if there were a ThemeData.join
           // because you need to copyWith manually everything every time.
-          colorScheme: ColorScheme.dark(
-            primary: color,
-            secondary: color,
-            surface: surfaceColor,
-          ),
+          colorScheme: (color.computeLuminance() > kLumContrast)
+              ? ColorScheme.light(
+                  primary: color,
+                  secondary: color,
+                  surface: surfaceColor,
+                )
+              : ColorScheme.dark(
+                  primary: color,
+                  secondary: color,
+                  surface: surfaceColor,
+                ),
         ).copyWith(
           cardTheme: Theme.of(context).cardTheme,
           buttonTheme: Theme.of(context).buttonTheme.copyWith(
@@ -108,52 +112,14 @@ class _ColorHomeState extends State<ColorHome> {
         child: Scaffold(
           backgroundColor: color,
           appBar: AppBar(
+            centerTitle: false,
+            elevation: 0,
+            backgroundColor: color,
             iconTheme: IconThemeData(color: contrastedColor),
             actions: <Widget>[
               _CopyColorButton(color: color),
             ],
-            title: TextFormField(
-              controller: _textEditingController,
-              onChanged: (str) {
-                _bloc.add(MoveColor(
-                    Color(int.parse("0xFF${str.padRight(6, "F")}")), false));
-              },
-              inputFormatters: [
-                LengthLimitingTextInputFormatter(6),
-              ],
-              decoration: InputDecoration(
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white38, width: 2),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(8.0),
-                    topRight: Radius.circular(8.0),
-                  ),
-                ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black26, width: 2),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(8.0),
-                    topRight: Radius.circular(8.0),
-                  ),
-                ),
-                filled: true,
-                fillColor: (color.computeLuminance() > kLumContrast)
-                    ? Colors.black12
-                    : Colors.white24,
-                isDense: true,
-                prefix: Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: Icon(FeatherIcons.hash, size: 16),
-                ),
-              ),
-              style: Theme.of(context)
-                  .textTheme
-                  .title
-                  .copyWith(color: contrastedColor),
-            ),
-            backgroundColor: color,
-            elevation: 0,
-            centerTitle: false,
+            title: TextFormColored(controller: _textEditingController),
           ),
           body: DefaultTabController(
             length: 4,
@@ -167,8 +133,9 @@ class _ColorHomeState extends State<ColorHome> {
                   tabs: [
                     Tab(
                       icon: Transform.rotate(
-                          angle: 0.5 * math.pi,
-                          child: Icon(FeatherIcons.sliders)),
+                        angle: 0.5 * math.pi,
+                        child: Icon(FeatherIcons.sliders),
+                      ),
                     ),
                     const Tab(icon: Text("HSLuv")),
                     const Tab(icon: Text("HSV")),
@@ -204,6 +171,55 @@ class _ColorHomeState extends State<ColorHome> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class TextFormColored extends StatelessWidget {
+  const TextFormColored({this.controller});
+
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      onChanged: (str) {
+        BlocProvider.of<SliderColorBloc>(context).add(
+            MoveColor(Color(int.parse("0xFF${str.padRight(6, "F")}")), false));
+      },
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(6),
+      ],
+      decoration: InputDecoration(
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.white38, width: 2),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(8.0),
+            topRight: Radius.circular(8.0),
+          ),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.black26, width: 2),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(8.0),
+            topRight: Radius.circular(8.0),
+          ),
+        ),
+        filled: true,
+        fillColor: (Theme.of(context).colorScheme.surface.computeLuminance() >
+                kLumContrast)
+            ? Colors.black12
+            : Colors.white24,
+        isDense: true,
+        prefix: Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: Icon(FeatherIcons.hash, size: 16),
+        ),
+      ),
+      style: Theme.of(context).textTheme.title.copyWith(
+            color: Theme.of(context).colorScheme.onBackground,
+          ),
     );
   }
 }

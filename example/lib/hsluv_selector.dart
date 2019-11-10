@@ -11,6 +11,7 @@ import 'package:hsluvsample/util/constants.dart';
 import 'package:hsluvsample/util/hsluv_tiny.dart';
 import 'package:hsluvsample/util/selected.dart';
 import 'package:hsluvsample/util/tiny_color.dart';
+import 'package:hsluvsample/util/when.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
 import 'package:infinite_listview/infinite_listview.dart';
 
@@ -259,6 +260,10 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
           colorScheme: (rgbColor.computeLuminance() > kLumContrast)
               ? ColorScheme.light(surface: rgbColor)
               : ColorScheme.dark(surface: rgbColor),
+            textTheme: const TextTheme(
+              caption: TextStyle(fontFamily: "B612Mono"),
+              button: TextStyle(fontFamily: "B612Mono"),
+            ),
         ).copyWith(
           cardTheme: Theme.of(context).cardTheme.copyWith(
                 margin: EdgeInsets.zero,
@@ -328,22 +333,6 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
       );
     });
   }
-
-  Widget cardTitle(String title, int index) {
-    return FlatButton(
-      onPressed: () {
-        setState(() {
-          modifyAndSaveExpanded(index);
-        });
-      },
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Text(
-        expanded == index ? title : title[0],
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontFamily: "B612Mono"),
-      ),
-    );
-  }
 }
 
 class _ExpandableTitle extends StatelessWidget {
@@ -367,7 +356,6 @@ class _ExpandableTitle extends StatelessWidget {
       child: Text(
         expanded == index ? title : title[0],
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontFamily: "B612Mono"),
       ),
     );
   }
@@ -396,6 +384,16 @@ class ExpandableColorBar extends StatelessWidget {
   final int listSize;
   final bool isInfinite;
 
+  Widget colorCompare(int index) {
+    return ColorCompareWidgetDetails(
+      kind: pageKey,
+      color: colorsList[index],
+      compactText: expanded == sectionIndex,
+      category: title,
+      onPressed: () => onColorPressed(colorsList[index].color),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(children: <Widget>[
@@ -412,14 +410,7 @@ class ExpandableColorBar extends StatelessWidget {
                   key: PageStorageKey<String>("$pageKey $sectionIndex"),
                   itemBuilder: (BuildContext context, int absoluteIndex) {
                     final int index = absoluteIndex.abs() % listSize;
-
-                    return ColorCompareWidgetDetails(
-                      kind: pageKey,
-                      color: colorsList[index],
-                      compactText: expanded == sectionIndex,
-                      category: title,
-                      onPressed: () => onColorPressed(colorsList[index].color),
-                    );
+                    return colorCompare(index);
                   },
                 )
               : MediaQuery.removePadding(
@@ -430,14 +421,7 @@ class ExpandableColorBar extends StatelessWidget {
                     itemCount: listSize,
                     key: PageStorageKey<String>("$pageKey $sectionIndex"),
                     itemBuilder: (BuildContext context, int index) {
-                      return ColorCompareWidgetDetails(
-                        kind: pageKey,
-                        color: colorsList[index],
-                        compactText: expanded == sectionIndex,
-                        category: title,
-                        onPressed: () =>
-                            onColorPressed(colorsList[index].color),
-                      );
+                      return colorCompare(index);
                     },
                   ),
                 ),
@@ -482,7 +466,7 @@ class ColorCompareWidgetDetails extends StatelessWidget {
       style: Theme.of(context)
           .textTheme
           .caption
-          .copyWith(color: textColor, fontFamily: "B612Mono"),
+          .copyWith(color: textColor),
     );
 
     final Widget centeredText =
@@ -516,9 +500,7 @@ class ColorCompareWidgetDetails extends StatelessWidget {
 
   Widget richTextColorToHSV(BuildContext context, HSInterColor hsi,
       Color textColor, String category) {
-    final TextStyle theme = Theme.of(context).textTheme.caption.copyWith(
-          fontFamily: "B612Mono",
-        );
+    final TextStyle theme = Theme.of(context).textTheme.caption;
 
     final String letterLorV = when({
       () => kind == hsluvStr: () => "L",
@@ -561,11 +543,3 @@ class ColorCompareWidgetDetails extends StatelessWidget {
   }
 }
 
-T when<T>(Map<bool Function(), T Function()> conditions, {T orElse()}) {
-  for (final dynamic entry in conditions.entries) {
-    if (entry.key()) {
-      return entry.value();
-    }
-  }
-  return orElse();
-}

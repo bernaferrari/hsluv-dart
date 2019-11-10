@@ -17,7 +17,11 @@ extension on List<double> {
 List<Color> hsluvAlternatives(Color color, [int n = 6]) {
   final HSLuvColor luv = HSLuvColor.fromColor(color);
   final int div = (360 / n).round();
-  return [for (; n > 0; n--) luv.withHue((luv.hue + div * n) % 360).toColor()];
+  // in the original, code it is: luv.hue + (div * n) % 360
+  // this was modified to ignore luv.hue value because the
+  // list that is observing would miss the current position every time
+  // the color changes.
+  return [for (; n > 0; n--) luv.withHue((div * n) % 360.0).toColor()];
 }
 
 List<Color> hsluvTones(Color color,

@@ -449,7 +449,7 @@ class ColorSlider extends StatelessWidget {
     return SliderTheme(
       data: SliderThemeData(
         trackHeight: 40,
-        thumbColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+        thumbColor: Colors.white.withOpacity(0.7),
         trackShape: GradientRoundedRectSliderTrackShape(colorList),
         thumbShape: RoundSliderThumbShape2(strValue: strValue),
       ),

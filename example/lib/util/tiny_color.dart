@@ -117,12 +117,16 @@ List<Color> nTrad(Color color, [int n = 6]) {
 }
 
 // get variation in Hue.
-// HSLColor and HSVColor will produce the same result.
 List<Color> hueVariations(Color color, [int n = 6]) {
+  // HSLColor and HSVColor will always have the same hue.
   final HSLColor hsl = HSLColor.fromColor(color);
 
   final int div = (360 / n).round();
-  return [for (; n > 0; n--) hsl.withHue((hsl.hue + div * n) % 360).toColor()];
+  // in the original, code it is: hsl.hue + (div * n) % 360
+  // this was modified to ignore luv.hue value because the
+  // list that is observing would miss the current position every time
+  // the color changes.
+  return [for (; n > 0; n--) hsl.withHue((div * n) % 360.0).toColor()];
 }
 
 List<Color> tones(Color color,

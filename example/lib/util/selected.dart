@@ -8,7 +8,7 @@ void copyToClipboard(BuildContext context, String text) {
   Clipboard.setData(ClipboardData(text: text));
 
   Scaffold.of(context).hideCurrentSnackBar();
-  final snackBar = SnackBar(content: Text('$text copied'));
+  final snackBar = SnackBar(content: Text('$text copied'), duration: const Duration(milliseconds: 1000),);
   Scaffold.of(context).showSnackBar(snackBar);
 }
 

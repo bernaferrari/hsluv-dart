@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hsluvsample/screen_color_home.dart';
 
 import 'blocs/blocs.dart';
+import 'contrast/contrast_screen.dart';
 
 void main() {
   BlocSupervisor.delegate = SimpleBlocDelegate();
@@ -50,8 +51,8 @@ class _BoxedAppState extends State<BoxedApp> {
         title: 'Flutter Demo',
         routes: {
           "/": (context) {
-//            return BetterColorSelector(color: Colors.orange[200]);
-            return ColorHome(initialColor: Colors.orange[200]);
+            return ContrastScreen(color: Colors.orange[200]);
+//            return ColorHome(initialColor: Colors.orange[200]);
           },
         },
         theme: base.copyWith(
