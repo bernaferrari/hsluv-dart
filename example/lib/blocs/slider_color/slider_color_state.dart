@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hsluv/flutter/hsluvcolor.dart';
 import 'package:meta/meta.dart';
 
 @immutable
@@ -20,18 +21,18 @@ class SliderColorLoading extends SliderColorState {
 class SliderColorLoaded extends SliderColorState {
   const SliderColorLoaded(this.hsvColor,
       this.rgbColor,
-      this.hslColor, [
+      this.hsluvColor, [
         this.updateTextField = false,
       ]);
 
   final Color rgbColor;
   final HSVColor hsvColor;
-  final HSLColor hslColor;
+  final HSLuvColor hsluvColor;
   final bool updateTextField;
 
   @override
   String toString() => 'BlindColorsLoaded state';
 
   @override
-  List<Object> get props => [hsvColor, rgbColor, hslColor, updateTextField];
+  List<Object> get props => [hsvColor, rgbColor, hsluvColor, updateTextField];
 }

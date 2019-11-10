@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hsluv/flutter/hsluvcolor.dart';
 import 'package:hsluvsample/multiple_sliders.dart';
 import 'package:hsluvsample/screen_about.dart';
 import 'package:hsluvsample/util/color_util.dart';
@@ -72,9 +71,9 @@ class _ColorHomeState extends State<ColorHome> {
           });
 
       final hsl = HSLuvSlider(
-          color: HSLuvColor.fromColor((state as SliderColorLoaded).rgbColor),
+          color: (state as SliderColorLoaded).hsluvColor,
           onChanged: (h, s, l) {
-            _bloc.add(MoveColor(HSLuvColor.fromHSL(h, s, l).toColor(), false));
+            _bloc.add(MoveHSLuv(h, s, l));
           });
 
       final hsv = HSVSlider(

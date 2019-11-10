@@ -74,7 +74,7 @@ class _ContactInfo extends StatelessWidget {
     return Column(
       children: <Widget>[
         const SizedBox(height: 16),
-        Text("HSLuv sample",
+        Text("HSLuv Sample",
             textAlign: TextAlign.center,
             style: Theme.of(context)
                 .textTheme

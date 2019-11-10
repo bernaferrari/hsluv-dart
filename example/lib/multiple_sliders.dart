@@ -43,7 +43,7 @@ class ColorSliders extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(24)
       ),
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
         child: picker,

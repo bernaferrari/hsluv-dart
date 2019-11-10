@@ -48,8 +48,8 @@ class MoveHSV extends SliderColorEvent {
   List<Object> get props => [h, s, v];
 }
 
-class MoveHSL extends SliderColorEvent {
-  const MoveHSL(this.h, this.s, this.l) : super();
+class MoveHSLuv extends SliderColorEvent {
+  const MoveHSLuv(this.h, this.s, this.l) : super();
 
   final double h;
   final double s;
