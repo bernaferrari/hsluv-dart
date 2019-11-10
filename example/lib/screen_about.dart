@@ -3,26 +3,80 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hsluvsample/contrast/contrast_screen.dart';
+import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/widgets/dismiss_keyboard_on_scroll.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutScreen extends StatelessWidget {
+  const AboutScreen({this.color});
+
+  final Color color;
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ListView(
-        key: const PageStorageKey("about"),
-        shrinkWrap: true,
-        children: [
-          const Padding(padding: EdgeInsets.all(4)),
-          Card(
-            margin: const EdgeInsets.only(left: 16, right: 16, top: 8),
-            child: _ContactInfo(),
-          ),
-          GDPR(),
-          const Padding(padding: EdgeInsets.all(4)),
-        ],
+    return Theme(
+      data: ThemeData.from(
+        colorScheme: ColorScheme.dark(
+          surface: blendColorWithBackground(color),
+        ),
+      ).copyWith(cardTheme: Theme.of(context).cardTheme),
+      child: Center(
+        child: ListView(
+          key: const PageStorageKey("about"),
+          shrinkWrap: true,
+          children: [
+            const Padding(padding: EdgeInsets.all(4)),
+            Card(
+              margin: const EdgeInsets.only(left: 16, right: 16, top: 8),
+              child: _ContactInfo(),
+            ),
+            Card(
+              clipBehavior: Clip.antiAlias,
+              margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
+              child: InkWell(
+                  onTap: () {
+                    Navigator.push<dynamic>(
+                      context,
+                      MaterialPageRoute<dynamic>(
+                        builder: (context) => ContrastScreen(color: color),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    child: ColorCompare(),
+                  )),
+            ),
+            GDPR(),
+            const Padding(padding: EdgeInsets.all(4)),
+          ],
+        ),
       ),
+    );
+  }
+}
+
+class ColorCompare extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(FeatherIcons.trendingUp),
+              const SizedBox(width: 16),
+              Text("Contrast Mode",
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.title),
+            ],
+          ),
+        ),
+        Icon(FeatherIcons.chevronRight),
+        const SizedBox(width: 16),
+      ],
     );
   }
 }

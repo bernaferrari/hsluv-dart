@@ -146,9 +146,9 @@ class _ColorHomeState extends State<ColorHome> {
                   child: TabBarView(
                     children: [
                       ColorSliders(rgb, hsv, hsl),
-                      HSLuvSelector(color: widget.initialColor),
-                      HSVSelector(color: widget.initialColor),
-                      AboutScreen(),
+                      HSLuvSelector(color: color),
+                      HSVSelector(color: color),
+                      AboutScreen(color: color),
                     ],
                   ),
                 ),
@@ -207,7 +207,7 @@ class TextFormColored extends StatelessWidget {
           ),
         ),
         filled: true,
-        fillColor: (Theme.of(context).colorScheme.surface.computeLuminance() >
+        fillColor: (Theme.of(context).colorScheme.primary.computeLuminance() >
                 kLumContrast)
             ? Colors.black12
             : Colors.white24,

@@ -51,8 +51,7 @@ class _BoxedAppState extends State<BoxedApp> {
         title: 'Flutter Demo',
         routes: {
           "/": (context) {
-            return ContrastScreen(color: Colors.orange[200]);
-//            return ColorHome(initialColor: Colors.orange[200]);
+            return ColorHome(initialColor: Colors.orange[200]);
           },
         },
         theme: base.copyWith(

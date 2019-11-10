@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -34,16 +35,21 @@ class ContrastScreen extends StatefulWidget {
 class _ContrastScreenState extends State<ContrastScreen> {
   bool useHSLuv = true;
 
+  final int r = Random().nextInt(102);
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider<ContrastColorBloc>(
-      builder: (ctx) =>
-          ContrastColorBloc()..add(LoadInit(widget.color, Colors.orange)),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Contrast Mode"),
-          elevation: 0,
-          actions: [
+      builder: (ctx) => ContrastColorBloc()
+        ..add(LoadInit(widget.color, Color(int.parse("0xFF${colorClaim[r]}")))),
+      child: Theme(
+        data: ThemeData.from(colorScheme: const ColorScheme.dark()),
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text("Contrast Mode"),
+            backgroundColor: blendColorWithBackground(widget.color),
+            elevation: 0,
+            actions: [
 //            IconButton(
 //              icon: Icon(Icons.help_outline),
 //              onPressed: () {
@@ -57,51 +63,53 @@ class _ContrastScreenState extends State<ContrastScreen> {
 //                });
 //              },
 //            ),
-            ToggleButtons(
-              children: const [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Text(
-                    "HSV",
-                    style: TextStyle(fontFamily: "B612Mono"),
+              ToggleButtons(
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Text(
+                      "HSV",
+                      style: TextStyle(fontFamily: "B612Mono"),
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Text(
-                    "HSLuv",
-                    style: TextStyle(fontFamily: "B612Mono"),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Text(
+                      "HSLuv",
+                      style: TextStyle(fontFamily: "B612Mono"),
+                    ),
                   ),
-                ),
-              ],
-              isSelected: [
-                useHSLuv == false,
-                useHSLuv == true,
-              ],
-              onPressed: (selected) {
-                setState(() {
-                  useHSLuv = !useHSLuv;
-                });
-              },
-            ),
-          ],
-        ),
-        body: Flex(
-          direction: MediaQuery.of(context).orientation == Orientation.landscape
-              ? Axis.horizontal
-              : Axis.vertical,
-          children: <Widget>[
-            Expanded(
-              child: useHSLuv
-                  ? const HSLuvSelector2(isFirst: true)
-                  : const HSVSelector2(isFirst: true),
-            ),
-            Expanded(
-              child: useHSLuv
-                  ? const HSLuvSelector2(isFirst: false)
-                  : const HSVSelector2(isFirst: false),
-            ),
-          ],
+                ],
+                isSelected: [
+                  useHSLuv == false,
+                  useHSLuv == true,
+                ],
+                onPressed: (selectedIndex) {
+                  setState(() {
+                    useHSLuv = selectedIndex != 0;
+                  });
+                },
+              ),
+            ],
+          ),
+          body: Flex(
+            direction:
+                MediaQuery.of(context).orientation == Orientation.landscape
+                    ? Axis.horizontal
+                    : Axis.vertical,
+            children: <Widget>[
+              Expanded(
+                child: useHSLuv
+                    ? const HSLuvSelector2(isFirst: true)
+                    : const HSVSelector2(isFirst: true),
+              ),
+              Expanded(
+                child: useHSLuv
+                    ? const HSLuvSelector2(isFirst: false)
+                    : const HSVSelector2(isFirst: false),
+              ),
+            ],
+          ),
         ),
       ),
     );
