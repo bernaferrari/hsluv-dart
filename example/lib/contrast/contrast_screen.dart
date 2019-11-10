@@ -93,8 +93,10 @@ class _ContrastScreenState extends State<ContrastScreen> {
             ],
           ),
           body: Flex(
-            direction:
-                MediaQuery.of(context).orientation == Orientation.landscape
+            // on iPad, always vertical.
+            direction: MediaQuery.of(context).size.shortestSide > 600
+                ? Axis.vertical
+                : MediaQuery.of(context).orientation == Orientation.landscape
                     ? Axis.horizontal
                     : Axis.vertical,
             children: <Widget>[
@@ -348,7 +350,11 @@ class _ContrastHorizontalPickerState extends State<ContrastHorizontalPicker> {
                             horizontal: 16,
                           ),
                           child: SizedBox(
-                            height: 64,
+                            // make items larger on iPad
+                            height:
+                                MediaQuery.of(context).size.shortestSide < 600
+                                    ? 56
+                                    : 64,
                             child: widgets[i],
                           ),
                         ),
@@ -396,89 +402,86 @@ class _UpperPart extends StatelessWidget {
       color: otherColor,
     );
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          SizedBox(
-            width: 56,
-            child: Column(
-              children: <Widget>[
-                RichText(
-                  text: TextSpan(style: style, children: [
-                    TextSpan(
-                      text: contrast.toStringAsPrecision(3),
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    TextSpan(
-                      text: ":1",
-                      style: style.copyWith(
-                        fontSize: 14,
-                      ),
-                    ),
-                  ]),
-                ),
-                Text(
-                  getContrastLetters(contrast),
-                  style: style.copyWith(fontSize: 12),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 1,
-            height: 32,
-            color: otherColor,
-          ),
-          Row(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        SizedBox(
+          width: 56,
+          child: Column(
             children: <Widget>[
-              if (contrast > 3.0) checkIcon else removeIcon,
-              const SizedBox(width: 8),
+              RichText(
+                text: TextSpan(style: style, children: [
+                  TextSpan(
+                    text: contrast.toStringAsPrecision(3),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  TextSpan(
+                    text: ":1",
+                    style: style.copyWith(
+                      fontSize: 14,
+                    ),
+                  ),
+                ]),
+              ),
+              Text(
+                getContrastLetters(contrast),
+                style: style.copyWith(fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          width: 1,
+          height: 32,
+          color: otherColor,
+        ),
+        Row(
+          children: <Widget>[
+            if (contrast > 3.0) checkIcon else removeIcon,
+            const SizedBox(width: 8),
 //                            Icon(
 //                              Icons.wb_sunny,
 //                              color: otherColor,
 //                            ),
-              const SizedBox(width: 8),
-              Column(
-                children: <Widget>[
-                  Text(
-                    "Large",
-                    style: TextStyle(
-                      // similar to H6
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: otherColor,
-                    ),
+            const SizedBox(width: 8),
+            Column(
+              children: <Widget>[
+                Text(
+                  "Large",
+                  style: TextStyle(
+                    // similar to H6
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: otherColor,
                   ),
-                  Text("AA Large", style: style),
-                ],
-              ),
-            ],
-          ),
-          Row(
-            children: <Widget>[
-              if (contrast > 4.5) checkIcon else removeIcon,
-              const SizedBox(width: 8),
-              Column(
-                children: <Widget>[
-                  Text(
-                    "Small",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: otherColor,
-                    ),
+                ),
+                Text("AA Large", style: style),
+              ],
+            ),
+          ],
+        ),
+        Row(
+          children: <Widget>[
+            if (contrast > 4.5) checkIcon else removeIcon,
+            const SizedBox(width: 8),
+            Column(
+              children: <Widget>[
+                Text(
+                  "Small",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: otherColor,
                   ),
-                  Text("AA", style: style),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
+                ),
+                Text("AA", style: style),
+              ],
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

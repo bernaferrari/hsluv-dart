@@ -62,18 +62,15 @@ class ContrastItem extends StatelessWidget {
       ],
     );
 
-    return Padding(
-      padding: EdgeInsets.zero,
-      child: SizedBox(
-        width: 56,
-        child: MaterialButton(
-          elevation: 0,
-          padding: EdgeInsets.zero,
-          color: color.color,
-          shape: const RoundedRectangleBorder(),
-          onPressed: onPressed,
-          child: cornerText,
-        ),
+    return SizedBox(
+      width: 56,
+      child: MaterialButton(
+        elevation: 0,
+        padding: EdgeInsets.zero,
+        color: color.color,
+        shape: const RoundedRectangleBorder(),
+        onPressed: onPressed,
+        child: cornerText,
       ),
     );
   }

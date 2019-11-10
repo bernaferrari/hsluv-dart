@@ -260,10 +260,10 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
           colorScheme: (rgbColor.computeLuminance() > kLumContrast)
               ? ColorScheme.light(surface: rgbColor)
               : ColorScheme.dark(surface: rgbColor),
-            textTheme: const TextTheme(
-              caption: TextStyle(fontFamily: "B612Mono"),
-              button: TextStyle(fontFamily: "B612Mono"),
-            ),
+          textTheme: const TextTheme(
+            caption: TextStyle(fontFamily: "B612Mono"),
+            button: TextStyle(fontFamily: "B612Mono"),
+          ),
         ).copyWith(
           cardTheme: Theme.of(context).cardTheme.copyWith(
                 margin: EdgeInsets.zero,
@@ -463,10 +463,7 @@ class ColorCompareWidgetDetails extends StatelessWidget {
 
     final Widget cornerText = Text(
       writtenValue,
-      style: Theme.of(context)
-          .textTheme
-          .caption
-          .copyWith(color: textColor),
+      style: Theme.of(context).textTheme.caption.copyWith(color: textColor),
     );
 
     final Widget centeredText =
@@ -491,16 +488,24 @@ class ColorCompareWidgetDetails extends StatelessWidget {
   }
 
   TextStyle themedHSVSpan(
-      TextStyle theme, Color textColor, bool isHighlighted) {
+    TextStyle theme,
+    Color textColor,
+    bool isHighlighted,
+    double side,
+  ) {
     return theme.copyWith(
       fontWeight: isHighlighted ? FontWeight.w700 : FontWeight.w400,
       color: textColor.withOpacity(isHighlighted ? 1 : 0.5),
+      // 12 doesn't fit all screens.
+      fontSize: side < 400 ? 10 : 12,
     );
   }
 
   Widget richTextColorToHSV(BuildContext context, HSInterColor hsi,
       Color textColor, String category) {
     final TextStyle theme = Theme.of(context).textTheme.caption;
+
+    final shortestSide = MediaQuery.of(context).size.width;
 
     final String letterLorV = when({
       () => kind == hsluvStr: () => "L",
@@ -513,15 +518,22 @@ class ColorCompareWidgetDetails extends StatelessWidget {
         children: <TextSpan>[
           TextSpan(
             text: "H:${hsi.hue.round()} ",
-            style: themedHSVSpan(theme, textColor, category == "H"),
+            style: themedHSVSpan(
+              theme,
+              textColor,
+              category == "H",
+              shortestSide,
+            ),
           ),
           TextSpan(
             text: 'S:${hsi.outputSaturation()}% ',
-            style: themedHSVSpan(theme, textColor, category == "S"),
+            style:
+                themedHSVSpan(theme, textColor, category == "S", shortestSide),
           ),
           TextSpan(
             text: '$letterLorV:${hsi.outputLightness()}%',
-            style: themedHSVSpan(theme, textColor, category == letterLorV),
+            style: themedHSVSpan(
+                theme, textColor, category == letterLorV, shortestSide),
           ),
         ],
       ),
@@ -542,4 +554,3 @@ class ColorCompareWidgetDetails extends StatelessWidget {
     return "R:${color.red} G:${color.green} B:${color.blue}";
   }
 }
-

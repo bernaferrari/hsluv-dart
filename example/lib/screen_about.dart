@@ -22,35 +22,38 @@ class AboutScreen extends StatelessWidget {
         ),
       ).copyWith(cardTheme: Theme.of(context).cardTheme),
       child: Center(
-        child: ListView(
-          key: const PageStorageKey("about"),
-          shrinkWrap: true,
-          children: [
-            const Padding(padding: EdgeInsets.all(4)),
-            Card(
-              margin: const EdgeInsets.only(left: 16, right: 16, top: 8),
-              child: _ContactInfo(),
-            ),
-            Card(
-              clipBehavior: Clip.antiAlias,
-              margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
-              child: InkWell(
-                  onTap: () {
-                    Navigator.push<dynamic>(
-                      context,
-                      MaterialPageRoute<dynamic>(
-                        builder: (context) => ContrastScreen(color: color),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12.0),
-                    child: ColorCompare(),
-                  )),
-            ),
-            GDPR(),
-            const Padding(padding: EdgeInsets.all(4)),
-          ],
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 818),
+          child: ListView(
+            key: const PageStorageKey("about"),
+            shrinkWrap: true,
+            children: [
+              const Padding(padding: EdgeInsets.all(4)),
+              Card(
+                margin: const EdgeInsets.only(left: 16, right: 16, top: 8),
+                child: _ContactInfo(),
+              ),
+              Card(
+                clipBehavior: Clip.antiAlias,
+                margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
+                child: InkWell(
+                    onTap: () {
+                      Navigator.push<dynamic>(
+                        context,
+                        MaterialPageRoute<dynamic>(
+                          builder: (context) => ContrastScreen(color: color),
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: ColorCompare(),
+                    )),
+              ),
+              GDPR(),
+              const Padding(padding: EdgeInsets.all(4)),
+            ],
+          ),
         ),
       ),
     );
