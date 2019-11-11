@@ -2,6 +2,9 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:hsluv/flutter/hsluvcolor.dart';
+
+import 'color_util.dart';
 
 // converted from TinyColor
 // https://github.com/bgrins/TinyColor
@@ -127,6 +130,25 @@ List<Color> hueVariations(Color color, [int n = 6]) {
   // list that is observing would miss the current position every time
   // the color changes.
   return [for (; n > 0; n--) hsl.withHue((div * n) % 360.0).toColor()];
+}
+
+// get variation in Hue.
+List<Color> hsluvHueToneVariation(Color color, [int n = 6, double toneDiff = 0]) {
+  // HSLColor and HSVColor will always have the same hue.
+  final HSLuvColor hsluv = HSLuvColor.fromColor(color);
+
+  final int div = (360 / n).round();
+  // in the original, code it is: hsl.hue + (div * n) % 360
+  // this was modified to ignore luv.hue value because the
+  // list that is observing would miss the current position every time
+  // the color changes.
+  return [
+    for (; n > 0; n--)
+      hsluv
+          .withHue((div * n) % 360.0)
+          .withLightness(interval(hsluv.lightness + toneDiff, 5, 95))
+          .toColor()
+  ];
 }
 
 List<Color> tones(Color color,

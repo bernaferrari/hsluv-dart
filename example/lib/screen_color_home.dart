@@ -14,6 +14,7 @@ import 'package:hsluvsample/widgets/color_sliders.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
 
 import 'blocs/slider_color/slider_color.dart';
+import 'dashboard_screen.dart';
 import 'hsluv_selector.dart';
 import 'util/constants.dart';
 
@@ -118,7 +119,7 @@ class _ColorHomeState extends State<ColorHome> {
             title: TextFormColored(controller: _textEditingController),
           ),
           body: DefaultTabController(
-            length: 4,
+            length: 5,
             initialIndex: 1,
             child: Column(
               children: <Widget>[
@@ -127,6 +128,7 @@ class _ColorHomeState extends State<ColorHome> {
                   indicatorColor: contrastedColor,
                   isScrollable: true,
                   tabs: [
+                    Tab(icon: Icon(FeatherIcons.home)),
                     Tab(
                       icon: Transform.rotate(
                         angle: 0.5 * math.pi,
@@ -141,22 +143,21 @@ class _ColorHomeState extends State<ColorHome> {
                 Expanded(
                   child: TabBarView(
                     children: [
+                      DashboardScreen(),
                       ColorSliders(rgb, hsv, hsl),
                       WatchBoxBuilder(
                         box: Hive.box<dynamic>("settings"),
                         builder: (BuildContext context, Box box) =>
                             HSLuvSelector(
                           color: color,
-                          moreColors:
-                              box.get("moreItems", defaultValue: false),
+                          moreColors: box.get("moreItems", defaultValue: false),
                         ),
                       ),
                       WatchBoxBuilder(
                         box: Hive.box<dynamic>("settings"),
                         builder: (BuildContext context, Box box) => HSVSelector(
                           color: color,
-                          moreColors:
-                              box.get("moreItems", defaultValue: false),
+                          moreColors: box.get("moreItems", defaultValue: false),
                         ),
                       ),
                       AboutScreen(color: color),

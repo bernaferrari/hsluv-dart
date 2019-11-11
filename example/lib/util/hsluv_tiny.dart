@@ -24,21 +24,27 @@ List<Color> hsluvAlternatives(Color color, [int n = 6]) {
   return [for (; n > 0; n--) luv.withHue((div * n) % 360.0).toColor()];
 }
 
-List<Color> hsluvTones(Color color, [double step = 5.0, double start = 100.0]) {
+List<Color> hsluvTones(Color color,
+    [int size, double start = 5.0, double stop = 100.0]) {
   final HSLuvColor hsluv = HSLuvColor.fromColor(color);
+  final step = (stop - start) / (size - 1);
 
   return [
-    for (double sat = start; sat > 0; sat -= step)
-      hsluv.withSaturation(sat).toColor()
+    // this is the only way I found to make it work, from e.g. 95 to 5, inclusive.
+    for (int n = size - 1; n >= 0; n -= 1)
+      hsluv.withSaturation(n * step + start).toColor()
   ];
 }
 
 List<Color> hsluvLightness(Color color,
-    [double step = 5.0, double start = 100.0]) {
+    [int size, double start = 5.0, double stop = 95.0]) {
   final HSLuvColor hsluv = HSLuvColor.fromColor(color);
+  final step = (stop - start) / (size - 1);
 
   return [
-    for (double light = start; light > 0; light -= step)
-      hsluv.withLightness(light).toColor()
+    // (n = size; n > 0) won't work because n * step will be wrong. Unless you
+    // you use (n-1) * step, but then it is an extra calculation per operation.
+    for (int n = size - 1; n >= 0; n -= 1)
+      hsluv.withLightness(n * step + start).toColor()
   ];
 }

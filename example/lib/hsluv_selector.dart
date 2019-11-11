@@ -42,7 +42,7 @@ class HSVSelector extends StatelessWidget {
 
     // maximum number of items
     final int itemsOnScreen =
-        ((MediaQuery.of(context).size.height - 112) / 56).ceil();
+        ((MediaQuery.of(context).size.height - 168) / 56).ceil();
 
     final int toneSize = moreColors ? itemsOnScreen * 2 : itemsOnScreen;
     final int hueSize = moreColors ? 90 : 60;
@@ -77,7 +77,7 @@ class HSLuvSelector extends StatelessWidget {
 
     // maximum number of items
     final int itemsOnScreen =
-        ((MediaQuery.of(context).size.height - 112) / 56).ceil();
+        ((MediaQuery.of(context).size.height - 168) / 56).ceil();
 
     final int toneSize = moreColors ? itemsOnScreen * 2 : itemsOnScreen;
     final int hueSize = moreColors ? 90 : 60;
@@ -86,9 +86,9 @@ class HSLuvSelector extends StatelessWidget {
       color: color,
       kind: kind,
       fetchHue: () => hsluvAlternatives(color, hueSize),
-      fetchSat: (Color c) => hsluvTones(c, 95 / toneSize).convertToInter(kind),
+      fetchSat: (Color c) => hsluvTones(c, toneSize, 5, 100).convertToInter(kind),
       fetchLight: (Color c) =>
-          hsluvLightness(c, 95 / toneSize, 90).convertToInter(kind),
+          hsluvLightness(c, toneSize, 5, 90).convertToInter(kind),
       hueTitle: hueStr,
       satTitle: satStr,
       lightTitle: lightStr,
@@ -145,9 +145,11 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
   }
 
   void modifyAndSaveExpanded(int updatedValue) {
-    expanded = updatedValue;
-    PageStorage.of(context).writeState(context, expanded,
-        identifier: ValueKey<String>(widget.kind));
+    setState(() {
+      expanded = updatedValue;
+      PageStorage.of(context).writeState(context, expanded,
+          identifier: ValueKey<String>(widget.kind));
+    });
   }
 
   List<ColorWithInter> parseHue() {
@@ -191,15 +193,9 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
           listSize: hueLen,
           isInfinite: true,
           colorsList: hue,
-          onTitlePressed: () {
-            setState(() {
-              modifyAndSaveExpanded(0);
-            });
-          },
+          onTitlePressed: () => modifyAndSaveExpanded(0),
           onColorPressed: (Color c) {
-            setState(() {
-              modifyAndSaveExpanded(0);
-            });
+            modifyAndSaveExpanded(0);
             colorSelected(context, c);
           });
 
@@ -210,15 +206,9 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
           sectionIndex: 1,
           listSize: widget.toneSize,
           colorsList: tones,
-          onTitlePressed: () {
-            setState(() {
-              modifyAndSaveExpanded(1);
-            });
-          },
+          onTitlePressed: () => modifyAndSaveExpanded(1),
           onColorPressed: (Color c) {
-            setState(() {
-              modifyAndSaveExpanded(1);
-            });
+            modifyAndSaveExpanded(1);
             colorSelected(context, c);
           });
 
@@ -229,15 +219,9 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
         sectionIndex: 2,
         listSize: widget.toneSize,
         colorsList: values,
-        onTitlePressed: () {
-          setState(() {
-            modifyAndSaveExpanded(2);
-          });
-        },
+        onTitlePressed: () => modifyAndSaveExpanded(2),
         onColorPressed: (Color c) {
-          setState(() {
-            modifyAndSaveExpanded(2);
-          });
+          modifyAndSaveExpanded(2);
           colorSelected(context, c);
         },
       );
