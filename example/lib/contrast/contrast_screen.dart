@@ -222,8 +222,17 @@ class ContrastHorizontalPicker extends StatefulWidget {
 }
 
 class _ContrastHorizontalPickerState extends State<ContrastHorizontalPicker> {
-  bool satSelected = false;
-  bool fiveSelected = false;
+  double opacity = 0.0;
+
+  @override
+  void initState() {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      setState(() {
+        opacity = 1.0;
+      });
+    });
+    super.initState();
+  }
 
   double interval(double value, double min, double max) {
     return math.min(math.max(value, min), max);
@@ -338,7 +347,12 @@ class _ContrastHorizontalPickerState extends State<ContrastHorizontalPicker> {
                 direction: Axis.vertical,
                 children: <Widget>[
                   const SizedBox(height: 8),
-                  _UpperPart(otherColor, contrast),
+                  AnimatedOpacity(
+                    opacity: opacity,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeIn,
+                    child: _UpperPart(otherColor, contrast),
+                  ),
                   Flex(
                     direction: Axis.vertical,
                     children: <Widget>[
@@ -362,11 +376,16 @@ class _ContrastHorizontalPickerState extends State<ContrastHorizontalPicker> {
                       ],
                     ],
                   ),
-                  _BottomPart(
-                    rgbColor,
-                    otherColor,
-                    widget.kind,
-                    widget.isFirst,
+                  AnimatedOpacity(
+                    opacity: opacity,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeIn,
+                    child: _BottomPart(
+                      rgbColor,
+                      otherColor,
+                      widget.kind,
+                      widget.isFirst,
+                    ),
                   ),
                 ],
               ),
