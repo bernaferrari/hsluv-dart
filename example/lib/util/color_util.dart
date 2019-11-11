@@ -11,8 +11,8 @@ Color blendColorWithBackground(Color color,
   return Color.alphaBlend(color.withOpacity(0.08), background);
 }
 
-String colorToHexStr(Color color) =>
-    "#${color.value.toRadixString(16).substring(2)}";
+extension ColorHex<E> on Color {
+  String toHexStr() => "#${value.toRadixString(16).substring(2)}";
 
-String colorToStr(Color color) =>
-    "${color.value.toRadixString(16).substring(2)}";
+  String toStr() => value.toRadixString(16).substring(2);
+}

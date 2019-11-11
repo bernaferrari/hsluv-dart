@@ -23,7 +23,7 @@ class AboutScreen extends StatelessWidget {
       ).copyWith(cardTheme: Theme.of(context).cardTheme),
       child: Center(
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 818),
+          constraints: const BoxConstraints(maxWidth: 818),
           child: ListView(
             key: const PageStorageKey("about"),
             shrinkWrap: true,
@@ -36,19 +36,7 @@ class AboutScreen extends StatelessWidget {
               Card(
                 clipBehavior: Clip.antiAlias,
                 margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
-                child: InkWell(
-                    onTap: () {
-                      Navigator.push<dynamic>(
-                        context,
-                        MaterialPageRoute<dynamic>(
-                          builder: (context) => ContrastScreen(color: color),
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      child: ColorCompare(),
-                    )),
+                child: ColorCompare(color: color),
               ),
               GDPR(),
               const Padding(padding: EdgeInsets.all(4)),
@@ -61,25 +49,44 @@ class AboutScreen extends StatelessWidget {
 }
 
 class ColorCompare extends StatelessWidget {
+  const ColorCompare({this.color});
+
+  final Color color;
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Icon(FeatherIcons.trendingUp),
-              const SizedBox(width: 16),
-              Text("Contrast Mode",
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.title),
-            ],
+    return InkWell(
+      onTap: () {
+        Navigator.push<dynamic>(
+          context,
+          MaterialPageRoute<dynamic>(
+            builder: (context) => ContrastScreen(color: color),
           ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(FeatherIcons.trendingUp),
+                  const SizedBox(width: 16),
+                  Text(
+                    "Contrast Mode",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                ],
+              ),
+            ),
+            Icon(FeatherIcons.chevronRight),
+            const SizedBox(width: 16),
+          ],
         ),
-        Icon(FeatherIcons.chevronRight),
-        const SizedBox(width: 16),
-      ],
+      ),
     );
   }
 }

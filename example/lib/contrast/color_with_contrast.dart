@@ -18,7 +18,7 @@ class ColorWithContrast {
   ColorWithContrast(this.color, this.inter, Color otherColor)
       : lum = color.computeLuminance(),
         contrast = calculateContrast(color, otherColor),
-        colorHex = colorToHexStr(color);
+        colorHex = color.toHexStr();
 
   final Color color;
   final HSInterColor inter;

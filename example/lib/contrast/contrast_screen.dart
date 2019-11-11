@@ -517,12 +517,12 @@ class _BottomPart extends StatelessWidget {
                 ),
                 color: color,
                 highlightedBorderColor: Theme.of(context).colorScheme.onSurface,
-                label: Text(colorToHexStr(color)),
+                label: Text(color.toHexStr()),
                 onPressed: () {
                   showSlidersDialog(context, isFirst, color);
                 },
                 onLongPress: () {
-                  copyToClipboard(context, colorToStr(color));
+                  copyToClipboard(context, color.toHexStr());
                 },
               ),
               const SizedBox(width: 16),

@@ -41,7 +41,7 @@ void showSlidersDialog(BuildContext outerContext, bool isFirst, Color color) {
             }
 
             if ((state as SliderColorLoaded).updateTextField) {
-              final clrStr = colorToStr(color);
+              final clrStr = color.toStr();
 
               if (controller.text != clrStr) {
                 controller.text = clrStr;

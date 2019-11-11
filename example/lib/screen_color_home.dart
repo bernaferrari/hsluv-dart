@@ -53,10 +53,10 @@ class _ColorHomeState extends State<ColorHome> {
       final color = (state as SliderColorLoaded).rgbColor;
 
       if ((state as SliderColorLoaded).updateTextField) {
-        final clrStr = colorToStr(color);
+        final clrStr = color.toStr();
         // without this, the cursor will be on the first position, not on last,
-        // when keyboard is opened.
-        // this is also where the controller is updated.
+        // when keyboard is open.
+        // this is also where the controller updates.
         if (_textEditingController.text != clrStr) {
           _textEditingController.text = clrStr;
         }
@@ -238,7 +238,7 @@ class _CopyColorButton extends StatelessWidget {
       tooltip: "copy color",
       icon: Icon(FeatherIcons.copy),
       onPressed: () {
-        copyToClipboard(context, colorToStr(color));
+        copyToClipboard(context,color.toHexStr());
       },
     );
   }

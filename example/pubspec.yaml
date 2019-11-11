@@ -58,3 +58,5 @@ flutter:
           weight: 400
         - asset: fonts/B612Mono-Bold.ttf
           weight: 700
+  assets:
+    - assets/colornames.json

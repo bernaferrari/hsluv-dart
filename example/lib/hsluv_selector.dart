@@ -17,6 +17,7 @@ import 'package:infinite_listview/infinite_listview.dart';
 
 import 'blocs/slider_color/slider_color.dart';
 import 'color_with_inter.dart';
+import 'colors_list.dart';
 import 'util/constants.dart';
 
 const hsvStr = "HSV";
@@ -80,9 +81,9 @@ class HSLuvSelector extends StatelessWidget {
       kind: kind,
       fetchHue: () => hsluvAlternatives(color, hueSize),
       fetchSat: (Color c) =>
-          hsluvTones(c, toneSize, 95 / toneSize, 5).convertToInter(kind),
+          hsluvTones(c, toneSize, 95 / toneSize, 0.5).convertToInter(kind),
       fetchLight: (Color c) =>
-          hsluvLightness(c, toneSize, 95 / toneSize, 0).convertToInter(kind),
+          hsluvLightness(c, toneSize, 95 / toneSize, 0.0).convertToInter(kind),
       hueTitle: hueStr,
       satTitle: satStr,
       lightTitle: lightStr,
@@ -149,30 +150,15 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
     // we will lose the list position because it will refresh every time.
     final List<Color> hue = widget.fetchHue();
 
-    if (addValue == 0 && addSaturation == 0) {
-      return hue.convertToInter(widget.kind);
-    }
-
     // apply the diff to the hue.
     return hue.map((Color c) {
       final HSInterColor hsluv = HSInterColor.fromColor(c, widget.kind);
-      final double valueDiff =
-          interval(hsluv.lightness - addValue, 0.0, hsluv.maxValue);
-      final double satDiff =
-          interval(hsluv.saturation - addSaturation, 0.0, hsluv.maxValue);
-
-      final HSInterColor updated =
-          hsluv.withSaturation(satDiff).withLightness(valueDiff);
-
-      return ColorWithInter(updated.toColor(), updated);
+      return ColorWithInter(hsluv.toColor(), hsluv);
     }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    final hue = parseHue();
-    final hueLen = hue.length;
-    final originalColor = HSInterColor.fromColor(widget.color, widget.kind);
 
     return BlocBuilder<SliderColorBloc, SliderColorState>(
         builder: (BuildContext context, SliderColorState state) {
@@ -183,6 +169,9 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
       final Color rgbColor = (state as SliderColorLoaded).rgbColor;
 
       // in the ideal the world they could be calculated in the Bloc &/or in parallel.
+      final List<ColorWithInter> hue = parseHue();
+      final int hueLen = hue.length;
+
       final List<ColorWithInter> tones = widget.fetchSat(rgbColor);
       final List<ColorWithInter> values = widget.fetchLight(rgbColor);
 
@@ -225,8 +214,6 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
           onColorPressed: (Color c) {
             setState(() {
               modifyAndSaveExpanded(1);
-              addSaturation = originalColor.saturation -
-                  HSInterColor.fromColor(c, widget.kind).saturation;
             });
             colorSelected(context, c);
           });
@@ -246,8 +233,6 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
         onColorPressed: (Color c) {
           setState(() {
             modifyAndSaveExpanded(2);
-            addValue = originalColor.lightness -
-                HSInterColor.fromColor(c, widget.kind).lightness;
           });
           colorSelected(context, c);
         },
@@ -316,7 +301,7 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.only(top: 12, bottom: 4),
                     child: Text(
                       HSInterColor.fromColor(rgbColor, widget.kind).toString(),
                       overflow: TextOverflow.ellipsis,
@@ -324,7 +309,8 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
                         fontFamily: "B612Mono",
                       ),
                     ),
-                  )
+                  ),
+                  NearestColor(color: rgbColor),
                 ],
               ),
             ),

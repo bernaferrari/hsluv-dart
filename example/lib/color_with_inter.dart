@@ -12,7 +12,7 @@ extension ListConversion<T> on List<Color> {
 class ColorWithInter {
   ColorWithInter(this.color, this.inter)
       : lum = color.computeLuminance(),
-        colorHex = colorToHexStr(color);
+        colorHex = color.toHexStr();
 
   final Color color;
   final HSInterColor inter;
