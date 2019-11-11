@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hsluvsample/contrast/color_with_contrast.dart';
 import 'package:hsluvsample/contrast/shuffle_color.dart';
 import 'package:hsluvsample/hsinter.dart';
@@ -45,11 +47,49 @@ class _ContrastScreenState extends State<ContrastScreen> {
       child: Theme(
         data: ThemeData.from(colorScheme: const ColorScheme.dark()),
         child: Scaffold(
-          appBar: AppBar(
-            title: const Text("Contrast Mode"),
-            backgroundColor: blendColorWithBackground(widget.color),
-            elevation: 0,
-            actions: [
+          appBar: buildAppBar(),
+          body: buildFlex(),
+        ),
+      ),
+    );
+  }
+
+  Widget buildFlex() {
+    return WatchBoxBuilder(
+      box: Hive.box<dynamic>("settings"),
+      builder: (BuildContext context, Box box) {
+        final bool more = box.get("moreItems", defaultValue: false);
+
+        return Flex(
+          // on iPad, always vertical.
+          direction: MediaQuery.of(context).size.shortestSide > 600
+              ? Axis.vertical
+              : MediaQuery.of(context).orientation == Orientation.landscape
+                  ? Axis.horizontal
+                  : Axis.vertical,
+          children: <Widget>[
+            Expanded(
+              child: useHSLuv
+                  ? HSLuvSelector2(isFirst: true, moreColors: more)
+                  : HSVSelector2(isFirst: true, moreColors: more),
+            ),
+            Expanded(
+              child: useHSLuv
+                  ? HSLuvSelector2(isFirst: false, moreColors: more)
+                  : HSVSelector2(isFirst: false, moreColors: more),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget buildAppBar() {
+    return AppBar(
+      title: const Text("Contrast Mode"),
+      backgroundColor: blendColorWithBackground(widget.color),
+      elevation: 0,
+      actions: [
 //            IconButton(
 //              icon: Icon(Icons.help_outline),
 //              onPressed: () {
@@ -63,79 +103,59 @@ class _ContrastScreenState extends State<ContrastScreen> {
 //                });
 //              },
 //            ),
-              ToggleButtons(
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12.0),
-                    child: Text(
-                      "HSV",
-                      style: TextStyle(fontFamily: "B612Mono"),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12.0),
-                    child: Text(
-                      "HSLuv",
-                      style: TextStyle(fontFamily: "B612Mono"),
-                    ),
-                  ),
-                ],
-                isSelected: [
-                  useHSLuv == false,
-                  useHSLuv == true,
-                ],
-                onPressed: (selectedIndex) {
-                  setState(() {
-                    useHSLuv = selectedIndex != 0;
-                  });
-                },
+        ToggleButtons(
+          children: const [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12.0),
+              child: Text(
+                "HSV",
+                style: TextStyle(fontFamily: "B612Mono"),
               ),
-            ],
-          ),
-          body: Flex(
-            // on iPad, always vertical.
-            direction: MediaQuery.of(context).size.shortestSide > 600
-                ? Axis.vertical
-                : MediaQuery.of(context).orientation == Orientation.landscape
-                    ? Axis.horizontal
-                    : Axis.vertical,
-            children: <Widget>[
-              Expanded(
-                child: useHSLuv
-                    ? const HSLuvSelector2(isFirst: true)
-                    : const HSVSelector2(isFirst: true),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12.0),
+              child: Text(
+                "HSLuv",
+                style: TextStyle(fontFamily: "B612Mono"),
               ),
-              Expanded(
-                child: useHSLuv
-                    ? const HSLuvSelector2(isFirst: false)
-                    : const HSVSelector2(isFirst: false),
-              ),
-            ],
-          ),
+            ),
+          ],
+          isSelected: [
+            useHSLuv == false,
+            useHSLuv == true,
+          ],
+          onPressed: (selectedIndex) {
+            setState(() {
+              useHSLuv = selectedIndex != 0;
+            });
+          },
         ),
-      ),
+      ],
     );
   }
 }
 
 class HSVSelector2 extends StatelessWidget {
   const HSVSelector2({
-    this.toneSize = 20,
-    this.hueSize = 90,
     this.isFirst,
+    this.moreColors,
   });
 
   // maximum number of items
-  final int toneSize;
-
-  // maximum number of items
-  final int hueSize;
+  final bool moreColors;
 
   final bool isFirst;
 
   @override
   Widget build(BuildContext context) {
     const String kind = hsvStr;
+
+    // maximum number of items
+    final int itemsOnScreen =
+        ((MediaQuery.of(context).size.height - 112) / 56).ceil();
+
+    final int toneSize = moreColors ? itemsOnScreen * 2 : itemsOnScreen;
+    final int hueSize = moreColors ? 90 : 45;
 
     return ContrastHorizontalPicker(
       kind: kind,
@@ -157,16 +177,12 @@ class HSVSelector2 extends StatelessWidget {
 
 class HSLuvSelector2 extends StatelessWidget {
   const HSLuvSelector2({
-    this.toneSize = 20,
-    this.hueSize = 90,
+    this.moreColors = false,
     this.isFirst,
   });
 
   // maximum number of items
-  final int toneSize;
-
-  // maximum number of items
-  final int hueSize;
+  final bool moreColors;
 
   final bool isFirst;
 
@@ -174,14 +190,20 @@ class HSLuvSelector2 extends StatelessWidget {
   Widget build(BuildContext context) {
     const String kind = hsluvStr;
 
+    // maximum number of items
+    final double width = MediaQuery.of(context).size.width - 24;
+    final int itemsOnScreen = (math.min(width, 818) / 56).ceil();
+
+    final int toneSize = moreColors ? itemsOnScreen * 2 : itemsOnScreen;
+    final int hueSize = moreColors ? 90 : 45;
+
     return ContrastHorizontalPicker(
       kind: kind,
       fetchHue: (Color c) => hsluvAlternatives(c, hueSize),
       fetchSat: (Color c, Color otherColor) =>
-          hsluvTones(c, toneSize, 95 / toneSize, 5)
-              .convertToContrast(kind, otherColor),
+          hsluvTones(c, 95 / toneSize).convertToContrast(kind, otherColor),
       fetchLight: (Color c, Color otherColor) =>
-          hsluvLightness(c, toneSize, 95 / toneSize, 0)
+          hsluvLightness(c, 95 / toneSize, 90)
               .convertToContrast(kind, otherColor),
       hueTitle: hueStr,
       satTitle: satStr,

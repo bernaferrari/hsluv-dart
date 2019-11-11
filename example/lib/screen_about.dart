@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hsluvsample/contrast/contrast_screen.dart';
 import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/widgets/dismiss_keyboard_on_scroll.dart';
@@ -38,12 +40,59 @@ class AboutScreen extends StatelessWidget {
                 margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
                 child: ColorCompare(color: color),
               ),
+              const Card(
+                clipBehavior: Clip.antiAlias,
+                margin: EdgeInsets.only(left: 16, right: 16, top: 16),
+                child: MoreColors(),
+              ),
               GDPR(),
               const Padding(padding: EdgeInsets.all(4)),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class MoreColors extends StatelessWidget {
+  const MoreColors({this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return WatchBoxBuilder(
+      box: Hive.box<dynamic>("settings"),
+      builder: (context, box) {
+        return SwitchListTile(
+          contentPadding:
+              const EdgeInsets.only(top: 16, bottom: 8, right: 16, left: 16),
+          value: box.get("moreItems", defaultValue: false),
+          subtitle: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              "Duplicate the number of colors in HSLuv/HSV pickers.",
+              textAlign: TextAlign.center,
+            ),
+          ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(FeatherIcons.plusCircle),
+              const SizedBox(width: 16),
+              Text(
+                "More Colors",
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.title,
+              ),
+            ],
+          ),
+          onChanged: (value) {
+            box.put('moreItems', value);
+          },
+        );
+      },
     );
   }
 }
@@ -65,7 +114,7 @@ class ColorCompare extends StatelessWidget {
         );
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
         child: Row(
           children: <Widget>[
             Expanded(
@@ -207,7 +256,7 @@ class _ContactInfo extends StatelessWidget {
             const SizedBox(width: 32),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
       ],
     );
   }

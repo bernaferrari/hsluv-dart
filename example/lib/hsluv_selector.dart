@@ -29,20 +29,23 @@ const valueStr = "Value";
 const lightStr = "Lightness";
 
 class HSVSelector extends StatelessWidget {
-  const HSVSelector({this.color, this.toneSize = 20, this.hueSize = 90});
+  const HSVSelector({this.color, this.moreColors = false});
 
   // initial color
   final Color color;
 
-  // maximum number of items
-  final int toneSize;
-
-  // maximum number of items
-  final int hueSize;
+  final bool moreColors;
 
   @override
   Widget build(BuildContext context) {
     const String kind = hsvStr;
+
+    // maximum number of items
+    final int itemsOnScreen =
+        ((MediaQuery.of(context).size.height - 112) / 56).ceil();
+
+    final int toneSize = moreColors ? itemsOnScreen * 2 : itemsOnScreen;
+    final int hueSize = moreColors ? 90 : 60;
 
     return HSGenericScreen(
       color: color,
@@ -61,29 +64,31 @@ class HSVSelector extends StatelessWidget {
 }
 
 class HSLuvSelector extends StatelessWidget {
-  const HSLuvSelector({this.color, this.toneSize = 20, this.hueSize = 90});
+  const HSLuvSelector({this.color, this.moreColors = false});
 
   // initial color
   final Color color;
 
-  // maximum number of items
-  final int toneSize;
-
-  // maximum number of items
-  final int hueSize;
+  final bool moreColors;
 
   @override
   Widget build(BuildContext context) {
     const String kind = hsluvStr;
 
+    // maximum number of items
+    final int itemsOnScreen =
+        ((MediaQuery.of(context).size.height - 112) / 56).ceil();
+
+    final int toneSize = moreColors ? itemsOnScreen * 2 : itemsOnScreen;
+    final int hueSize = moreColors ? 90 : 60;
+
     return HSGenericScreen(
       color: color,
       kind: kind,
       fetchHue: () => hsluvAlternatives(color, hueSize),
-      fetchSat: (Color c) =>
-          hsluvTones(c, toneSize, 95 / toneSize, 0.5).convertToInter(kind),
+      fetchSat: (Color c) => hsluvTones(c, 95 / toneSize).convertToInter(kind),
       fetchLight: (Color c) =>
-          hsluvLightness(c, toneSize, 95 / toneSize, 0.0).convertToInter(kind),
+          hsluvLightness(c, 95 / toneSize, 90).convertToInter(kind),
       hueTitle: hueStr,
       satTitle: satStr,
       lightTitle: lightStr,
@@ -159,7 +164,6 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return BlocBuilder<SliderColorBloc, SliderColorState>(
         builder: (BuildContext context, SliderColorState state) {
       if (state is SliderColorLoading) {
@@ -404,6 +408,7 @@ class ExpandableColorBar extends StatelessWidget {
                   removeBottom: true,
                   context: context,
                   child: ListView.builder(
+                    physics: const BouncingScrollPhysics(),
                     itemCount: listSize,
                     key: PageStorageKey<String>("$pageKey $sectionIndex"),
                     itemBuilder: (BuildContext context, int index) {

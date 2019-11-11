@@ -3,14 +3,26 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
 import 'package:hsluvsample/screen_color_home.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'blocs/blocs.dart';
-import 'contrast/contrast_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await openBox();
   BlocSupervisor.delegate = SimpleBlocDelegate();
   runApp(BoxedApp());
+}
+
+Future openBox() async {
+  if (!false) {
+    final dir = await getApplicationDocumentsDirectory();
+    Hive.init(dir.path);
+  }
+
+  return await Hive.openBox<dynamic>("settings");
 }
 
 class BoxedApp extends StatefulWidget {

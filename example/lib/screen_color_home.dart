@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hsluvsample/multiple_sliders.dart';
 import 'package:hsluvsample/screen_about.dart';
 import 'package:hsluvsample/util/color_util.dart';
@@ -25,13 +27,7 @@ class ColorHome extends StatefulWidget {
 }
 
 class _ColorHomeState extends State<ColorHome> {
-  TextEditingController _textEditingController;
-
-  @override
-  void initState() {
-    super.initState();
-    _textEditingController = TextEditingController();
-  }
+  final TextEditingController _textEditingController = TextEditingController();
 
   @override
   void dispose() {
@@ -146,8 +142,23 @@ class _ColorHomeState extends State<ColorHome> {
                   child: TabBarView(
                     children: [
                       ColorSliders(rgb, hsv, hsl),
-                      HSLuvSelector(color: color),
-                      HSVSelector(color: color),
+                      WatchBoxBuilder(
+                        box: Hive.box<dynamic>("settings"),
+                        builder: (BuildContext context, Box box) =>
+                            HSLuvSelector(
+                          color: color,
+                          moreColors:
+                              box.get("moreItems", defaultValue: false),
+                        ),
+                      ),
+                      WatchBoxBuilder(
+                        box: Hive.box<dynamic>("settings"),
+                        builder: (BuildContext context, Box box) => HSVSelector(
+                          color: color,
+                          moreColors:
+                              box.get("moreItems", defaultValue: false),
+                        ),
+                      ),
                       AboutScreen(color: color),
                     ],
                   ),
@@ -238,7 +249,7 @@ class _CopyColorButton extends StatelessWidget {
       tooltip: "copy color",
       icon: Icon(FeatherIcons.copy),
       onPressed: () {
-        copyToClipboard(context,color.toHexStr());
+        copyToClipboard(context, color.toHexStr());
       },
     );
   }

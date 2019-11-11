@@ -18,8 +18,8 @@ class NearestColorState extends State<NearestColor> {
     return SizedBox(
       height: 24,
       child: FutureBuilder(
-          future:
-              DefaultAssetBundle.of(context).loadString("assets/colornames.json"),
+          future: DefaultAssetBundle.of(context)
+              .loadString("assets/colornames.json"),
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
               return const SizedBox.shrink();
@@ -39,8 +39,7 @@ class NearestColorState extends State<NearestColor> {
             return Text(
               nearest.name,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.caption.copyWith(
-              ),
+              style: Theme.of(context).textTheme.caption.copyWith(),
             );
           }),
     );

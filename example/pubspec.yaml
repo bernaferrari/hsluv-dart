@@ -29,6 +29,9 @@ dependencies:
   flutter_feather_icons: ^1.0.3
   infinite_listview: ^1.0.1+1
   url_launcher: ^5.2.5
+  hive: ^1.1.1
+  hive_flutter: ^0.2.1
+  path_provider: ^1.4.0
 
 dev_dependencies:
   hive_generator: ^0.5.2

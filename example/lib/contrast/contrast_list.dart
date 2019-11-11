@@ -54,6 +54,7 @@ class ContrastList extends StatelessWidget {
               removeBottom: true,
               context: context,
               child: ListView.builder(
+                physics: const BouncingScrollPhysics(),
                 itemCount: listSize,
                 scrollDirection: Axis.horizontal,
                 key: PageStorageKey<String>("$pageKey $sectionIndex"),

@@ -24,38 +24,21 @@ List<Color> hsluvAlternatives(Color color, [int n = 6]) {
   return [for (; n > 0; n--) luv.withHue((div * n) % 360.0).toColor()];
 }
 
-List<Color> hsluvTones(Color color,
-    [int n = 6, double step = 0.15, double start = 0.1]) {
-  final HSLuvColor hsv = HSLuvColor.fromColor(color);
-  double sat = start;
-  final List<Color> list = [];
+List<Color> hsluvTones(Color color, [double step = 5.0, double start = 100.0]) {
+  final HSLuvColor hsluv = HSLuvColor.fromColor(color);
 
-  for (; n > 0; n--) {
-    sat += step;
-    if (sat > 100.0) {
-      sat = 100.0;
-    }
-
-    list.add(hsv.withSaturation(sat).toColor());
-  }
-
-  return list.reversed.toList();
+  return [
+    for (double sat = start; sat > 0; sat -= step)
+      hsluv.withSaturation(sat).toColor()
+  ];
 }
 
 List<Color> hsluvLightness(Color color,
-    [int n = 6, double step = 0.05, double start = 0.0]) {
-  final HSLuvColor hsv = HSLuvColor.fromColor(color);
-  double darkness = start;
-  final List<Color> ret = [];
+    [double step = 5.0, double start = 100.0]) {
+  final HSLuvColor hsluv = HSLuvColor.fromColor(color);
 
-  for (; n > 0; n--) {
-    darkness += step;
-    if (darkness > 95.0) {
-      darkness = 95.0;
-    }
-
-    ret.add(hsv.withLightness(darkness).toColor());
-  }
-
-  return ret.reversed.toList();
+  return [
+    for (double light = start; light > 0; light -= step)
+      hsluv.withLightness(light).toColor()
+  ];
 }
