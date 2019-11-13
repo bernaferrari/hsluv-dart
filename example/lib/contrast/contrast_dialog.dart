@@ -12,7 +12,7 @@ import '../blocs/contrast_color/contrast_color_bloc.dart';
 import '../blocs/contrast_color/contrast_color_event.dart';
 import '../blocs/slider_color/slider_color.dart';
 
-void showSlidersDialog(BuildContext outerContext, bool isFirst, Color color) {
+void showSlidersDialog(BuildContext outerContext, Color color, [bool isFirst]) {
   BlocProvider.of<SliderColorBloc>(outerContext).add(MoveColor(color, true));
   bool ignoreFirstOpen = true;
 
@@ -32,20 +32,24 @@ void showSlidersDialog(BuildContext outerContext, bool isFirst, Color color) {
 
             final Color color = (state as SliderColorLoaded).rgbColor;
 
-            if (ignoreFirstOpen) {
-              BlocProvider.of<ContrastColorBloc>(context).add(CMoveColor(
-                color,
-                isFirst,
-              ));
-            } else {
-              ignoreFirstOpen = !ignoreFirstOpen;
+            if (isFirst != null) {
+              // only update the ContrastColorBloc when called from inside a
+              // contrast screen. Else, ignore this.
+              if (ignoreFirstOpen) {
+                BlocProvider.of<ContrastColorBloc>(context).add(CMoveColor(
+                  color,
+                  isFirst,
+                ));
+              } else {
+                ignoreFirstOpen = !ignoreFirstOpen;
+              }
             }
 
             if ((state as SliderColorLoaded).updateTextField) {
               final clrStr = color.toStr();
 
               if (controller.text != clrStr) {
-                controller.text = clrStr;
+                setTextAndPosition(controller, clrStr);
               }
             }
 
@@ -86,4 +90,14 @@ void showSlidersDialog(BuildContext outerContext, bool isFirst, Color color) {
           },
         );
       });
+}
+
+// this is necessary because of https://github.com/flutter/flutter/issues/11416
+void setTextAndPosition(TextEditingController controller, String newText,
+    {int caretPosition}) {
+  final int offset = caretPosition ?? newText.length;
+  controller.value = controller.value.copyWith(
+      text: newText,
+      selection: TextSelection.collapsed(offset: offset),
+      composing: TextRange.empty);
 }

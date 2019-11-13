@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hsluvsample/contrast/contrast_dialog.dart';
 import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/util/constants.dart';
 
@@ -28,10 +29,7 @@ class ColorSearchButton extends StatelessWidget {
           label: Text(color.toHexStr()),
           textColor: onSurface,
           onPressed: () {
-//              showSlidersDialog(context, isFirst, widget.color);
-          },
-          onLongPress: () {
-//              copyToClipboard(context, color.toHexStr());
+            showSlidersDialog(context, color);
           },
         ),
       ),

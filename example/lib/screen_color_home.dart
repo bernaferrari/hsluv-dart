@@ -191,6 +191,7 @@ class TextFormColored extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      autofocus: true,
       controller: controller,
       onChanged: (str) {
         BlocProvider.of<SliderColorBloc>(context).add(

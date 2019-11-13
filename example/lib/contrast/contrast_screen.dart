@@ -580,7 +580,7 @@ class _BottomPart extends StatelessWidget {
                 highlightedBorderColor: Theme.of(context).colorScheme.onSurface,
                 label: Text(color.toHexStr()),
                 onPressed: () {
-                  showSlidersDialog(context, isFirst, color);
+                  showSlidersDialog(context, color, isFirst);
                 },
                 onLongPress: () {
                   copyToClipboard(context, color.toHexStr());
