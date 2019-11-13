@@ -8,12 +8,12 @@ import 'package:hsluvsample/multiple_sliders.dart';
 import 'package:hsluvsample/screen_about.dart';
 import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/util/selected.dart';
+import 'package:hsluvsample/vertical_picker/vertical_picker_main.dart';
 import 'package:hsluvsample/widgets/color_sliders.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
 
 import 'blocs/slider_color/slider_color.dart';
 import 'dashboard_screen.dart';
-import 'hsluv_selector.dart';
 import 'util/constants.dart';
 
 class ColorHome extends StatefulWidget {
