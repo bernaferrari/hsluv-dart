@@ -1,11 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SliderWithSelector extends StatefulWidget {
-  const SliderWithSelector(this.rgb, this.hsv, this.hsl, this.context);
+  const SliderWithSelector(this.sliders, this.color, this.context);
 
-  final Widget rgb;
-  final Widget hsv;
-  final Widget hsl;
+  final Color color;
+  final List<Widget> sliders;
 
   // this is necessary to save the selected position.
   // Flutter will discard the Dialog's context when Dialog closes.
@@ -16,15 +16,29 @@ class SliderWithSelector extends StatefulWidget {
 }
 
 class _SliderWithSelectorState extends State<SliderWithSelector> {
-  List<bool> isSelected;
-
   @override
   void initState() {
-    isSelected = PageStorage.of(widget.context).readState(widget.context,
+    currentSegment = PageStorage.of(widget.context).readState(widget.context,
             identifier: const ValueKey("Selectable Sliders")) ??
-        [true, false, false];
+        0;
 
     super.initState();
+  }
+
+  final Map<int, Widget> children = const <int, Widget>{
+    0: Text("RGB"),
+    1: Text("HSLuv"),
+    2: Text("HSV"),
+  };
+
+  int currentSegment = 0;
+
+  void onValueChanged(int newValue) {
+    setState(() {
+      currentSegment = newValue;
+      PageStorage.of(widget.context).writeState(widget.context, currentSegment,
+          identifier: const ValueKey("Selectable Sliders"));
+    });
   }
 
   @override
@@ -32,37 +46,16 @@ class _SliderWithSelectorState extends State<SliderWithSelector> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ToggleButtons(
-          textStyle: const TextStyle(fontFamily: "B612Mono"),
-          children: const <Widget>[
-            Text("RGB"),
-            Text("HSV"),
-            Text("HSLuv"),
-          ],
-          onPressed: (int index) {
-            setState(() {
-              for (int buttonIndex = 0;
-                  buttonIndex < isSelected.length;
-                  buttonIndex++) {
-                if (buttonIndex == index) {
-                  isSelected[buttonIndex] = true;
-                } else {
-                  isSelected[buttonIndex] = false;
-                }
-              }
-              PageStorage.of(widget.context).writeState(
-                  widget.context, isSelected,
-                  identifier: const ValueKey("Selectable Sliders"));
-            });
-          },
-          isSelected: isSelected,
+        CupertinoSlidingSegmentedControl<int>(
+          children: children,
+          thumbColor: widget.color,
+          onValueChanged: onValueChanged,
+          groupValue: currentSegment,
         ),
         Padding(
           // this is the right padding, so text don't get glued to the border.
-          padding: const EdgeInsets.only(top: 16),
-          child: isSelected[0]
-              ? widget.rgb
-              : isSelected[1] ? widget.hsl : widget.hsv,
+          padding: const EdgeInsets.only(top: 8),
+          child: widget.sliders[currentSegment],
         ),
       ],
     );

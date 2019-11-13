@@ -6,16 +6,16 @@ import 'package:hsluvsample/hsinter.dart';
 import 'package:hsluvsample/util/color_util.dart';
 
 extension ListConversion<T> on List<Color> {
-  List<ColorWithContrast> convertToContrast(String kind, Color otherColor) =>
-      map((Color c) => ColorWithContrast(
+  List<InterColorWithContrast> convertToContrast(String kind, Color otherColor) =>
+      map((Color c) => InterColorWithContrast(
             c,
             HSInterColor.fromColor(c, kind),
             otherColor,
           )).toList();
 }
 
-class ColorWithContrast {
-  ColorWithContrast(this.color, this.inter, Color otherColor)
+class InterColorWithContrast {
+  InterColorWithContrast(this.color, this.inter, Color otherColor)
       : lum = color.computeLuminance(),
         contrast = calculateContrast(color, otherColor),
         colorHex = color.toHexStr();

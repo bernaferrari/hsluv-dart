@@ -112,7 +112,7 @@ class HSInterColor {
       () => kind == "HSLuv": () =>
           "H:${hue.toInt()} S:${outputSaturation()} L:${outputLightness()}",
       () => kind == "HSV": () =>
-          "H: ${hue.toInt()} S:${outputSaturation()} V:${outputLightness()}",
+          "H:${hue.toInt()} S:${outputSaturation()} V:${outputLightness()}",
     });
   }
 }

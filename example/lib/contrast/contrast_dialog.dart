@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hsluvsample/contrast/selectable_sliders.dart';
 import 'package:hsluvsample/screen_color_home.dart';
 import 'package:hsluvsample/util/color_util.dart';
+import 'package:hsluvsample/util/constants.dart';
 import 'package:hsluvsample/widgets/color_sliders.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
 
@@ -69,13 +70,18 @@ void showSlidersDialog(BuildContext outerContext, bool isFirst, Color color) {
                       .add(MoveHSV(h, s, v));
                 });
 
-            // return object of type Dialog
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.0)),
-              title: TextFormColored(controller: controller),
-              backgroundColor: color,
-              content: SliderWithSelector(rgb, hsluv, hsv, context),
+            return Theme(
+              data: ThemeData.from(
+                  colorScheme: color.computeLuminance() > kLumContrast
+                      ? const ColorScheme.light()
+                      : const ColorScheme.dark()),
+              child: AlertDialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.0)),
+                title: TextFormColored(controller: controller),
+                backgroundColor: color,
+                content: SliderWithSelector([rgb, hsluv, hsv], color, context),
+              ),
             );
           },
         );

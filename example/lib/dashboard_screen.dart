@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hsluvsample/blocs/blocs.dart';
+import 'package:hsluvsample/contrast/shuffle_color.dart';
 import 'package:hsluvsample/util/selected.dart';
 import 'package:hsluvsample/util/tiny_color.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
 import 'package:infinite_listview/infinite_listview.dart';
 
-import 'util/color_blindness.dart';
 import 'contrast/color_with_contrast.dart';
+import 'util/color_blindness.dart';
 
 class HorizontalAlternative extends StatelessWidget {
   const HorizontalAlternative({this.color});
@@ -72,6 +73,118 @@ class ColorBlindSection extends StatelessWidget {
   }
 }
 
+class ColorWithContrast {
+  ColorWithContrast(this.color, Color color2)
+      : lum = color.computeLuminance(),
+        contrast = calculateContrast(color, color2);
+
+  final Color color;
+  final double contrast;
+  final double lum;
+}
+
+class ContrastSection extends StatelessWidget {
+  const ContrastSection({this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    var filteredList = [...colorClaim, ...materialColors,]
+        .map((f) => ColorWithContrast(Color(int.parse("0xFF$f")), color))
+        .toList()
+        .where((f) => f.contrast > 4)
+        .toList(growable: false);
+
+    print("total len: ${filteredList.length}");
+            filteredList.sort((a, b) =>
+                HSVColor.fromColor(b.color).hue.compareTo(HSVColor.fromColor(a.color).hue));
+//    if (filteredList.length > 16) {
+//      filteredList = filteredList.sublist(0, 16);
+//    } else if (filteredList.length > 6) {
+//      filteredList = filteredList.sublist(0, 6);
+//    }
+
+    return LayoutBuilder(
+      builder: (context, builder) {
+        const numOfItems = 4; //(builder.maxWidth / 56).floor();
+
+        return SizedBox(
+          height: 56 * 4.0,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: <Widget>[
+              for (int i = 0; i < filteredList.length - 4; i+=4)
+                Column(
+                  children: <Widget>[
+                    ContrastButton(filteredList[i], width: builder.maxWidth / numOfItems),
+                    ContrastButton(filteredList[i+1], width: builder.maxWidth / numOfItems),
+                    ContrastButton(filteredList[i+2], width: builder.maxWidth / numOfItems),
+                    ContrastButton(filteredList[i+3], width: builder.maxWidth / numOfItems),
+                  ],
+                )
+            ],
+          ),
+        );
+
+//        return Wrap(
+//          children: <Widget>[
+//            for (ColorWithContrast item in filteredList)
+//              ContrastButton(item, width: builder.maxWidth / numOfItems)
+//          ],
+//        );
+      },
+    );
+  }
+}
+
+class ContrastButton extends StatelessWidget {
+  const ContrastButton(this.colorWithContrast, {this.width = 48});
+
+  final ColorWithContrast colorWithContrast;
+  final double width;
+
+  @override
+  Widget build(BuildContext context) {
+    final color =
+        (BlocProvider.of<SliderColorBloc>(context).state as SliderColorLoaded)
+            .rgbColor;
+
+    return SizedBox(
+      width: 56,//width,
+      height: 56,
+      child: MaterialButton(
+        padding: EdgeInsets.zero,
+        elevation: 0,
+        shape: const RoundedRectangleBorder(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              "${colorWithContrast.contrast.toStringAsPrecision(3)}",
+              style: TextStyle(
+                fontSize: 16,
+//                fontWeight: FontWeight.w700,
+                color: color,
+              ),
+            ),
+//            Text(
+//              "${getContrastLetters(colorWithContrast.contrast)}" ,
+//              style: Theme.of(context).textTheme.caption.copyWith(
+//                color: color.withOpacity(0.7)
+//              ),
+//            ),
+          ],
+        ),
+        color: colorWithContrast.color,
+        onPressed: () {
+          colorSelected(context, colorWithContrast.color);
+        },
+      ),
+    );
+  }
+}
+
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen();
 
@@ -79,6 +192,8 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final double itemWidth = MediaQuery.of(context).size.width;
     const double itemHeight = 56;
+
+    print("ONSURFACE IS ${Theme.of(context).colorScheme.onSurface}");
 
     return BlocBuilder<SliderColorBloc, SliderColorState>(
         builder: (BuildContext context, SliderColorState state) {
@@ -153,7 +268,7 @@ class DashboardScreen extends StatelessWidget {
             ],
           ),
         ),
-
+//        ContrastSection(color: color),
 //            Row(
 //              children: <Widget>[
 //                Center(
@@ -315,10 +430,10 @@ class DashboardScreen extends StatelessWidget {
 //                scrollDirection: Axis.horizontal,
 //              ),
 //            ),
-        const Divider(),
+//        const Divider(),
         Padding(
           padding:
-              const EdgeInsets.only(left: 16, right: 16.0, top: 0, bottom: 8),
+              const EdgeInsets.only(left: 16, right: 16.0, top: 16, bottom: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
@@ -330,7 +445,7 @@ class DashboardScreen extends StatelessWidget {
                     .title
                     .copyWith(fontFamily: "B612Mono"),
               ),
-              OutlineButton(
+              FlatButton(
                 onPressed: () {
 //                      Navigator.push<dynamic>(
 //                        context,
@@ -339,7 +454,7 @@ class DashboardScreen extends StatelessWidget {
 //                        ),
 //                      );
                 },
-                highlightedBorderColor: Colors.white,
+//                highlightedBorderColor: Colors.white,
                 child: const Text("SEE MORE"),
               ),
             ],
@@ -351,7 +466,7 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-Widget colorContrast(List<ColorWithContrast> allContrast, int index) {
+Widget colorContrast(List<InterColorWithContrast> allContrast, int index) {
   const itemWidth = 48.0;
   const itemHeight = 40.0; // 36 + 4 of padding
 
@@ -378,16 +493,17 @@ class ColoredBlindButton extends StatelessWidget {
       child: MaterialButton(
         padding: EdgeInsets.zero,
         elevation: 0,
-        shape: RoundedRectangleBorder(),
+        shape: const RoundedRectangleBorder(),
         child: Text(
-          colorWithBlind.affects.substring(0, 6),
+          "${colorWithBlind.worstCase.toStringAsPrecision(1)}%",
           //colorWithBlind.name[0],
           style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
-            color: (BlocProvider.of<SliderColorBloc>(context).state
-                    as SliderColorLoaded)
-                .rgbColor,
+            fontSize: 16,
+//            fontWeight: FontWeight.w700,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)
+//            color: (BlocProvider.of<SliderColorBloc>(context).state
+//                    as SliderColorLoaded)
+//                .rgbColor,
           ),
         ),
         color: colorWithBlind.color,
@@ -439,26 +555,28 @@ Map<String, List<ColorWithBlind>> retrieveColorBlind(Color color) {
 
   return {
     "Trichromacy": [
-      ColorWithBlind(protanomaly(color), "Protanomaly", "1% $m, 0.01% $f"),
-      ColorWithBlind(deuteranomaly(color), "Deuteranomaly", "6% $m, 0.4% $f"),
-      ColorWithBlind(tritanomaly(color), "Tritanomaly", "0.01% $p"),
+      ColorWithBlind(protanomaly(color), "Protanomaly", "1% $m, 0.01% $f", 1),
+      ColorWithBlind(
+          deuteranomaly(color), "Deuteranomaly", "6% $m, 0.4% $f", 6),
+      ColorWithBlind(tritanomaly(color), "Tritanomaly", "0.01% $p", 0.01),
     ],
     "Dichromacy": [
-      ColorWithBlind(protanopia(color), "Protanopia", "1% $m"),
-      ColorWithBlind(deuteranopia(color), "Deuteranopia", "1% $m"),
-      ColorWithBlind(tritanopia(color), "Tritanopia", "less than 1% $p"),
+      ColorWithBlind(protanopia(color), "Protanopia", "1% $m", 1),
+      ColorWithBlind(deuteranopia(color), "Deuteranopia", "1% $m", 1),
+      ColorWithBlind(tritanopia(color), "Tritanopia", "less than 1% $p", 1),
     ],
     "Monochromacy": [
-      ColorWithBlind(achromatopsia(color), "Achromatopsia", "0.003% $p"),
-      ColorWithBlind(achromatomaly(color), "Achromatomaly", "0.001% $p"),
+      ColorWithBlind(achromatopsia(color), "Achromatopsia", "0.003% $p", 0.003),
+      ColorWithBlind(achromatomaly(color), "Achromatomaly", "0.001% $p", 0.001),
     ],
   };
 }
 
 class ColorWithBlind {
-  ColorWithBlind(this.color, this.name, this.affects);
+  ColorWithBlind(this.color, this.name, this.affects, this.worstCase);
 
   final Color color;
+  final double worstCase;
   final String name;
   final String affects;
 }

@@ -16,7 +16,7 @@ class ContrastItem extends StatelessWidget {
     this.kind,
   });
 
-  final ColorWithContrast color;
+  final InterColorWithContrast color;
   final Function onPressed;
   final bool compactText;
   final double contrast;

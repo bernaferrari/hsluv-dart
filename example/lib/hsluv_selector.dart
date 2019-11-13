@@ -3,21 +3,20 @@ import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hsluv/flutter/hsluvcolor.dart';
-import 'package:hsluvsample/blocs/blocs.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hsluvsample/hsinter.dart';
 import 'package:hsluvsample/util/constants.dart';
 import 'package:hsluvsample/util/hsluv_tiny.dart';
 import 'package:hsluvsample/util/selected.dart';
 import 'package:hsluvsample/util/tiny_color.dart';
 import 'package:hsluvsample/util/when.dart';
-import 'package:hsluvsample/widgets/loading_indicator.dart';
 import 'package:infinite_listview/infinite_listview.dart';
 
-import 'blocs/slider_color/slider_color.dart';
 import 'color_with_inter.dart';
 import 'colors_list.dart';
+import 'util/color_util.dart';
 import 'util/constants.dart';
 
 const hsvStr = "HSV";
@@ -27,6 +26,167 @@ const hueStr = "Hue";
 const satStr = "Saturation";
 const valueStr = "Value";
 const lightStr = "Lightness";
+
+
+class ColorSearchButton extends StatelessWidget {
+  const ColorSearchButton({this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color onSurface =
+    Theme.of(context).colorScheme.onSurface.withOpacity(0.7);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8),
+      child: SizedBox(
+        height: 36,
+        child: OutlineButton.icon(
+          icon: Icon(FeatherIcons.search, size: 16),
+          color: color,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(defaultRadius),
+          ),
+          borderSide: BorderSide(color: onSurface),
+          highlightedBorderColor: onSurface,
+          label: Text(color.toHexStr()),
+          textColor: onSurface,
+          onPressed: () {
+//              showSlidersDialog(context, isFirst, widget.color);
+          },
+          onLongPress: () {
+//              copyToClipboard(context, color.toHexStr());
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class BorderedIconButton extends StatelessWidget {
+  const BorderedIconButton({this.child, this.onPressed});
+
+  final Function onPressed;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: RawMaterialButton(
+        onPressed: null,
+        child: child,
+        shape: CircleBorder(
+          side: BorderSide(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+        ),
+        elevation: 0.0,
+        padding: EdgeInsets.zero,
+      ),
+      onPressed: onPressed,
+    );
+  }
+}
+
+class HSVerticalPicker extends StatefulWidget {
+  const HSVerticalPicker({this.color});
+
+  final Color color;
+
+  @override
+  _HSVerticalPickerState createState() => _HSVerticalPickerState();
+}
+
+class _HSVerticalPickerState extends State<HSVerticalPicker> {
+  bool useHSLuv = true;
+
+  int currentSegment = 0;
+
+  void onValueChanged(int newValue) {
+    setState(() {
+      currentSegment = newValue;
+      useHSLuv = currentSegment == 0;
+    });
+  }
+
+  final Map<int, Widget> children = const <int, Widget>{
+    0: Text('HSLuv'),
+    1: Text('HSV'),
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("${useHSLuv ? "HSLuv" : "HSV"} Picker"),
+        elevation: 0,
+        backgroundColor: widget.color,
+        actions: <Widget>[
+//          BorderedIconButton(
+//            child: Text(
+//              useHSLuv ? "HSV" : "HSL",
+//              style: const TextStyle(fontSize: 12),
+//            ),
+//            onPressed: () {
+//              setState(() {
+//                useHSLuv = !useHSLuv;
+//              });
+//            },
+//          ),
+          ColorSearchButton(color: widget.color),
+//          BorderedIconButton(
+//            child: Icon(FeatherIcons.copy, size: 16),
+//            onPressed: () {
+//              setState(() {
+//                useHSLuv = !useHSLuv;
+//              });
+//            },
+//          ),
+          BorderedIconButton(
+            child: Icon(FeatherIcons.moreHorizontal, size: 16),
+            onPressed: () {
+//              setState(() {
+//                useHSLuv = !useHSLuv;
+//              });
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      backgroundColor: widget.color,
+      body: Column(
+        children: <Widget>[
+          SizedBox(
+            width: 500,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: CupertinoSlidingSegmentedControl<int>(
+                thumbColor: widget.color,
+                children: children,
+                onValueChanged: onValueChanged,
+                groupValue: currentSegment,
+              ),
+            ),
+          ),
+          Expanded(
+            child: WatchBoxBuilder(
+              box: Hive.box<dynamic>("settings"),
+              builder: (BuildContext context, Box box) => useHSLuv
+                  ? HSLuvSelector(
+                      color: widget.color,
+                      moreColors: box.get("moreItems", defaultValue: false),
+                    )
+                  : HSVSelector(
+                      color: widget.color,
+                      moreColors: box.get("moreItems", defaultValue: false),
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class HSVSelector extends StatelessWidget {
   const HSVSelector({this.color, this.moreColors = false});
@@ -86,7 +246,8 @@ class HSLuvSelector extends StatelessWidget {
       color: color,
       kind: kind,
       fetchHue: () => hsluvAlternatives(color, hueSize),
-      fetchSat: (Color c) => hsluvTones(c, toneSize, 5, 100).convertToInter(kind),
+      fetchSat: (Color c) =>
+          hsluvTones(c, toneSize, 5, 100).convertToInter(kind),
       fetchLight: (Color c) =>
           hsluvLightness(c, toneSize, 5, 90).convertToInter(kind),
       hueTitle: hueStr,
@@ -135,8 +296,8 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
   @override
   void initState() {
     super.initState();
-    expanded = PageStorage.of(context)
-            .readState(context, identifier: ValueKey<String>(widget.kind)) ??
+    expanded = PageStorage.of(context).readState(context,
+            identifier: const ValueKey<String>("VerticalSelector")) ??
         0;
   }
 
@@ -148,7 +309,7 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
     setState(() {
       expanded = updatedValue;
       PageStorage.of(context).writeState(context, expanded,
-          identifier: ValueKey<String>(widget.kind));
+          identifier: const ValueKey<String>("VerticalSelector"));
     });
   }
 
@@ -166,146 +327,130 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SliderColorBloc, SliderColorState>(
-        builder: (BuildContext context, SliderColorState state) {
-      if (state is SliderColorLoading) {
-        return const Scaffold(body: Center(child: LoadingIndicator()));
-      }
+    final Color rgbColor = widget.color;
 
-      final Color rgbColor = (state as SliderColorLoaded).rgbColor;
+    // in the ideal the world they could be calculated in the Bloc &/or in parallel.
+    final List<ColorWithInter> hue = parseHue();
+    final int hueLen = hue.length;
 
-      // in the ideal the world they could be calculated in the Bloc &/or in parallel.
-      final List<ColorWithInter> hue = parseHue();
-      final int hueLen = hue.length;
+    final List<ColorWithInter> tones = widget.fetchSat(rgbColor);
+    final List<ColorWithInter> values = widget.fetchLight(rgbColor);
 
-      final List<ColorWithInter> tones = widget.fetchSat(rgbColor);
-      final List<ColorWithInter> values = widget.fetchLight(rgbColor);
+    final Color borderColor = (rgbColor.computeLuminance() > kLumContrast)
+        ? Colors.black.withOpacity(0.40)
+        : Colors.white.withOpacity(0.40);
 
-      final Color borderColor = (rgbColor.computeLuminance() > kLumContrast)
-          ? Colors.black.withOpacity(0.40)
-          : Colors.white.withOpacity(0.40);
-
-      final Widget hueWidget = ExpandableColorBar(
-          pageKey: widget.kind,
-          title: widget.hueTitle,
-          expanded: expanded,
-          sectionIndex: 0,
-          listSize: hueLen,
-          isInfinite: true,
-          colorsList: hue,
-          onTitlePressed: () => modifyAndSaveExpanded(0),
-          onColorPressed: (Color c) {
-            modifyAndSaveExpanded(0);
-            colorSelected(context, c);
-          });
-
-      final satWidget = ExpandableColorBar(
-          pageKey: widget.kind,
-          title: widget.satTitle,
-          expanded: expanded,
-          sectionIndex: 1,
-          listSize: widget.toneSize,
-          colorsList: tones,
-          onTitlePressed: () => modifyAndSaveExpanded(1),
-          onColorPressed: (Color c) {
-            modifyAndSaveExpanded(1);
-            colorSelected(context, c);
-          });
-
-      final valueWidget = ExpandableColorBar(
+    final Widget hueWidget = ExpandableColorBar(
         pageKey: widget.kind,
-        title: widget.lightTitle,
+        title: widget.hueTitle,
         expanded: expanded,
-        sectionIndex: 2,
-        listSize: widget.toneSize,
-        colorsList: values,
-        onTitlePressed: () => modifyAndSaveExpanded(2),
+        sectionIndex: 0,
+        listSize: hueLen,
+        isInfinite: true,
+        colorsList: hue,
+        onTitlePressed: () => modifyAndSaveExpanded(0),
         onColorPressed: (Color c) {
-          modifyAndSaveExpanded(2);
+          modifyAndSaveExpanded(0);
           colorSelected(context, c);
-        },
-      );
+        });
 
-      final List<Widget> widgets = <Widget>[hueWidget, satWidget, valueWidget];
+    final satWidget = ExpandableColorBar(
+        pageKey: widget.kind,
+        title: widget.satTitle,
+        expanded: expanded,
+        sectionIndex: 1,
+        listSize: widget.toneSize,
+        colorsList: tones,
+        onTitlePressed: () => modifyAndSaveExpanded(1),
+        onColorPressed: (Color c) {
+          modifyAndSaveExpanded(1);
+          colorSelected(context, c);
+        });
 
-      return Theme(
-        data: ThemeData.from(
-          colorScheme: (rgbColor.computeLuminance() > kLumContrast)
-              ? ColorScheme.light(surface: rgbColor)
-              : ColorScheme.dark(surface: rgbColor),
-          textTheme: const TextTheme(
-            caption: TextStyle(fontFamily: "B612Mono"),
-            button: TextStyle(fontFamily: "B612Mono"),
-          ),
-        ).copyWith(
-          cardTheme: Theme.of(context).cardTheme.copyWith(
-                margin: EdgeInsets.zero,
-                clipBehavior: Clip.antiAlias,
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(color: borderColor),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
+    final valueWidget = ExpandableColorBar(
+      pageKey: widget.kind,
+      title: widget.lightTitle,
+      expanded: expanded,
+      sectionIndex: 2,
+      listSize: widget.toneSize,
+      colorsList: values,
+      onTitlePressed: () => modifyAndSaveExpanded(2),
+      onColorPressed: (Color c) {
+        modifyAndSaveExpanded(2);
+        colorSelected(context, c);
+      },
+    );
+
+    final List<Widget> widgets = <Widget>[hueWidget, satWidget, valueWidget];
+
+    return Theme(
+      data: ThemeData.from(
+        colorScheme: (rgbColor.computeLuminance() > kLumContrast)
+            ? ColorScheme.light(surface: rgbColor)
+            : ColorScheme.dark(surface: rgbColor),
+        textTheme: const TextTheme(
+          caption: TextStyle(fontFamily: "B612Mono"),
+          button: TextStyle(fontFamily: "B612Mono"),
         ),
-        child: Scaffold(
-          backgroundColor: rgbColor,
-          body: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 818),
-              child: Column(
+      ).copyWith(
+        cardTheme: Theme.of(context).cardTheme.copyWith(
+              margin: EdgeInsets.zero,
+              clipBehavior: Clip.antiAlias,
+              shape: RoundedRectangleBorder(
+                side: BorderSide(color: borderColor),
+                borderRadius: BorderRadius.circular(defaultRadius),
+              ),
+            ),
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 818),
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.only(top: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          const SizedBox(width: 8),
-                          for (int i = 0; i < 3; i++) ...<Widget>[
-                            const SizedBox(width: 8),
-                            Flexible(
-                              flex: (i == expanded) ? 1 : 0,
-                              child: LayoutBuilder(
-                                // thanks Remi Rousselet for the idea!
-                                builder:
-                                    (BuildContext ctx, BoxConstraints builder) {
-                                  return AnimatedContainer(
-                                    width:
-                                        (i == expanded) ? builder.maxWidth : 64,
-                                    duration: const Duration(milliseconds: 250),
-                                    curve: (i == expanded)
-                                        ? Curves.easeOut
-                                        : Curves.easeIn,
-                                    child: widgets[i],
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                          ],
-                          const SizedBox(width: 8),
-                        ],
+                  const SizedBox(width: 8),
+                  for (int i = 0; i < 3; i++) ...<Widget>[
+                    const SizedBox(width: 8),
+                    Flexible(
+                      flex: (i == expanded) ? 1 : 0,
+                      child: LayoutBuilder(
+                        // thanks Remi Rousselet for the idea!
+                        builder:
+                            (BuildContext ctx, BoxConstraints builder) {
+                          return AnimatedContainer(
+                            width: (i == expanded) ? builder.maxWidth : 64,
+                            duration: const Duration(milliseconds: 250),
+                            curve: (i == expanded)
+                                ? Curves.easeOut
+                                : Curves.easeIn,
+                            child: widgets[i],
+                          );
+                        },
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12, bottom: 4),
-                    child: Text(
-                      HSInterColor.fromColor(rgbColor, widget.kind).toString(),
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontFamily: "B612Mono",
-                      ),
-                    ),
-                  ),
-                  NearestColor(color: rgbColor),
+                    const SizedBox(width: 8),
+                  ],
+                  const SizedBox(width: 8),
                 ],
               ),
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.only(top: 12, bottom: 4),
+              child: Text(
+                HSInterColor.fromColor(rgbColor, widget.kind).toString(),
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontFamily: "B612Mono",
+                ),
+              ),
+            ),
+            NearestColor(color: rgbColor),
+          ],
         ),
-      );
-    });
+      ),
+    );
   }
 }
 
@@ -326,7 +471,8 @@ class _ExpandableTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return FlatButton(
       onPressed: onTitlePressed,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(defaultRadius)),
       child: Text(
         expanded == index ? title : title[0],
         overflow: TextOverflow.ellipsis,
@@ -513,19 +659,5 @@ class ColorCompareWidgetDetails extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String colorToHSLuv(Color color) {
-    final hsluv = HSLuvColor.fromColor(color);
-    return "H:${hsluv.hue.round()} S:${hsluv.saturation.round()}% L:${hsluv.lightness.round()}%";
-  }
-
-  String colorToHSV(Color color) {
-    final hsv = HSVColor.fromColor(color);
-    return "H:${hsv.hue.round()} S:${(hsv.saturation * 100).round()}% V:${(hsv.value * 100).round()}%";
-  }
-
-  String colorToRGB(Color color) {
-    return "R:${color.red} G:${color.green} B:${color.blue}";
   }
 }

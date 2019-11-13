@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hsluvsample/multiple_sliders.dart';
 import 'package:hsluvsample/screen_about.dart';
 import 'package:hsluvsample/util/color_util.dart';
@@ -83,21 +81,23 @@ class _ColorHomeState extends State<ColorHome> {
 
       final surfaceColor = blendColorWithBackground(color);
 
+      final colorScheme = (color.computeLuminance() > kLumContrast)
+          ? ColorScheme.light(
+              primary: color,
+              secondary: color,
+              surface: surfaceColor,
+            )
+          : ColorScheme.dark(
+              primary: color,
+              secondary: color,
+              surface: surfaceColor,
+            );
+
       return Theme(
         data: ThemeData.from(
           // todo it would be nice if there were a ThemeData.join
           // because you need to copyWith manually everything every time.
-          colorScheme: (color.computeLuminance() > kLumContrast)
-              ? ColorScheme.light(
-                  primary: color,
-                  secondary: color,
-                  surface: surfaceColor,
-                )
-              : ColorScheme.dark(
-                  primary: color,
-                  secondary: color,
-                  surface: surfaceColor,
-                ),
+          colorScheme: colorScheme,
         ).copyWith(
           cardTheme: Theme.of(context).cardTheme,
           buttonTheme: Theme.of(context).buttonTheme.copyWith(
@@ -108,63 +108,59 @@ class _ColorHomeState extends State<ColorHome> {
         ),
         child: Scaffold(
           backgroundColor: color,
-          appBar: AppBar(
-            centerTitle: false,
-            elevation: 0,
-            backgroundColor: color,
-            iconTheme: IconThemeData(color: contrastedColor),
-            actions: <Widget>[
-              _CopyColorButton(color: color),
-            ],
-            title: TextFormColored(controller: _textEditingController),
-          ),
+//          appBar: AppBar(
+//            centerTitle: false,
+//            elevation: 0,
+//            backgroundColor: color,
+//            iconTheme: IconThemeData(color: contrastedColor),
+////            actions: <Widget>[
+////              _CopyColorButton(color: color),
+////            ],
+////            title: TextFormColored(controller: _textEditingController),
+//          ),
           body: DefaultTabController(
-            length: 5,
+            length: 4,
             initialIndex: 1,
-            child: Column(
-              children: <Widget>[
-                TabBar(
-                  labelColor: contrastedColor,
-                  indicatorColor: contrastedColor,
-                  isScrollable: true,
-                  tabs: [
-                    Tab(icon: Icon(FeatherIcons.home)),
-                    Tab(
-                      icon: Transform.rotate(
-                        angle: 0.5 * math.pi,
-                        child: Icon(FeatherIcons.sliders),
+            child: SafeArea(
+              child: Column(
+                children: <Widget>[
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        DashboardScreen(),
+                        ColorSliders(rgb, hsv, hsl),
+                        HSVerticalPicker(color: color),
+                        AboutScreen(color: color),
+                      ],
+                    ),
+                  ),
+                  TabBar(
+                    labelColor: contrastedColor,
+                    indicatorColor: contrastedColor,
+                    isScrollable: true,
+                    indicator: BoxDecoration(
+                      color: colorScheme.onSurface.withOpacity(0.10),
+                      border: Border(
+                        top: BorderSide(
+                          color: colorScheme.onSurface,
+                          width: 2.0,
+                        ),
                       ),
                     ),
-                    const Tab(icon: Text("HSLuv")),
-                    const Tab(icon: Text("HSV")),
-                    Tab(icon: Icon(FeatherIcons.info)),
-                  ],
-                ),
-                Expanded(
-                  child: TabBarView(
-                    children: [
-                      DashboardScreen(),
-                      ColorSliders(rgb, hsv, hsl),
-                      WatchBoxBuilder(
-                        box: Hive.box<dynamic>("settings"),
-                        builder: (BuildContext context, Box box) =>
-                            HSLuvSelector(
-                          color: color,
-                          moreColors: box.get("moreItems", defaultValue: false),
+                    tabs: [
+                      Tab(icon: Icon(FeatherIcons.home)),
+                      Tab(
+                        icon: Transform.rotate(
+                          angle: 0.5 * math.pi,
+                          child: const Icon(FeatherIcons.sliders),
                         ),
                       ),
-                      WatchBoxBuilder(
-                        box: Hive.box<dynamic>("settings"),
-                        builder: (BuildContext context, Box box) => HSVSelector(
-                          color: color,
-                          moreColors: box.get("moreItems", defaultValue: false),
-                        ),
-                      ),
-                      AboutScreen(color: color),
+                      const Tab(icon: Icon(FeatherIcons.barChart2)),
+                      Tab(icon: Icon(FeatherIcons.info)),
                     ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -221,8 +217,8 @@ class TextFormColored extends StatelessWidget {
         filled: true,
         fillColor: (Theme.of(context).colorScheme.primary.computeLuminance() >
                 kLumContrast)
-            ? Colors.black12
-            : Colors.white24,
+            ? Colors.white24
+            : Colors.black12,
         isDense: true,
         prefix: Padding(
           padding: const EdgeInsets.only(right: 8.0),

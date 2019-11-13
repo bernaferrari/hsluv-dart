@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:hsluvsample/screen_color_home.dart';
+import 'package:hsluvsample/util/constants.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'blocs/blocs.dart';
@@ -74,18 +75,18 @@ class _BoxedAppState extends State<BoxedApp> {
           ),
           dialogTheme: base.dialogTheme.copyWith(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(defaultRadius),
             ),
           ),
           buttonTheme: base.buttonTheme.copyWith(
             padding: EdgeInsets.zero,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(defaultRadius / 2),
             ),
           ),
           cardTheme: base.cardTheme.copyWith(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(defaultRadius),
             ),
           ),
         ),

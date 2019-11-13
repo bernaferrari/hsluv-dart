@@ -103,33 +103,53 @@ class _ContrastScreenState extends State<ContrastScreen> {
 //                });
 //              },
 //            ),
-        ToggleButtons(
-          children: const [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12.0),
-              child: Text(
-                "HSV",
-                style: TextStyle(fontFamily: "B612Mono"),
-              ),
+        IconButton(
+          icon: RawMaterialButton(
+            onPressed: null,
+            child: Text(
+              useHSLuv ? "HSV" : "HSL",
+              style: const TextStyle(fontSize: 12),
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12.0),
-              child: Text(
-                "HSLuv",
-                style: TextStyle(fontFamily: "B612Mono"),
-              ),
+            shape: CircleBorder(
+              side: BorderSide(color: Theme.of(context).colorScheme.onSurface),
             ),
-          ],
-          isSelected: [
-            useHSLuv == false,
-            useHSLuv == true,
-          ],
-          onPressed: (selectedIndex) {
+            elevation: 0.0,
+            padding: EdgeInsets.zero,
+          ),
+          onPressed: () {
             setState(() {
-              useHSLuv = selectedIndex != 0;
+              useHSLuv = !useHSLuv;
             });
           },
         ),
+
+//        ToggleButtons(
+//          children: const [
+//            Padding(
+//              padding: EdgeInsets.symmetric(horizontal: 12.0),
+//              child: Text(
+//                "HSV",
+//                style: TextStyle(fontFamily: "B612Mono"),
+//              ),
+//            ),
+//            Padding(
+//              padding: EdgeInsets.symmetric(horizontal: 12.0),
+//              child: Text(
+//                "HSLuv",
+//                style: TextStyle(fontFamily: "B612Mono"),
+//              ),
+//            ),
+//          ],
+//          isSelected: [
+//            useHSLuv == false,
+//            useHSLuv == true,
+//          ],
+//          onPressed: (selectedIndex) {
+//            setState(() {
+//              useHSLuv = selectedIndex != 0;
+//            });
+//          },
+//        ),
       ],
     );
   }
@@ -230,8 +250,8 @@ class ContrastHorizontalPicker extends StatefulWidget {
   final String kind;
   final bool isFirst;
   final List<Color> Function(Color) fetchHue;
-  final List<ColorWithContrast> Function(Color, Color) fetchSat;
-  final List<ColorWithContrast> Function(Color, Color) fetchLight;
+  final List<InterColorWithContrast> Function(Color, Color) fetchSat;
+  final List<InterColorWithContrast> Function(Color, Color) fetchLight;
 
   final int toneSize;
   final String hueTitle;
@@ -260,11 +280,11 @@ class _ContrastHorizontalPickerState extends State<ContrastHorizontalPicker> {
     return math.min(math.max(value, min), max);
   }
 
-  List<ColorWithContrast> parseHue(Color color, Color otherColor) {
+  List<InterColorWithContrast> parseHue(Color color, Color otherColor) {
     return widget.fetchHue(color).map((Color c) {
       final HSInterColor hsluv = HSInterColor.fromColor(c, widget.kind);
       final color = hsluv.toColor();
-      return ColorWithContrast(color, hsluv, otherColor);
+      return InterColorWithContrast(color, hsluv, otherColor);
     }).toList();
   }
 
@@ -297,9 +317,9 @@ class _ContrastHorizontalPickerState extends State<ContrastHorizontalPicker> {
       final hueLen = hue.length;
 
       // in the ideal the world they could be calculated in the Bloc &/or in parallel.
-      final List<ColorWithContrast> tones =
+      final List<InterColorWithContrast> tones =
           widget.fetchSat(rgbColor, otherColor);
-      final List<ColorWithContrast> values =
+      final List<InterColorWithContrast> values =
           widget.fetchLight(rgbColor, otherColor);
 
       final Color borderColor = (rgbColor.computeLuminance() > kLumContrast)
@@ -339,7 +359,7 @@ class _ContrastHorizontalPickerState extends State<ContrastHorizontalPicker> {
 
       final shape = RoundedRectangleBorder(
         side: BorderSide(color: borderColor),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(defaultRadius),
       );
 
       return Theme(
@@ -569,7 +589,7 @@ class _BottomPart extends StatelessWidget {
               const SizedBox(width: 16),
               MaterialButton(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(defaultRadius),
                   side: BorderSide(
                     color: Theme.of(context)
                         .colorScheme

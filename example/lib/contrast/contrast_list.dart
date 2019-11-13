@@ -19,7 +19,7 @@ class ContrastList extends StatelessWidget {
   final Function(Color) onColorPressed;
   final Function(int) buildWidget;
 
-  final List<ColorWithContrast> colorsList;
+  final List<InterColorWithContrast> colorsList;
   final String title;
   final String pageKey;
   final int sectionIndex;

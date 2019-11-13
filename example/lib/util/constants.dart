@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 const double kLumContrast = 0.34;
 const String kPrimary = "Primary";
 const String kSurface = "Surface";
@@ -7,3 +9,5 @@ const String kAA = "AA (4.5)";
 const String kAAA = "AAA (7.0)";
 
 const int maxContrastItemsLen = 24;
+
+const double defaultRadius = 16.0;
