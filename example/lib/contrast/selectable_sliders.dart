@@ -16,14 +16,7 @@ class SliderWithSelector extends StatefulWidget {
 }
 
 class _SliderWithSelectorState extends State<SliderWithSelector> {
-  @override
-  void initState() {
-    currentSegment = PageStorage.of(widget.context).readState(widget.context,
-            identifier: const ValueKey("Selectable Sliders")) ??
-        0;
-
-    super.initState();
-  }
+  int currentSegment;
 
   final Map<int, Widget> children = const <int, Widget>{
     0: Text("RGB"),
@@ -31,13 +24,25 @@ class _SliderWithSelectorState extends State<SliderWithSelector> {
     2: Text("HSV"),
   };
 
-  int currentSegment = 0;
+  @override
+  void initState() {
+    currentSegment = PageStorage.of(widget.context).readState(
+          widget.context,
+          identifier: const ValueKey("Selectable Sliders"),
+        ) ??
+        1;
+
+    super.initState();
+  }
 
   void onValueChanged(int newValue) {
     setState(() {
       currentSegment = newValue;
-      PageStorage.of(widget.context).writeState(widget.context, currentSegment,
-          identifier: const ValueKey("Selectable Sliders"));
+      PageStorage.of(widget.context).writeState(
+        widget.context,
+        currentSegment,
+        identifier: const ValueKey("Selectable Sliders"),
+      );
     });
   }
 
