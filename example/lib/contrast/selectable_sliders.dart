@@ -2,9 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SliderWithSelector extends StatefulWidget {
-  const SliderWithSelector(this.sliders, this.color, this.context);
+  const SliderWithSelector(
+      this.sliders, this.color, this.selectableColor, this.context);
 
   final Color color;
+  final Color selectableColor;
   final List<Widget> sliders;
 
   // this is necessary to save the selected position.
@@ -53,7 +55,9 @@ class _SliderWithSelectorState extends State<SliderWithSelector> {
       children: <Widget>[
         CupertinoSlidingSegmentedControl<int>(
           children: children,
-          thumbColor: Theme.of(context).colorScheme.surface,
+          backgroundColor:
+              Theme.of(context).colorScheme.onSurface.withOpacity(0.20),
+          thumbColor: widget.selectableColor,
           onValueChanged: onValueChanged,
           groupValue: currentSegment,
         ),

@@ -7,6 +7,7 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hsluvsample/hsinter.dart';
+import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/util/constants.dart';
 import 'package:hsluvsample/util/selected.dart';
 import 'package:hsluvsample/vertical_picker/picker_list.dart';
@@ -77,9 +78,16 @@ class _HSVerticalPickerState extends State<HSVerticalPicker> {
           SizedBox(
             width: 500,
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(
+                  left: 16.0, right: 16, top: 16, bottom: 12),
               child: CupertinoSlidingSegmentedControl<int>(
-                thumbColor: widget.color,
+                backgroundColor:
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.20),
+                thumbColor: compositeColors(
+                  Theme.of(context).colorScheme.background,
+                  Theme.of(context).colorScheme.primary,
+                  0.20,
+                ),
                 children: children,
                 onValueChanged: onValueChanged,
                 groupValue: currentSegment,
