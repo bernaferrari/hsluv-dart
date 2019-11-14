@@ -119,7 +119,7 @@ class _ColorHomeState extends State<ColorHome> {
 ////            title: TextFormColored(controller: _textEditingController),
 //          ),
           body: DefaultTabController(
-            length: 4,
+            length: 3,
             initialIndex: 1,
             child: SafeArea(
               child: Column(
@@ -127,7 +127,7 @@ class _ColorHomeState extends State<ColorHome> {
                   Expanded(
                     child: TabBarView(
                       children: [
-                        DashboardScreen(),
+//                        DashboardScreen(),
                         ColorSliders(rgb, hsv, hsl),
                         HSVerticalPicker(color: color),
                         AboutScreen(color: color),
@@ -148,7 +148,7 @@ class _ColorHomeState extends State<ColorHome> {
                       ),
                     ),
                     tabs: [
-                      Tab(icon: Icon(FeatherIcons.home)),
+//                      Tab(icon: Icon(FeatherIcons.home)),
                       Tab(
                         icon: Transform.rotate(
                           angle: 0.5 * math.pi,
@@ -184,15 +184,16 @@ class _ColorHomeState extends State<ColorHome> {
 }
 
 class TextFormColored extends StatelessWidget {
-  const TextFormColored({this.controller});
+  const TextFormColored({this.controller, this.radius});
 
+  final double radius;
   final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
-    const borderRadius = BorderRadius.only(
-      topLeft: Radius.circular(16.0),
-      topRight: Radius.circular(16.0),
+    final borderRadius = BorderRadius.only(
+      topLeft: Radius.circular(radius),
+      topRight: Radius.circular(radius),
     );
 
     return TextFormField(

@@ -10,6 +10,8 @@ import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/widgets/dismiss_keyboard_on_scroll.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'dashboard_screen.dart';
+
 class AboutScreen extends StatelessWidget {
   const AboutScreen({this.color});
 
@@ -40,10 +42,10 @@ class AboutScreen extends StatelessWidget {
                 margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
                 child: ColorCompare(color: color),
               ),
-              const Card(
+              Card(
                 clipBehavior: Clip.antiAlias,
-                margin: EdgeInsets.only(left: 16, right: 16, top: 16),
-                child: MoreColors(),
+                margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
+                child: ColorBlindSection(color: color),
               ),
               GDPR(),
               const Padding(padding: EdgeInsets.all(4)),
@@ -56,9 +58,9 @@ class AboutScreen extends StatelessWidget {
 }
 
 class MoreColors extends StatelessWidget {
-  const MoreColors({this.color});
+  const MoreColors({this.activeColor});
 
-  final Color color;
+  final Color activeColor;
 
   @override
   Widget build(BuildContext context) {
@@ -66,27 +68,15 @@ class MoreColors extends StatelessWidget {
       box: Hive.box<dynamic>("settings"),
       builder: (context, box) {
         return SwitchListTile(
-          contentPadding:
-              const EdgeInsets.only(top: 16, bottom: 8, right: 16, left: 16),
+          contentPadding: const EdgeInsets.only(top: 8, bottom: 8, right: 16, left: 16),
           value: box.get("moreItems", defaultValue: false),
-          subtitle: const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text(
-              "Duplicate the number of colors in HSLuv/HSV pickers.",
-              textAlign: TextAlign.center,
-            ),
+          activeColor: activeColor,
+          subtitle: Text("Duplicate the number of colors in HSLuv/HSV pickers.",
+          style: Theme.of(context).textTheme.caption,
           ),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Icon(FeatherIcons.plusCircle),
-              const SizedBox(width: 16),
-              Text(
-                "More Colors",
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.title,
-              ),
-            ],
+          title: Text(
+            "More Colors",
+            style: Theme.of(context).textTheme.title,
           ),
           onChanged: (value) {
             box.put('moreItems', value);

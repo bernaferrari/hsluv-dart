@@ -13,6 +13,7 @@ import 'package:hsluvsample/util/selected.dart';
 import 'package:hsluvsample/vertical_picker/picker_list.dart';
 
 import '../color_with_inter.dart';
+import '../screen_about.dart';
 import '../util/constants.dart';
 import 'app_bar.dart';
 import 'hsluv_selector.dart';
@@ -64,9 +65,28 @@ class _HSVerticalPickerState extends State<HSVerticalPicker> {
           BorderedIconButton(
             child: Icon(FeatherIcons.moreHorizontal, size: 16),
             onPressed: () {
-//              setState(() {
-//                useHSLuv = !useHSLuv;
-//              });
+              showDialog<dynamic>(
+                  context: context,
+                  builder: (BuildContext ctx) {
+                    return AlertDialog(
+                      contentPadding: const EdgeInsets.all(24),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      backgroundColor: widget.color,
+                      content: Card(
+                        clipBehavior: Clip.antiAlias,
+                          margin: EdgeInsets.zero,
+                          color: compositeColors(
+                            Theme.of(context).colorScheme.background,
+                            Theme.of(context).colorScheme.primary,
+                            0.20,
+                          ),
+                          elevation: 0,
+                          child: MoreColors(
+                            activeColor: Colors.green,
+                          )),
+                    );
+                  });
             },
           ),
           const SizedBox(width: 8),

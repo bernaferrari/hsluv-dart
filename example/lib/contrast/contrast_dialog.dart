@@ -95,6 +95,8 @@ class DialogWidget extends StatelessWidget {
           0.20,
         );
 
+        const radius = 16.0;
+
         return Theme(
           data: ThemeData.from(colorScheme: scheme).copyWith(
             highlightColor: surface,
@@ -102,21 +104,21 @@ class DialogWidget extends StatelessWidget {
             textSelectionHandleColor: surface,
           ),
           child: AlertDialog(
+            contentPadding: const EdgeInsets.all(24),
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0)),
+                borderRadius: BorderRadius.circular(radius)),
             backgroundColor: color,
             content: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                const SizedBox(height: 8),
-                TextFormColored(controller: controller),
+                TextFormColored(controller: controller, radius: radius),
                 Card(
                   elevation: 0,
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.only(
-                      bottomRight: Radius.circular(24.0),
-                      bottomLeft: Radius.circular(24.0),
+                      bottomRight: Radius.circular(radius),
+                      bottomLeft: Radius.circular(radius),
                     ),
                   ),
                   margin: EdgeInsets.zero,
@@ -131,21 +133,20 @@ class DialogWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: SizedBox(
-                    width: 500,
-                    child: FlatButton(
-                      color: selectableColor,
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: 500,
+                  height: 36,
+                  child: FlatButton(
+                    color: selectableColor,
 //                      color: selectableColor,
-                      onPressed: () {
-                        Navigator.of(context).pop(color);
-                      },
-                      shape: RoundedRectangleBorder(
-                          side: BorderSide(color: surface),
-                          borderRadius: BorderRadius.circular(24.0)),
-                      child: const Text("Select"),
-                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop(color);
+                    },
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(color: surface),
+                        borderRadius: BorderRadius.circular(24.0)),
+                    child: const Text("Select"),
                   ),
                 ),
 //                   const SizedBox(height: 16),
