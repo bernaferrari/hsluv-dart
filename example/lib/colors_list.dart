@@ -20,7 +20,11 @@ class NearestColor extends StatelessWidget {
           if (snapshot.connectionState != ConnectionState.done) {
             return const SizedBox.shrink();
           }
-          return AnimatedText((snapshot.data as NamedColor).name);
+          return Text(
+            (snapshot.data as NamedColor).name,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.caption.copyWith(),
+          );
         },
       ),
     );

@@ -18,7 +18,7 @@ class RGBSlider extends StatefulWidget {
 }
 
 extension on int {
-  String convertToHexString() => this.toRadixString(16).padLeft(2, '0');
+  String convertToHexString() => toRadixString(16).padLeft(2, '0');
 }
 
 class _RGBSliderState extends State<RGBSlider> {
@@ -26,26 +26,26 @@ class _RGBSliderState extends State<RGBSlider> {
   int valueBlue = 0;
   int valueGreen = 0;
 
-  var colorRed = [Colors.black, const Color(0xFFFF0000)];
-  var colorGreen = [Colors.black, const Color(0xFF00FF00)];
-  var colorBlue = [Colors.black, const Color(0xFF0000FF)];
+  List<Color> colorRed;
+  List<Color> colorGreen;
+  List<Color> colorBlue;
 
   void updateColorLists() {
     final vg = valueGreen.convertToHexString();
     final vr = valueRed.convertToHexString();
-    final vb = valueGreen.convertToHexString();
+    final vb = valueBlue.convertToHexString();
 
     colorRed = [
       Color(int.parse("0xFF00$vg$vb")),
-      Color(int.parse("0xFFFF$vg$vb"))
+      Color(int.parse("0xFFFF$vg$vb")),
     ];
     colorGreen = [
       Color(int.parse("0xFF${vr}00$vb")),
-      Color(int.parse("0xFF${vr}FF$vb"))
+      Color(int.parse("0xFF${vr}FF$vb")),
     ];
     colorBlue = [
       Color(int.parse("0xFF$vr${vg}00")),
-      Color(int.parse("0xFF$vr${vg}FF"))
+      Color(int.parse("0xFF$vr${vg}FF")),
     ];
   }
 

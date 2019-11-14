@@ -190,6 +190,11 @@ class TextFormColored extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const borderRadius = BorderRadius.only(
+      topLeft: Radius.circular(16.0),
+      topRight: Radius.circular(16.0),
+    );
+
     return TextFormField(
       autofocus: true,
       controller: controller,
@@ -203,23 +208,17 @@ class TextFormColored extends StatelessWidget {
       decoration: InputDecoration(
         enabledBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.white38, width: 2),
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(8.0),
-            topRight: Radius.circular(8.0),
-          ),
+          borderRadius: borderRadius,
         ),
         focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.black26, width: 2),
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(8.0),
-            topRight: Radius.circular(8.0),
-          ),
+          borderRadius: borderRadius,
         ),
         filled: true,
         fillColor: (Theme.of(context).colorScheme.primary.computeLuminance() >
                 kLumContrast)
-            ? Colors.white24
-            : Colors.black12,
+            ? Colors.black12
+            : Colors.white24,
         isDense: true,
         prefix: Padding(
           padding: const EdgeInsets.only(right: 8.0),

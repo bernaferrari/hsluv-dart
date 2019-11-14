@@ -12,7 +12,6 @@ import 'package:hsluvsample/util/selected.dart';
 import 'package:hsluvsample/vertical_picker/picker_list.dart';
 
 import '../color_with_inter.dart';
-import '../colors_list.dart';
 import '../util/constants.dart';
 import 'app_bar.dart';
 import 'hsluv_selector.dart';
@@ -285,7 +284,7 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 12, bottom: 4),
+              padding: const EdgeInsets.only(top: 12, bottom: 12),
               child: Text(
                 HSInterColor.fromColor(rgbColor, widget.kind).toString(),
                 overflow: TextOverflow.ellipsis,
@@ -294,7 +293,6 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
                 ),
               ),
             ),
-            NearestColor(color: rgbColor),
           ],
         ),
       ),
