@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hsluvsample/color_with_inter.dart';
-import 'package:hsluvsample/util/tiny_color.dart';
+import 'package:hsluvsample/util/hsv_tiny.dart';
 
 import 'vertical_picker_main.dart';
 
@@ -26,11 +26,11 @@ class HSVSelector extends StatelessWidget {
     return HSGenericScreen(
       color: color,
       kind: kind,
-      fetchHue: () => hueVariations(color, hueSize),
+      fetchHue: () => hsvAlternatives(color, hueSize),
       fetchSat: (Color c) =>
-          tonesHSV(c, toneSize, 0.9 / toneSize, 0.1).convertToInter(kind),
-      fetchLight: (Color c) => valueVariations(c, toneSize, 0.9 / toneSize, 0.1)
-          .convertToInter(kind),
+          hsvTones(c, toneSize, 0.05, 1.0).convertToInter(kind),
+      fetchLight: (Color c) =>
+          hsvValues(c, toneSize, 0.05, 1.0).convertToInter(kind),
       hueTitle: hueStr,
       satTitle: satStr,
       lightTitle: valueStr,

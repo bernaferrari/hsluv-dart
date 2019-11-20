@@ -8,12 +8,13 @@ import 'package:hsluvsample/multiple_sliders.dart';
 import 'package:hsluvsample/screen_about.dart';
 import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/util/selected.dart';
+import 'package:hsluvsample/util/when.dart';
 import 'package:hsluvsample/vertical_picker/vertical_picker_main.dart';
 import 'package:hsluvsample/widgets/color_sliders.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
 
+import 'blocs/blocs.dart';
 import 'blocs/slider_color/slider_color.dart';
-import 'dashboard_screen.dart';
 import 'util/constants.dart';
 
 class ColorHome extends StatefulWidget {
@@ -127,13 +128,15 @@ class _ColorHomeState extends State<ColorHome> {
                   Expanded(
                     child: TabBarView(
                       children: [
-//                        DashboardScreen(),
                         ColorSliders(rgb, hsv, hsl),
                         HSVerticalPicker(color: color),
                         AboutScreen(color: color),
+//                        ContrastScreen(color: color),
+//                        MDCHome(),
                       ],
                     ),
                   ),
+                  ThemeBar(),
                   TabBar(
                     labelColor: contrastedColor,
                     indicatorColor: contrastedColor,
@@ -157,6 +160,7 @@ class _ColorHomeState extends State<ColorHome> {
                       ),
                       const Tab(icon: Icon(FeatherIcons.barChart2)),
                       Tab(icon: Icon(FeatherIcons.info)),
+//                      const Tab(icon: Icon(FeatherIcons.layers)),
                     ],
                   ),
                 ],
@@ -180,6 +184,111 @@ class _ColorHomeState extends State<ColorHome> {
         ],
       ),
     );
+  }
+}
+
+class ThemeBar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final accentColor =
+        Theme.of(context).colorScheme.onSurface.withOpacity(0.40);
+
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: accentColor),
+      ),
+      elevation: 0,
+      color: compositeColors(Theme.of(context).colorScheme.background,
+          Theme.of(context).colorScheme.primary, 0.20),
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            SizedBox(
+              height: 36,
+              child: FlatButton.icon(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/theme');
+                },
+                icon: Icon(FeatherIcons.layout,
+                    size: 20, color: Theme.of(context).colorScheme.onSurface),
+                label: Text(
+                  "Theming",
+                  style: Theme.of(context).textTheme.body2.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              width: 1,
+              height: 24,
+              color: accentColor,
+            ),
+            const SizedBox(width: 16),
+            const RoundSelectableColor(kPrimary),
+            const SizedBox(width: 8),
+            const RoundSelectableColor(kSurface),
+            const SizedBox(width: 8),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class RoundSelectableColor extends StatelessWidget {
+  const RoundSelectableColor(this.kind);
+
+  final String kind;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<MdcSelectedBloc, MdcSelectedState>(
+        builder: (context, state) {
+      final selected = (state as MDCLoadedState).selected;
+      final allItems = (state as MDCLoadedState).allItems;
+
+      final Color primaryColor = allItems[kPrimary];
+      final Color surfaceColor = allItems[kSurface];
+
+      final Color correctColor = when({
+        () => kind == kPrimary: () => primaryColor,
+        () => kind == kSurface: () => surfaceColor,
+      });
+
+      return SizedBox(
+        width: 24,
+        height: 24,
+        child: RawMaterialButton(
+          onPressed: () {
+            BlocProvider.of<MdcSelectedBloc>(context).add(
+              MDCUpdateAllEvent(
+                primaryColor: primaryColor,
+                surfaceColor: surfaceColor,
+                selectedTitle: kind,
+              ),
+            );
+            colorSelected(context, correctColor);
+          },
+          fillColor: correctColor,
+          shape: CircleBorder(
+            side: BorderSide(
+              width: 2,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            ),
+          ),
+          child: kind == selected ? Icon(FeatherIcons.check, size: 16) : null,
+          elevation: 0.0,
+          padding: EdgeInsets.zero,
+        ),
+      );
+    });
   }
 }
 
@@ -229,26 +338,6 @@ class TextFormColored extends StatelessWidget {
       style: Theme.of(context).textTheme.title.copyWith(
             color: Theme.of(context).colorScheme.onBackground,
           ),
-    );
-  }
-}
-
-class _CopyColorButton extends StatelessWidget {
-  // this needs to be in a separate widget to avoid this error:
-  // https://stackoverflow.com/questions/51304568/scaffold-of-called-with-a-context-that-does-not-contain-a-scaffold
-  const _CopyColorButton({Key key, this.color}) : super(key: key);
-
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      padding: const EdgeInsets.only(left: 8, right: 16),
-      tooltip: "copy color",
-      icon: Icon(FeatherIcons.copy),
-      onPressed: () {
-        copyToClipboard(context, color.toHexStr());
-      },
     );
   }
 }

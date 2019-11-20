@@ -39,6 +39,20 @@ class _ContrastScreenState extends State<ContrastScreen> {
 
   final int r = Random().nextInt(102);
 
+  int currentSegment = 0;
+
+  void onValueChanged(int newValue) {
+    setState(() {
+      currentSegment = newValue;
+      useHSLuv = currentSegment == 0;
+    });
+  }
+
+  final Map<int, Widget> children = const <int, Widget>{
+    0: Text('HSLuv'),
+    1: Text('HSV'),
+  };
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider<ContrastColorBloc>(
@@ -48,7 +62,32 @@ class _ContrastScreenState extends State<ContrastScreen> {
         data: ThemeData.from(colorScheme: const ColorScheme.dark()),
         child: Scaffold(
           appBar: buildAppBar(),
-          body: buildFlex(),
+          body: Column(
+            children: <Widget>[
+              SizedBox(
+                width: 500,
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      left: 16.0, right: 16, top: 16, bottom: 12),
+                  child: CupertinoSlidingSegmentedControl<int>(
+                    backgroundColor: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.20),
+                    thumbColor: compositeColors(
+                      Theme.of(context).colorScheme.background,
+                      Theme.of(context).colorScheme.primary,
+                      0.20,
+                    ),
+                    children: children,
+                    onValueChanged: onValueChanged,
+                    groupValue: currentSegment,
+                  ),
+                ),
+              ),
+              Expanded(child: buildFlex()),
+            ],
+          ),
         ),
       ),
     );
@@ -61,6 +100,7 @@ class _ContrastScreenState extends State<ContrastScreen> {
         final bool more = box.get("moreItems", defaultValue: false);
 
         return Flex(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           // on iPad, always vertical.
           direction: MediaQuery.of(context).size.shortestSide > 600
               ? Axis.vertical
@@ -86,7 +126,7 @@ class _ContrastScreenState extends State<ContrastScreen> {
 
   Widget buildAppBar() {
     return AppBar(
-      title: const Text("Contrast Mode"),
+      title: const Text("Contrast Compare"),
       backgroundColor: blendColorWithBackground(widget.color),
       elevation: 0,
       actions: [
@@ -103,25 +143,25 @@ class _ContrastScreenState extends State<ContrastScreen> {
 //                });
 //              },
 //            ),
-        IconButton(
-          icon: RawMaterialButton(
-            onPressed: null,
-            child: Text(
-              useHSLuv ? "HSV" : "HSL",
-              style: const TextStyle(fontSize: 12),
-            ),
-            shape: CircleBorder(
-              side: BorderSide(color: Theme.of(context).colorScheme.onSurface),
-            ),
-            elevation: 0.0,
-            padding: EdgeInsets.zero,
-          ),
-          onPressed: () {
-            setState(() {
-              useHSLuv = !useHSLuv;
-            });
-          },
-        ),
+//        IconButton(
+//          icon: RawMaterialButton(
+//            onPressed: null,
+//            child: Text(
+//              useHSLuv ? "HSV" : "HSL",
+//              style: const TextStyle(fontSize: 12),
+//            ),
+//            shape: CircleBorder(
+//              side: BorderSide(color: Theme.of(context).colorScheme.onSurface),
+//            ),
+//            elevation: 0.0,
+//            padding: EdgeInsets.zero,
+//          ),
+//          onPressed: () {
+//            setState(() {
+//              useHSLuv = !useHSLuv;
+//            });
+//          },
+//        ),
 
 //        ToggleButtons(
 //          children: const [
@@ -381,56 +421,73 @@ class _ContrastHorizontalPickerState extends State<ContrastHorizontalPicker> {
         ),
         child: Scaffold(
           backgroundColor: rgbColor,
-          body: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 818),
-              child: Flex(
-                mainAxisAlignment: MainAxisAlignment.center,
-                direction: Axis.vertical,
-                children: <Widget>[
-                  const SizedBox(height: 8),
-                  AnimatedOpacity(
-                    opacity: opacity,
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeIn,
-                    child: _UpperPart(otherColor, contrast),
-                  ),
-                  Flex(
-                    direction: Axis.vertical,
-                    children: <Widget>[
-                      const SizedBox(height: 8),
-                      for (int i = 0; i < 3; i++) ...<Widget>[
-                        const SizedBox(height: 4),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                          ),
-                          child: SizedBox(
-                            // make items larger on iPad
-                            height:
-                                MediaQuery.of(context).size.shortestSide < 600
-                                    ? 56
-                                    : 64,
-                            child: widgets[i],
-                          ),
+          body: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 818),
+            child: Flex(
+              mainAxisAlignment: MainAxisAlignment.center,
+              direction: Axis.vertical,
+              children: <Widget>[
+                const SizedBox(height: 8),
+                AnimatedOpacity(
+                  opacity: opacity,
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeIn,
+                  child: _UpperPart(
+                      rgbColor, otherColor, contrast, widget.isFirst),
+                ),
+                Flex(
+                  direction: Axis.vertical,
+                  children: <Widget>[
+                    const SizedBox(height: 8),
+                    for (int i = 0; i < 3; i++) ...<Widget>[
+                      const SizedBox(height: 4),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16, right: 8),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: SizedBox(
+                                // make items larger on iPad
+                                height:
+                                    MediaQuery.of(context).size.shortestSide <
+                                            600
+                                        ? 56
+                                        : 64,
+                                child: widgets[i],
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            SizedBox(
+                              width: 48,
+                              child: Text(
+                                HSInterColor.fromColor(rgbColor, widget.kind)
+                                    .toPartialStr(i),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontFamily: "B612Mono", fontSize: 12),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 4),
-                      ],
+                      ),
+                      const SizedBox(height: 4),
                     ],
-                  ),
-                  AnimatedOpacity(
-                    opacity: opacity,
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeIn,
-                    child: _BottomPart(
-                      rgbColor,
-                      otherColor,
-                      widget.kind,
-                      widget.isFirst,
-                    ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+//                if (widget.isFirst) const SizedBox(height: 16),
+
+//                  AnimatedOpacity(
+//                    opacity: opacity,
+//                    duration: const Duration(milliseconds: 500),
+//                    curve: Curves.easeIn,
+//                    child: _BottomPart(
+//                      rgbColor,
+//                      otherColor,
+//                      widget.kind,
+//                      widget.isFirst,
+//                    ),
+//                  ),
+              ],
             ),
           ),
         ),
@@ -440,10 +497,12 @@ class _ContrastHorizontalPickerState extends State<ContrastHorizontalPicker> {
 }
 
 class _UpperPart extends StatelessWidget {
-  const _UpperPart(this.otherColor, this.contrast);
+  const _UpperPart(this.color, this.otherColor, this.contrast, this.isFirst);
 
   final Color otherColor;
+  final Color color;
   final double contrast;
+  final bool isFirst;
 
   @override
   Widget build(BuildContext context) {
@@ -464,8 +523,9 @@ class _UpperPart extends StatelessWidget {
     );
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
+        const SizedBox(width: 16),
         SizedBox(
           width: 56,
           child: Column(
@@ -494,54 +554,61 @@ class _UpperPart extends StatelessWidget {
             ],
           ),
         ),
-        Container(
-          width: 1,
-          height: 32,
-          color: otherColor,
-        ),
-        Row(
-          children: <Widget>[
-            if (contrast > 3.0) checkIcon else removeIcon,
-            const SizedBox(width: 8),
-//                            Icon(
-//                              Icons.wb_sunny,
-//                              color: otherColor,
-//                            ),
-            const SizedBox(width: 8),
-            Column(
-              children: <Widget>[
-                Text(
-                  "Large",
-                  style: TextStyle(
-                    // similar to H6
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: otherColor,
-                  ),
-                ),
-                Text("AA Large", style: style),
-              ],
+        Expanded(
+          child: Center(
+            child: Container(
+              width: 1,
+              height: 32,
+              color: otherColor,
             ),
-          ],
+          ),
         ),
-        Row(
-          children: <Widget>[
-            if (contrast > 4.5) checkIcon else removeIcon,
-            const SizedBox(width: 8),
-            Column(
-              children: <Widget>[
-                Text(
-                  "Small",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: otherColor,
-                  ),
-                ),
-                Text("AA", style: style),
-              ],
-            ),
-          ],
-        ),
+        _Buttons(color: color, otherColor: otherColor, isFirst: isFirst),
+        const SizedBox(width: 16),
+
+//        Row(
+//          children: <Widget>[
+//            if (contrast > 3.0) checkIcon else removeIcon,
+//            const SizedBox(width: 8),
+////                            Icon(
+////                              Icons.wb_sunny,
+////                              color: otherColor,
+////                            ),
+//            const SizedBox(width: 8),
+//            Column(
+//              children: <Widget>[
+//                Text(
+//                  "Large",
+//                  style: TextStyle(
+//                    // similar to H6
+//                    fontSize: 18,
+//                    fontWeight: FontWeight.w500,
+//                    color: otherColor,
+//                  ),
+//                ),
+//                Text("AA Large", style: style),
+//              ],
+//            ),
+//          ],
+//        ),
+//        Row(
+//          children: <Widget>[
+//            if (contrast > 4.5) checkIcon else removeIcon,
+//            const SizedBox(width: 8),
+//            Column(
+//              children: <Widget>[
+//                Text(
+//                  "Small",
+//                  style: TextStyle(
+//                    fontSize: 14,
+//                    color: otherColor,
+//                  ),
+//                ),
+//                Text("AA", style: style),
+//              ],
+//            ),
+//          ],
+//        ),
       ],
     );
   }
@@ -569,52 +636,65 @@ class _BottomPart extends StatelessWidget {
               fontFamily: "B612Mono",
             ),
           ),
-          Row(
-            children: <Widget>[
-              OutlineButton.icon(
-                icon: Icon(
-                  FeatherIcons.search,
-                  size: 16,
-                ),
-                color: color,
-                highlightedBorderColor: Theme.of(context).colorScheme.onSurface,
-                label: Text(color.toHexStr()),
-                onPressed: () {
-                  showSlidersDialog(context, color, isFirst);
-                },
-                onLongPress: () {
-                  copyToClipboard(context, color.toHexStr());
-                },
-              ),
-              const SizedBox(width: 16),
-              MaterialButton(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(defaultRadius),
-                  side: BorderSide(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.12),
-                    width: 1.0,
-                  ),
-                ),
-                minWidth: 48,
-                elevation: 0,
-                child: Icon(
-                  FeatherIcons.shuffle,
-                  size: 16,
-                ),
-                color: color,
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  BlocProvider.of<ContrastColorBloc>(context)
-                      .add(CMoveColor(shuffleColor(otherColor), isFirst));
-                },
-              ),
-            ],
-          ),
+          _Buttons(color: color, otherColor: otherColor, isFirst: isFirst),
         ],
       ),
+    );
+  }
+}
+
+class _Buttons extends StatelessWidget {
+  const _Buttons({this.color, this.otherColor, this.isFirst});
+
+  final Color color;
+  final Color otherColor;
+  final bool isFirst;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        OutlineButton.icon(
+          icon: Icon(
+            FeatherIcons.search,
+            size: 16,
+          ),
+          color: color,
+          highlightedBorderColor: otherColor,
+          borderSide: BorderSide(color: otherColor),
+          label: Text(color.toHexStr()),
+          onPressed: () {
+            showSlidersDialog(context, color, isFirst);
+          },
+          onLongPress: () {
+            copyToClipboard(context, color.toHexStr());
+          },
+        ),
+        const SizedBox(width: 16),
+        MaterialButton(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(defaultRadius),
+            side: BorderSide(
+              color: otherColor,
+              width: 1.0,
+            ),
+          ),
+          highlightColor:
+              Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+          minWidth: 48,
+          elevation: 0,
+          child: Icon(
+            FeatherIcons.shuffle,
+            size: 16,
+          ),
+//          color: color,
+          padding: EdgeInsets.zero,
+          onPressed: () {
+            BlocProvider.of<ContrastColorBloc>(context)
+                .add(CMoveColor(shuffleColor(otherColor), isFirst));
+          },
+        ),
+      ],
     );
   }
 }

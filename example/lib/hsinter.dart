@@ -115,4 +115,19 @@ class HSInterColor {
           "H:${hue.toInt()} S:${outputSaturation()} V:${outputLightness()}",
     });
   }
+
+  String toPartialStr(int index) {
+    return when({
+      () => kind == "HSLuv": () => when({
+            () => index == 0: () => "H:${hue.toInt()}",
+            () => index == 1: () => "S:${outputSaturation()}",
+            () => index == 2: () => "L:${outputLightness()}",
+          }),
+      () => kind == "HSV": () => when({
+            () => index == 0: () => "H:${hue.toInt()}",
+            () => index == 1: () => "S:${outputSaturation()}",
+            () => index == 2: () => "V:${outputLightness()}",
+          }),
+    });
+  }
 }

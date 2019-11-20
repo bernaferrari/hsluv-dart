@@ -49,8 +49,8 @@ class _HSVerticalPickerState extends State<HSVerticalPicker> {
   }
 
   final Map<int, Widget> children = const <int, Widget>{
-    0: Text('HSLuv'),
-    1: Text('HSV'),
+    0: Text("HSLuv"),
+    1: Text("HSV"),
   };
 
   @override
@@ -74,7 +74,7 @@ class _HSVerticalPickerState extends State<HSVerticalPicker> {
                           borderRadius: BorderRadius.circular(16)),
                       backgroundColor: widget.color,
                       content: Card(
-                        clipBehavior: Clip.antiAlias,
+                          clipBehavior: Clip.antiAlias,
                           margin: EdgeInsets.zero,
                           color: compositeColors(
                             Theme.of(context).colorScheme.background,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
+import 'package:hsluvsample/mdc/mdc_home.dart';
 import 'package:hsluvsample/screen_color_home.dart';
 import 'package:hsluvsample/util/constants.dart';
 import 'package:path_provider/path_provider.dart';
@@ -59,6 +60,9 @@ class _BoxedAppState extends State<BoxedApp> {
         BlocProvider<SliderColorBloc>(
           builder: (context) => _sliderBloc,
         ),
+        BlocProvider<MdcSelectedBloc>(
+          builder: (context) => MdcSelectedBloc(_sliderBloc),
+        ),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
@@ -66,6 +70,7 @@ class _BoxedAppState extends State<BoxedApp> {
           "/": (context) {
             return ColorHome(initialColor: Colors.orange[200]);
           },
+          "/theme" : (context) => MDCHome()
         },
         theme: base.copyWith(
           typography: Typography().copyWith(
