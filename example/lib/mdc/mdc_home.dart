@@ -3,12 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hsluvsample/blocs/blocs.dart';
 import 'package:hsluvsample/contrast/color_with_contrast.dart';
+import 'package:hsluvsample/dashboard_screen.dart';
 import 'package:hsluvsample/mdc/settings.dart';
 import 'package:hsluvsample/mdc/showcase.dart';
 import 'package:hsluvsample/mdc/templates.dart';
 import 'package:hsluvsample/util/constants.dart';
 import 'package:hsluvsample/util/selected.dart';
 
+import 'blindness.dart';
 import 'components.dart';
 import 'contrast_compare.dart';
 
@@ -18,7 +20,9 @@ class MDCHome extends StatelessWidget {
     return BlocBuilder<MdcSelectedBloc, MdcSelectedState>(
         builder: (context, state) {
       final selected = (state as MDCLoadedState).selected;
-      final allItems = (state as MDCLoadedState).allItems;
+      final pureColors = (state as MDCLoadedState).allItems;
+
+      final allItems = (state as MDCLoadedState).blindness;
 
       final Color primaryColor = allItems[kPrimary];
       final Color surfaceColor = allItems[kSurface];
@@ -58,18 +62,27 @@ class MDCHome extends StatelessWidget {
           child: Scaffold(
             appBar: AppBar(),
             body: DefaultTabController(
-              length: 5,
+              length: 6,
               initialIndex: 1,
               child: Column(
                 children: <Widget>[
                   TabBar(
                     isScrollable: true,
                     tabs: [
-                      const Tab(icon: const Text("MDC")),
+                      const Tab(icon: Text("MDC")),
                       Tab(icon: Icon(FeatherIcons.list)),
-                      Tab(icon: Icon(contrast > 4 ? FeatherIcons.smile : FeatherIcons.frown)),
+                      Tab(
+                        icon: Icon(
+                          contrast > 4.5
+                              ? FeatherIcons.smile
+                              : FeatherIcons.frown,
+                          // face will only be happy when contrast satisfies AA.
+                        ),
+                      ),
                       Tab(icon: Icon(FeatherIcons.briefcase)),
-                      Tab(icon: Icon(FeatherIcons.settings)),
+                      Tab(icon: Icon(FeatherIcons.columns)),
+                      Tab(icon: Icon(FeatherIcons.globe)),
+                      // globe because of accessibility
                     ],
                   ),
                   Expanded(
@@ -96,9 +109,102 @@ class MDCHome extends StatelessWidget {
                           backgroundColor: backgroundColor,
                         ),
                         Settings(),
+                        ColorBlindnessTheme(
+                          // it should receive them pure, not the colorblind color.
+                          primaryColor: pureColors[kPrimary],
+                          surfaceColor: pureColors[kSurface],
+                        ),
                       ],
                     ),
                   ),
+                  BlocBuilder<ColorBlindBloc, int>(
+                      builder: (BuildContext context, int state) {
+                    final ColorWithBlind blindSurface =
+                        getColorBlindFromIndex(surfaceColor, state);
+
+                    final ColorWithBlind blindPrimary =
+                        getColorBlindFromIndex(primaryColor, state);
+
+                    return ExpandedSection(
+                      child: state == 0
+                          ? const SizedBox.shrink()
+                          : Row(
+                              children: <Widget>[
+                                const SizedBox(width: 8),
+                                IconButton(
+                                  icon: Icon(
+                                    FeatherIcons.xCircle,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    BlocProvider.of<ColorBlindBloc>(context)
+                                        .add(0);
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(blindPrimary.name,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .body2),
+                                      Text(
+                                        blindPrimary.affects,
+                                        style:
+                                            Theme.of(context).textTheme.caption,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+//                                SizedBox(
+//                                  width: 36,
+//                                  height: 36,
+//                                  child: Material(
+//                                    child: Icon(
+//                                      FeatherIcons.target,
+//                                      size: 16,
+//                                      color: primaryColor,
+//                                    ),
+//                                    shape: CircleBorder(),
+//                                    color: surfaceColor,
+//                                  ),
+//                                ),
+                                SizedBox(
+                                  width: 36,
+                                  child: FlatButton(
+                                    child: Icon(FeatherIcons.chevronLeft),
+                                    onPressed: () {
+                                      int newState = state - 1;
+                                      if (newState <= 0) {
+                                        newState = 8;
+                                      }
+                                      BlocProvider.of<ColorBlindBloc>(context)
+                                          .add(newState);
+                                    },
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 36,
+                                  child: FlatButton(
+                                    child: Icon(FeatherIcons.chevronRight),
+                                    onPressed: () {
+                                      int newState = state + 1;
+                                      if (newState > 8) {
+                                        newState = 1;
+                                      }
+                                      BlocProvider.of<ColorBlindBloc>(context)
+                                          .add(newState);
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                              ],
+                            ),
+                    );
+                  }),
                   Container(
                     height: 56,
                     child: Center(
@@ -106,13 +212,14 @@ class MDCHome extends StatelessWidget {
                         scrollDirection: Axis.horizontal,
                         shrinkWrap: true,
                         children: <Widget>[
-                          IconButton(
-                            tooltip: "Shuffle Colors",
-                            icon: Icon(FeatherIcons.shuffle, size: 20,),
-                            onPressed: () {
-
-                            },
-                          ),
+//                          IconButton(
+//                            tooltip: "Shuffle Colors",
+//                            icon: Icon(
+//                              FeatherIcons.shuffle,
+//                              size: 20,
+//                            ),
+//                            onPressed: () {},
+//                          ),
                           for (var key in allItems.keys)
                             Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -131,18 +238,6 @@ class MDCHome extends StatelessWidget {
                                 },
                               ),
                             ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: SizedBox(
-                              width: 48,
-                              child: FlatButton(
-                                child: Text("Edit"),
-                                onPressed: () {
-
-                                },
-                              ),
-                            ),
-                          )
                         ],
                       ),
                     ),

@@ -34,17 +34,20 @@ class BoxedApp extends StatefulWidget {
 
 class _BoxedAppState extends State<BoxedApp> {
   SliderColorBloc _sliderBloc;
+  ColorBlindBloc colorBlindBloc;
 
   @override
   void initState() {
     super.initState();
     _sliderBloc = SliderColorBloc()..add(MoveColor(Colors.orange[200], true));
+    colorBlindBloc = ColorBlindBloc();
   }
 
   @override
   void dispose() {
     super.dispose();
     _sliderBloc.close();
+    colorBlindBloc.close();
   }
 
   @override
@@ -61,8 +64,11 @@ class _BoxedAppState extends State<BoxedApp> {
           builder: (context) => _sliderBloc,
         ),
         BlocProvider<MdcSelectedBloc>(
-          builder: (context) => MdcSelectedBloc(_sliderBloc),
+          builder: (context) => MdcSelectedBloc(_sliderBloc, colorBlindBloc),
         ),
+        BlocProvider<ColorBlindBloc>(
+          builder: (context) => colorBlindBloc,
+        )
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
@@ -70,7 +76,7 @@ class _BoxedAppState extends State<BoxedApp> {
           "/": (context) {
             return ColorHome(initialColor: Colors.orange[200]);
           },
-          "/theme" : (context) => MDCHome()
+          "/theme": (context) => MDCHome()
         },
         theme: base.copyWith(
           typography: Typography().copyWith(

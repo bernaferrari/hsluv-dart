@@ -6,9 +6,24 @@ abstract class MdcSelectedEvent extends Equatable {
   const MdcSelectedEvent();
 }
 
+class MDCBlindnessEvent extends MdcSelectedEvent {
+  const MDCBlindnessEvent({this.blindnessSelected});
+
+  final int blindnessSelected;
+
+  @override
+  String toString() => "MDCBlindnessEvent...";
+
+  @override
+  List<Object> get props => [blindnessSelected];
+}
+
 class MDCLoadEvent extends MdcSelectedEvent {
-  const MDCLoadEvent(
-      {this.currentColor, this.currentTitle, this.selectedTitle});
+  const MDCLoadEvent({
+    this.currentColor,
+    this.currentTitle,
+    this.selectedTitle,
+  });
 
   final Color currentColor;
   final String currentTitle;
@@ -16,15 +31,18 @@ class MDCLoadEvent extends MdcSelectedEvent {
 
   @override
   String toString() =>
-      "MDCLoadEvent... cColor: $currentColor cTitle $currentTitle sTitle $selectedTitle";
+      "MDCLoadEvent... Color: $currentColor Title: $currentTitle Selected: $selectedTitle";
 
   @override
   List<Object> get props => [currentColor, currentTitle, selectedTitle];
 }
 
 class MDCUpdateAllEvent extends MdcSelectedEvent {
-  const MDCUpdateAllEvent(
-      {this.primaryColor, this.surfaceColor, this.selectedTitle});
+  const MDCUpdateAllEvent({
+    this.primaryColor,
+    this.surfaceColor,
+    this.selectedTitle,
+  });
 
   final Color primaryColor;
   final Color surfaceColor;

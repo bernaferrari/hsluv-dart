@@ -8,6 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hsluvsample/blocs/contrast_color/contrast_color_event.dart';
+import 'package:hsluvsample/blocs/contrast_color/contrast_color_state.dart';
 import 'package:hsluvsample/contrast/color_with_contrast.dart';
 import 'package:hsluvsample/contrast/shuffle_color.dart';
 import 'package:hsluvsample/hsinter.dart';

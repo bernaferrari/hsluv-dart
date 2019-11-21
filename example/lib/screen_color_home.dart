@@ -252,7 +252,7 @@ class RoundSelectableColor extends StatelessWidget {
     return BlocBuilder<MdcSelectedBloc, MdcSelectedState>(
         builder: (context, state) {
       final selected = (state as MDCLoadedState).selected;
-      final allItems = (state as MDCLoadedState).allItems;
+      final allItems = (state as MDCLoadedState).blindness;
 
       final Color primaryColor = allItems[kPrimary];
       final Color surfaceColor = allItems[kSurface];

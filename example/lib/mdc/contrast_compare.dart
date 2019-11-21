@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hsluvsample/contrast/color_with_contrast.dart';
+import 'package:hsluvsample/contrast/contrast_util.dart';
 import 'package:hsluvsample/mdc/container_with_number.dart';
 import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/util/constants.dart';
@@ -64,7 +65,7 @@ class ContrastComparison extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 32.0),
               child: Text(
                 "In a dark theme, at higher levels of elevation, components express depth by displaying lighter surface color.\n"
-                    "The higher a surface’s elevation (raising it closer to an implied light source), the lighter that surface becomes. That lightness is expressed through the application of a semi-transparent overlay using the On Surface color (default: white).",
+                "The higher a surface’s elevation (raising it closer to an implied light source), the lighter that surface becomes. That lightness is expressed through the application of a semi-transparent overlay using the On Surface color (default: white).",
                 style: Theme.of(context).textTheme.caption,
                 textAlign: TextAlign.justify,
               ),
@@ -133,22 +134,26 @@ class ListContrast extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           shrinkWrap: true,
           children: <Widget>[
-            Center(
-              child: Text(
-                contrastList[0].toStringAsPrecision(3),
-                style: Theme.of(context).textTheme.title,
-              ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text("max", style: Theme.of(context).textTheme.overline),
+                ContrastText(contrastList[0], withSizedBox: false),
+                Text(getContrastLetters(contrastList[0]), style: Theme.of(context).textTheme.overline),
+              ],
             ),
             const SizedBox(width: 16),
             for (int i = 0; i < elevationEntriesList.length; i++)
               compareWidget2(context, contrastList[i], i),
             const SizedBox(width: 16),
-            Center(
-              child: Text(
-                contrastList[elevationEntriesList.length - 1]
-                    .toStringAsPrecision(3),
-                style: Theme.of(context).textTheme.title,
-              ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text("min", style: Theme.of(context).textTheme.overline),
+                ContrastText(contrastList[elevationEntriesList.length - 1],
+                    withSizedBox: false),
+                Text(getContrastLetters(contrastList[elevationEntriesList.length - 1]), style: Theme.of(context).textTheme.overline),
+              ],
             ),
           ],
         ),
@@ -158,7 +163,8 @@ class ListContrast extends StatelessWidget {
 
   Widget compareWidget2(BuildContext context, double contrast, int i) {
     return Tooltip(
-      message: "[${elevationEntries[i].elevation.round()}] ${contrast.toStringAsPrecision(3)}:1",
+      message:
+          "[${elevationEntries[i].elevation.round()}] ${contrast.toStringAsPrecision(3)}:1",
       child: Column(
         children: <Widget>[
           Expanded(
@@ -239,11 +245,12 @@ class RowContrastCompare extends StatelessWidget {
                 Row(
                   children: <Widget>[
                     SizedBox(
-                        width: 56,
-                        child: HexCaption(
-                          colorWithContrast.color,
-                          Theme.of(context).textTheme.caption.color,
-                        )),
+                      width: 56,
+                      child: HexCaption(
+                        colorWithContrast.color,
+                        Theme.of(context).textTheme.caption.color,
+                      ),
+                    ),
                     const SizedBox(width: 8),
                     ContrastProgressBar(contrast: contrast),
                     const SizedBox(width: 4),
@@ -259,27 +266,34 @@ class RowContrastCompare extends StatelessWidget {
 }
 
 class ContrastText extends StatelessWidget {
-  const ContrastText(this.contrast);
+  const ContrastText(this.contrast, {this.withSizedBox = true});
 
   final double contrast;
+  final bool withSizedBox;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 56,
-      child: RichText(
-        text: TextSpan(
-          text: contrast.toStringAsPrecision(3),
-          style: Theme.of(context).textTheme.title.copyWith(fontSize: 18),
-          children: <TextSpan>[
-            TextSpan(
-              text: ':1',
-              style: Theme.of(context).textTheme.title.copyWith(fontSize: 16),
-            ),
-          ],
-        ),
+    final widget = RichText(
+      text: TextSpan(
+        text: contrast.toStringAsPrecision(3),
+        style: Theme.of(context).textTheme.title.copyWith(fontSize: 18),
+        children: <TextSpan>[
+          TextSpan(
+            text: ':1',
+            style: Theme.of(context).textTheme.title.copyWith(fontSize: 14),
+          ),
+        ],
       ),
     );
+
+    if (withSizedBox) {
+      return SizedBox(
+        width: 56,
+        child: widget,
+      );
+    } else {
+      return widget;
+    }
   }
 }
 

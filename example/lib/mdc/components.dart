@@ -105,7 +105,7 @@ class Components extends StatelessWidget {
 //              ),
 //            ),
 //          ),
-          Padding(
+          const Padding(
             padding: const EdgeInsets.only(top: 24.0),
             child: Text(
               "background",
@@ -127,7 +127,7 @@ class Components extends StatelessWidget {
                   style: TextStyle(color: Colors.white),
                 ),
                 subtitle: Text(
-                  "${(bgFromPrimary.toHexStr())} = 8% of Primary + #121212",
+                  "${bgFromPrimary.toHexStr()} = 8% of Primary + #121212",
                   style: TextStyle(
                       fontSize: 12, color: Colors.white.withOpacity(0.8)),
                 ),
@@ -138,7 +138,7 @@ class Components extends StatelessWidget {
               },
             ),
           ),
-          Padding(
+          const Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Text(
               "out of creativity?",
@@ -186,7 +186,7 @@ class Components extends StatelessWidget {
 
                     final surface = (BlocProvider.of<MdcSelectedBloc>(context)
                             .state as MDCLoadedState)
-                        .allItems[kSurface];
+                        .blindness[kSurface];
                     final newPrimaryColor =
                         findMatchingPair(randomList, surface, 4.5);
 
@@ -212,7 +212,7 @@ class Components extends StatelessWidget {
 
                     final primary = (BlocProvider.of<MdcSelectedBloc>(context)
                             .state as MDCLoadedState)
-                        .allItems[kPrimary];
+                        .blindness[kPrimary];
 
                     final newSurfaceColor =
                         findMatchingPair(randomList, primary, 4.5);
@@ -223,7 +223,6 @@ class Components extends StatelessWidget {
                       surfaceColor: newSurfaceColor,
                       selectedTitle: kSurface,
                     ));
-
                     colorSelected(context, newSurfaceColor);
                   },
                 ),
