@@ -3,11 +3,34 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:hsluvsample/contrast/color_with_contrast.dart';
 
+import '../blocs.dart';
 import 'multiple_contrast_color_event.dart';
 import 'multiple_contrast_color_state.dart';
 
 class MultipleContrastColorBloc
     extends Bloc<MultipleContrastColorEvent, MultipleContrastColorState> {
+  MultipleContrastColorBloc(this._sliderColorsBloc) {
+    _slidersSubscription = _sliderColorsBloc.listen((stateValue) async {
+      if (stateValue is SliderColorLoaded) {
+        add(
+          MCMoveColor(
+            stateValue.rgbColor,
+            (state as MultipleContrastColorLoaded).selected,
+          ),
+        );
+      }
+    });
+  }
+
+  final SliderColorBloc _sliderColorsBloc;
+  StreamSubscription _slidersSubscription;
+
+  @override
+  Future<void> close() {
+    _slidersSubscription.cancel();
+    return super.close();
+  }
+
   @override
   MultipleContrastColorState get initialState => MultipleContrastColorLoading();
 
@@ -37,7 +60,7 @@ class MultipleContrastColorBloc
       );
     }
 
-    yield MultipleContrastColorLoaded(loadedColors);
+    yield MultipleContrastColorLoaded(loadedColors, 0);
   }
 
   Stream<MultipleContrastColorState> _mapColor(MCMoveColor load) async* {
@@ -68,7 +91,7 @@ class MultipleContrastColorBloc
         );
       }
     }
-
-    yield MultipleContrastColorLoaded(newList);
+    
+    yield MultipleContrastColorLoaded(newList, load.index);
   }
 }

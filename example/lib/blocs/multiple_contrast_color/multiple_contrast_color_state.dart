@@ -3,10 +3,7 @@ import 'dart:ui';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hsluv/flutter/hsluvcolor.dart';
-import 'package:hsluvsample/contrast/color_with_contrast.dart';
 import 'package:meta/meta.dart';
-
-import '../../dashboard_screen.dart';
 
 @immutable
 abstract class MultipleContrastColorState extends Equatable {
@@ -22,15 +19,16 @@ class MultipleContrastColorLoading extends MultipleContrastColorState {
 }
 
 class MultipleContrastColorLoaded extends MultipleContrastColorState {
-  const MultipleContrastColorLoaded(this.colorsList);
+  const MultipleContrastColorLoaded(this.colorsList, this.selected);
 
   final List<ContrastedColor> colorsList;
+  final int selected;
 
   @override
   String toString() => 'BlindColorsLoaded state $colorsList';
 
   @override
-  List<Object> get props => [colorsList];
+  List<Object> get props => [colorsList, selected];
 }
 
 class ContrastedColor {

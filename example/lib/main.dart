@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'blocs/blocs.dart';
 import 'contrast/contrast_screen.dart';
+import 'contrast/shuffle_color.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,6 +63,23 @@ class _BoxedAppState extends State<BoxedApp> {
 
     return MultiBlocProvider(
       providers: [
+        BlocProvider<MultipleContrastColorBloc>(
+          builder: (context) => MultipleContrastColorBloc(_sliderBloc)
+            ..add(
+              MultipleLoadInit(
+                [
+                  Colors.orange[200],
+                  getShuffleColor(),
+                  getShuffleColor(),
+                  Colors.white,
+                  Colors.black,
+                  getShuffleColor(),
+                  getShuffleColor(),
+                  getShuffleColor(),
+                ],
+              ),
+        ),
+        ),
         BlocProvider<SliderColorBloc>(
           builder: (context) => _sliderBloc,
         ),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hsluvsample/mdc/components.dart';
 import 'package:hsluvsample/multiple_sliders.dart';
 import 'package:hsluvsample/screen_about.dart';
 import 'package:hsluvsample/util/color_util.dart';
@@ -188,6 +189,8 @@ class _ColorHomeState extends State<ColorHome> {
 }
 
 class ThemeBar extends StatelessWidget {
+  final bool themeMode = false;
+
   @override
   Widget build(BuildContext context) {
     final accentColor =
@@ -198,45 +201,108 @@ class ThemeBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(color: accentColor),
       ),
+      clipBehavior: Clip.antiAlias,
       elevation: 0,
       color: compositeColors(Theme.of(context).colorScheme.background,
           Theme.of(context).colorScheme.primary, 0.20),
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 12, left: 16, right: 16),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            SizedBox(
-              height: 36,
-              child: FlatButton.icon(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/theme');
-                },
-                icon: Icon(FeatherIcons.layout,
-                    size: 20, color: Theme.of(context).colorScheme.onSurface),
-                label: Text(
-                  "Theming",
-                  style: Theme.of(context).textTheme.body2.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontWeight: FontWeight.w600,
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: themeMode
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  SizedBox(
+                    height: 36,
+                    child: FlatButton.icon(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/theme');
+                      },
+                      icon: Icon(FeatherIcons.layout,
+                          size: 20,
+                          color: Theme.of(context).colorScheme.onSurface),
+                      label: Text(
+                        "Theming",
+                        style: Theme.of(context).textTheme.body2.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontWeight: FontWeight.w600,
+                            ),
                       ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              width: 1,
-              height: 24,
-              color: accentColor,
-            ),
-            const SizedBox(width: 16),
-            const RoundSelectableColor(kPrimary),
-            const SizedBox(width: 8),
-            const RoundSelectableColor(kSurface),
-            const SizedBox(width: 8),
-          ],
-        ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 1,
+                    height: 24,
+                    color: accentColor,
+                  ),
+                  const SizedBox(width: 16),
+                  const RoundSelectableColor(kPrimary),
+                  const SizedBox(width: 8),
+                  const RoundSelectableColor(kSurface),
+                  const SizedBox(width: 8),
+                ],
+              )
+            : BlocBuilder<MultipleContrastColorBloc,
+                MultipleContrastColorState>(builder: (context, state) {
+                if (state is MultipleContrastColorLoading) {
+                  return const Center(child: LoadingIndicator());
+                }
+
+                final selected =
+                    (state as MultipleContrastColorLoaded).selected;
+
+                final list = (state as MultipleContrastColorLoaded).colorsList;
+                return SizedBox(
+                  height: 36,
+                  child: ListView(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      children: <Widget>[
+                        const SizedBox(width: 16),
+                        for (int i = 0; i < list.length; i++) ...[
+                          SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: RawMaterialButton(
+                              onPressed: () {
+                                BlocProvider.of<MultipleContrastColorBloc>(
+                                        context)
+                                    .add(
+                                  MCMoveColor(
+                                    list[i].rgbColor,
+                                    i,
+                                  ),
+                                );
+                                colorSelected(context, list[i].rgbColor);
+                              },
+                              fillColor: list[i].rgbColor,
+                              shape: CircleBorder(
+                                side: BorderSide(
+                                  width: 2,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withOpacity(0.7),
+                                ),
+                              ),
+                              child: selected == i
+                                  ? Icon(
+                                      FeatherIcons.check,
+                                      size: 16,
+                                      color: contrastingColor(list[i].rgbColor),
+                                    )
+                                  : null,
+                              elevation: 0.0,
+                              padding: EdgeInsets.zero,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        const SizedBox(width: 8),
+                      ]),
+                );
+              }),
       ),
     );
   }

@@ -50,100 +50,81 @@ class _MultipleContrastScreenState extends State<MultipleContrastScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<MultipleContrastColorBloc>(
-      builder: (ctx) => MultipleContrastColorBloc()
-        ..add(
-          MultipleLoadInit(
-            [
-              widget.color,
-              getShuffleColor(),
-              getShuffleColor(),
-              Colors.white,
-              Colors.black,
-              getShuffleColor(),
-              getShuffleColor(),
-              getShuffleColor(),
-              getShuffleColor(),
-              getShuffleColor(),
+    return BlocBuilder<MultipleContrastColorBloc, MultipleContrastColorState>(
+        builder:
+            (BuildContext builderContext, MultipleContrastColorState state) {
+      if (state is MultipleContrastColorLoading) {
+        return const Scaffold(body: Center(child: LoadingIndicator()));
+      }
+
+      final list = (state as MultipleContrastColorLoaded).colorsList;
+
+      ColorScheme colorScheme;
+
+      if (list[0].rgbColor.computeLuminance() > kLumContrast) {
+        colorScheme = ColorScheme.light(
+          primary: list[0].rgbColor,
+          surface: list[0].rgbColor,
+        );
+      } else {
+        colorScheme = ColorScheme.dark(
+          primary: list[0].rgbColor,
+          surface: list[0].rgbColor,
+        );
+      }
+
+      return Theme(
+        data: ThemeData.from(
+          colorScheme: colorScheme,
+        ),
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text("Contrast Compare"),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(FeatherIcons.list),
+                onPressed: () => showReorderDialog(builderContext, list),
+              )
+            ],
+            bottom: PreferredSize(
+              preferredSize: const Size(500, 56),
+              child: Container(
+                width: 500,
+                padding: const EdgeInsets.only(
+                  left: 16.0,
+                  right: 16,
+                  top: 16,
+                  bottom: 12,
+                ),
+                child: CupertinoSlidingSegmentedControl<int>(
+                  backgroundColor: colorScheme.onSurface.withOpacity(0.20),
+                  thumbColor: compositeColors(
+                    colorScheme.background,
+                    list[0].rgbColor,
+                    0.20,
+                  ),
+                  children: const <int, Widget>{
+                    0: Text('Contrast'),
+                    1: Text('Info'),
+                  },
+                  onValueChanged: onValueChanged,
+                  groupValue: currentSegment,
+                ),
+              ),
+            ),
+//              backgroundColor: blendColorWithBackground(widget.color),
+          ),
+          body: Column(
+            children: <Widget>[
+              if (contrastMode)
+                Expanded(child: buildFlex(list))
+              else
+                Expanded(child: InfoScreen(list))
             ],
           ),
         ),
-      child: BlocBuilder<MultipleContrastColorBloc, MultipleContrastColorState>(
-          builder:
-              (BuildContext builderContext, MultipleContrastColorState state) {
-        if (state is MultipleContrastColorLoading) {
-          return const Scaffold(body: Center(child: LoadingIndicator()));
-        }
-
-        final list = (state as MultipleContrastColorLoaded).colorsList;
-
-        ColorScheme colorScheme;
-
-        if (list[0].rgbColor.computeLuminance() > kLumContrast) {
-          colorScheme = ColorScheme.light(
-            primary: list[0].rgbColor,
-            surface: list[0].rgbColor,
-          );
-        } else {
-          colorScheme = ColorScheme.dark(
-            primary: list[0].rgbColor,
-            surface: list[0].rgbColor,
-          );
-        }
-
-        return Theme(
-          data: ThemeData.from(
-            colorScheme: colorScheme,
-          ),
-          child: Scaffold(
-            appBar: AppBar(
-              title: const Text("Contrast Compare"),
-              actions: <Widget>[
-                IconButton(
-                  icon: Icon(FeatherIcons.list),
-                  onPressed: () => showReorderDialog(builderContext, list),
-                )
-              ],
-              bottom: PreferredSize(
-                preferredSize: const Size(500, 56),
-                child: Container(
-                  width: 500,
-                  padding: const EdgeInsets.only(
-                    left: 16.0,
-                    right: 16,
-                    top: 16,
-                    bottom: 12,
-                  ),
-                  child: CupertinoSlidingSegmentedControl<int>(
-                    backgroundColor: colorScheme.onSurface.withOpacity(0.20),
-                    thumbColor: compositeColors(
-                      colorScheme.background,
-                      list[0].rgbColor,
-                      0.20,
-                    ),
-                    children: const <int, Widget>{
-                      0: Text('Contrast'),
-                      1: Text('Info'),
-                    },
-                    onValueChanged: onValueChanged,
-                    groupValue: currentSegment,
-                  ),
-                ),
-              ),
-//              backgroundColor: blendColorWithBackground(widget.color),
-            ),
-            body: Column(
-              children: <Widget>[
-                if (contrastMode)
-                  Expanded(child: buildFlex(list))
-                else
-                  Expanded(child: InfoScreen(list))
-              ],
-            ),
-          ),
-        );
-      }),
-    );
+      );
+    });
   }
 
   Widget buildFlex(List<ContrastedColor> list) {
