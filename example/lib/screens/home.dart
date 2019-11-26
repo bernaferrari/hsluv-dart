@@ -6,6 +6,7 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hsluvsample/mdc/components.dart';
 import 'package:hsluvsample/screens/about.dart';
 import 'package:hsluvsample/screens/multiple_sliders.dart';
+import 'package:hsluvsample/screens/single_color_blindness.dart';
 import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/util/selected.dart';
 import 'package:hsluvsample/util/when.dart';
@@ -83,7 +84,7 @@ class _HomeState extends State<Home> {
         child: Scaffold(
           backgroundColor: color,
           body: DefaultTabController(
-            length: 3,
+            length: 4,
             initialIndex: 1,
             child: SafeArea(
               child: Column(
@@ -93,6 +94,7 @@ class _HomeState extends State<Home> {
                       children: [
                         const MultipleSliders(),
                         HSVerticalPicker(color: color),
+                        const SingleColorBlindness(),
                         const About(),
                       ],
                     ),
@@ -119,6 +121,7 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       const Tab(icon: Icon(FeatherIcons.barChart2)),
+                      Tab(icon: Icon(Icons.invert_colors)),
                       Tab(icon: Icon(FeatherIcons.info)),
                     ],
                   ),

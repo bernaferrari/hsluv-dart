@@ -8,6 +8,7 @@ import 'package:hsluvsample/util/color_blindness.dart';
 import 'package:hsluvsample/util/selected.dart';
 import 'package:hsluvsample/vertical_picker/app_bar_actions.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
+import 'package:hsluvsample/widgets/update_color_dialog.dart';
 
 import '../mdc/components.dart';
 import '../util/color_util.dart';
@@ -28,63 +29,72 @@ class SingleColorBlindness extends StatelessWidget {
         final surfaceColor = blendColorWithBackground(color);
         final values = retrieveColorBlind(color);
 
-        return Theme(
-          data: ThemeData.from(
-            colorScheme: ColorScheme.dark(surface: surfaceColor),
-          ).copyWith(
-            cardTheme: Theme.of(context).cardTheme,
-            buttonTheme: Theme.of(context).buttonTheme,
-          ),
-          child: Scaffold(
-            appBar: AppBar(
-              title: const Text("Color Blindness"),
-              actions: <Widget>[
-                ColorSearchButton(color: color),
-                const SizedBox(width: 8),
-              ],
-            ),
+        return Scaffold(
+          appBar: AppBar(
             backgroundColor: color,
-            body: Card(
-              margin: const EdgeInsets.all(16),
-              child: ListView(
-                key: const PageStorageKey("color_blind"),
-                children: <Widget>[
-                  const SizedBox(height: 16),
-                  for (var key in values.keys) ...[
-                    Text(
-                      key,
-                      style: Theme.of(context).textTheme.title,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: LayoutBuilder(
-                        builder: (context, builder) {
-                          final numOfItems = (builder.maxWidth / 280).floor();
-                          return Wrap(
-                            children: <Widget>[
-                              for (var value in values[key]) ...[
-                                SizedBox(
-                                  width: builder.maxWidth / numOfItems,
-                                  height: 80,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: _ColorBlindCard(value, color),
-                                  ),
-                                )
-                              ],
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    if (key != "Monochromacy") const Divider(),
-                    const SizedBox(height: 8),
-                  ],
-                ],
+            elevation: 0,
+            title: const Text("Color Blindness"),
+            actions: <Widget>[
+              ColorSearchButton(color: color),
+              const SizedBox(width: 8),
+            ],
+          ),
+          backgroundColor: color,
+          body: Card(
+            color: Theme.of(context).colorScheme.background.withOpacity(0.20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(
+                color:
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.40),
               ),
+            ),
+            elevation: 0,
+            margin: const EdgeInsets.all(16),
+            child: ListView(
+              key: const PageStorageKey("color_blind"),
+              children: <Widget>[
+                const SizedBox(height: 24),
+                for (var key in values.keys) ...[
+                  Text(
+                    key,
+                    style: Theme.of(context).textTheme.title,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    child: LayoutBuilder(
+                      builder: (context, builder) {
+                        final numOfItems = (builder.maxWidth / 280).floor();
+                        return Wrap(
+                          children: <Widget>[
+                            for (var value in values[key]) ...[
+                              SizedBox(
+                                width: builder.maxWidth / numOfItems,
+                                height: 80,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: _ColorBlindCard(value, color),
+                                ),
+                              )
+                            ],
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  if (key != "Monochromacy")
+                    Divider(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.40),
+                    ),
+                  const SizedBox(height: 12),
+                ],
+              ],
             ),
           ),
         );
@@ -142,9 +152,17 @@ class _ColorBlindCard extends StatelessWidget {
     return MaterialButton(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       color: blindColor.color,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+              color:
+                  Theme.of(context).colorScheme.onSurface.withOpacity(0.20))),
       elevation: 0,
       onPressed: () {
         colorSelected(context, blindColor.color);
+      },
+      onLongPress: () {
+        showSlidersDialog(context, blindColor.color);
       },
       child: Row(
         children: <Widget>[

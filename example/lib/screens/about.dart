@@ -12,8 +12,6 @@ import 'package:hsluvsample/contrast/shuffle_color.dart';
 import 'package:hsluvsample/util/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'single_color_blindness.dart';
-
 class About extends StatelessWidget {
   const About();
 
@@ -32,9 +30,6 @@ class About extends StatelessWidget {
             ),
             TranslucentCard(
               child: ColorCompare(),
-            ),
-            TranslucentCard(
-              child: ColorBlindSection(),
             ),
             TranslucentCard(
               child: ShuffleSection(),
@@ -172,47 +167,6 @@ class ColorCompare extends StatelessWidget {
                   const SizedBox(width: 16),
                   Text(
                     "Compare Colors",
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.title,
-                  ),
-                ],
-              ),
-            ),
-            Icon(FeatherIcons.chevronRight),
-            const SizedBox(width: 16),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ColorBlindSection extends StatelessWidget {
-  const ColorBlindSection();
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        Navigator.push<dynamic>(
-          context,
-          MaterialPageRoute<dynamic>(
-            builder: (context) => const SingleColorBlindness(),
-          ),
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Icon(FeatherIcons.globe),
-                  const SizedBox(width: 16),
-                  Text(
-                    "Color Blindness",
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.title,
                   ),
