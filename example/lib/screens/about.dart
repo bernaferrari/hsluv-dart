@@ -2,17 +2,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hsluvsample/blocs/blocs.dart';
 import 'package:hsluvsample/contrast/contrast_screen.dart';
+import 'package:hsluvsample/contrast/shuffle_color.dart';
 import 'package:hsluvsample/util/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'single_color_blind.dart';
+import 'single_color_blindness.dart';
 
-class AboutScreen extends StatelessWidget {
-  const AboutScreen();
+class About extends StatelessWidget {
+  const About();
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +35,9 @@ class AboutScreen extends StatelessWidget {
             ),
             TranslucentCard(
               child: ColorBlindSection(),
+            ),
+            TranslucentCard(
+              child: ShuffleSection(),
             ),
             TranslucentCard(
               child: GDPR(),
@@ -191,7 +197,7 @@ class ColorBlindSection extends StatelessWidget {
         Navigator.push<dynamic>(
           context,
           MaterialPageRoute<dynamic>(
-            builder: (context) => const BlindScreen(),
+            builder: (context) => const SingleColorBlindness(),
           ),
         );
       },
@@ -207,6 +213,44 @@ class ColorBlindSection extends StatelessWidget {
                   const SizedBox(width: 16),
                   Text(
                     "Color Blindness",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                ],
+              ),
+            ),
+            Icon(FeatherIcons.chevronRight),
+            const SizedBox(width: 16),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ShuffleSection extends StatelessWidget {
+  const ShuffleSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        BlocProvider.of<MultipleContrastColorBloc>(context).add(
+          MultipleLoadInit(getShuffledColors()),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(FeatherIcons.shuffle),
+                  const SizedBox(width: 16),
+                  Text(
+                    "Shuffle colors",
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.title,
                   ),

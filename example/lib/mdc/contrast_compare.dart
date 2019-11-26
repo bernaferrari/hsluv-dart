@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hsluvsample/contrast/inter_color_with_contrast.dart';
 import 'package:hsluvsample/contrast/contrast_util.dart';
-import 'package:hsluvsample/mdc/container_with_number.dart';
+import 'package:hsluvsample/mdc/widgets/container_with_number.dart';
 import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/util/constants.dart';
 import 'package:hsluvsample/util/selected.dart';
 
-import 'elevation_overlay.dart';
+import 'util/elevation_overlay.dart';
 import 'widgets/FAProgressBar.dart';
 
 class ColorWithContrast {

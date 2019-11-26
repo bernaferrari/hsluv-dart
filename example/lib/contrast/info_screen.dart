@@ -6,6 +6,7 @@ import 'package:hsluvsample/mdc/components.dart';
 import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/util/constants.dart';
 import 'package:hsluvsample/util/when.dart';
+import 'package:hsluvsample/widgets/update_color_dialog.dart';
 
 class InfoScreen extends StatefulWidget {
   const InfoScreen(this.list);
@@ -64,20 +65,31 @@ class _InfoScreenState extends State<InfoScreen> {
     final list = widget.list;
 
     return ListView(
+      key: const PageStorageKey("InfoKey"),
       children: <Widget>[
         header(list),
         for (int i = 1; i < list.length; i++)
-          Container(
+          SizedBox(
             height: 112,
-            color: list[i].rgbColor,
-            child: when({
-              () => currentSegment == 0: () =>
-                  rgbInfo(Colors.red, list[i].rgbColor, false, 1.0),
-              () => currentSegment == 1: () =>
-                  hsluvInfo(Colors.red, list[i].rgbColor, false, 1.0),
-              () => currentSegment == 2: () =>
-                  hsvInfo(Colors.red, list[i].rgbColor, false, 1.0),
-            }),
+            child: Material(
+              color: list[i].rgbColor,
+              child: InkWell(
+                onTap: () {
+                  showSlidersDialog(context, list[i].rgbColor);
+                },
+                onLongPress: () {
+                  showSlidersDialog(context, list[i].rgbColor);
+                },
+                child: when({
+                  () => currentSegment == 0: () =>
+                      rgbInfo(list[0].rgbColor, list[i].rgbColor, false, 1.0),
+                  () => currentSegment == 1: () =>
+                      hsluvInfo(list[0].rgbColor, list[i].rgbColor, false, 1.0),
+                  () => currentSegment == 2: () =>
+                      hsvInfo(list[0].rgbColor, list[i].rgbColor, false, 1.0),
+                }),
+              ),
+            ),
           ),
       ],
     );
@@ -96,7 +108,7 @@ class _InfoScreenState extends State<InfoScreen> {
           headerText("RGB", 0, firstColor),
           const SizedBox(height: 8),
           rgbInfo(
-            Colors.red,
+            firstColor,
             firstColor,
             true,
             currentSegment == 0 ? 1.0 : 0.5,
@@ -105,7 +117,7 @@ class _InfoScreenState extends State<InfoScreen> {
           headerText("HSLuv", 1, firstColor),
           const SizedBox(height: 8),
           hsluvInfo(
-            Colors.red,
+            firstColor,
             firstColor,
             true,
             currentSegment == 1 ? 1.0 : 0.5,
@@ -114,7 +126,7 @@ class _InfoScreenState extends State<InfoScreen> {
           headerText("HSV", 2, firstColor),
           const SizedBox(height: 8),
           hsvInfo(
-            Colors.red,
+            firstColor,
             firstColor,
             true,
             currentSegment == 2 ? 1.0 : 0.5,

@@ -9,7 +9,7 @@ import 'package:hsluvsample/util/constants.dart';
 import 'package:hsluvsample/util/selected.dart';
 import 'package:hsluvsample/widgets/color_sliders/slider_that_works.dart';
 
-import 'elevation_overlay.dart';
+import 'util/elevation_overlay.dart';
 
 class Components extends StatelessWidget {
   const Components(

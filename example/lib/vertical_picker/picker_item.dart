@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hsluvsample/util/constants.dart';
 import 'package:hsluvsample/util/selected.dart';
 import 'package:hsluvsample/util/when.dart';
+import 'package:hsluvsample/widgets/update_color_dialog.dart';
 
 import '../color_with_inter.dart';
 import '../hsinter.dart';
@@ -57,6 +58,9 @@ class ColorCompareWidgetDetails extends StatelessWidget {
               () {
                 colorSelected(context, color.color);
               },
+          onLongPress: () {
+            showSlidersDialog(context, color.color);
+          },
           child: compactText ? centeredText : cornerText,
         ),
       ),

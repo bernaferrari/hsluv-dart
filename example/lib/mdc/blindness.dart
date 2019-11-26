@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hsluvsample/blocs/blocs.dart';
+import 'package:hsluvsample/util/color_blindness.dart';
 
-import '../dashboard_screen.dart';
+import 'util/color_blind_from_index.dart';
+import '../screens/single_color_blindness.dart';
 
 class ColorBlindnessTheme extends StatelessWidget {
   const ColorBlindnessTheme({this.primaryColor, this.surfaceColor});
@@ -65,6 +67,29 @@ class ColorBlindnessTheme extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  // sources:
+// https://www.color-blindness.com/
+// https://www.color-blindness.com/category/tools/
+// https://en.wikipedia.org/wiki/Color_blindness
+// https://en.wikipedia.org/wiki/Dichromacy
+  List<ColorWithBlind> retrieveColorBlindList(Color color) {
+    const m = "of males";
+    const f = "of females";
+    const p = "of population";
+
+    return [
+      ColorWithBlind(color, "None", "default"),
+      ColorWithBlind(protanomaly(color), "Protanomaly", "1% $m, 0.01% $f"),
+      ColorWithBlind(deuteranomaly(color), "Deuteranomaly", "6% $m, 0.4% $f"),
+      ColorWithBlind(tritanomaly(color), "Tritanomaly", "0.01% $p"),
+      ColorWithBlind(protanopia(color), "Protanopia", "1% $m"),
+      ColorWithBlind(deuteranopia(color), "Deuteranopia", "1% $m"),
+      ColorWithBlind(tritanopia(color), "Tritanopia", "less than 1% $p"),
+      ColorWithBlind(achromatopsia(color), "Achromatopsia", "0.003% $p"),
+      ColorWithBlind(achromatomaly(color), "Achromatomaly", "0.001% $p"),
+    ];
   }
 }
 

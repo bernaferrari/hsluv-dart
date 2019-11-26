@@ -9,6 +9,10 @@ class _ColorContrast {
   final double contrast;
 }
 
+extension on String {
+  Color hexToColor() => Color(int.parse("0xFF${this}"));
+}
+
 Color shuffleColor(Color currentColor) {
   final contrasts = colorClaim.map((i) {
     final color = Color(int.parse("0xFF$i"));
@@ -29,7 +33,12 @@ Color shuffleColor(Color currentColor) {
 
 Color getShuffleColor() {
   final colorsList = colorClaim.toList()..shuffle();
-  return Color(int.parse("0xFF${colorsList.first}"));
+  return colorsList.first.hexToColor();
+}
+
+List<Color> getShuffledColors([int n = 8]) {
+  final colorsList = colorClaim.toList()..shuffle();
+  return [for (int i = 0; i < n; i++) colorsList[i].hexToColor()];
 }
 
 // https://www.vanschneider.com/colors

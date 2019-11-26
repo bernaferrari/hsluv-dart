@@ -6,14 +6,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hsluvsample/blocs/blocs.dart';
 import 'package:hsluvsample/util/color_blindness.dart';
 import 'package:hsluvsample/util/selected.dart';
-import 'package:hsluvsample/vertical_picker/app_bar.dart';
+import 'package:hsluvsample/vertical_picker/app_bar_actions.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
 
-import 'mdc/components.dart';
-import 'util/color_util.dart';
+import '../mdc/components.dart';
+import '../util/color_util.dart';
 
-class BlindScreen extends StatelessWidget {
-  const BlindScreen();
+class SingleColorBlindness extends StatelessWidget {
+  const SingleColorBlindness();
 
   @override
   Widget build(BuildContext context) {

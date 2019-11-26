@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
 
-import 'blocs/slider_color/slider_color.dart';
-import 'widgets/color_sliders.dart';
+import '../blocs/slider_color/slider_color.dart';
+import '../widgets/color_sliders.dart';
 
-class ColorSliders extends StatelessWidget {
-  const ColorSliders();
+class MultipleSliders extends StatelessWidget {
+  const MultipleSliders();
 
   @override
   Widget build(BuildContext context) {

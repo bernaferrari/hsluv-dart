@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hsluvsample/blocs/blocs.dart';
 import 'package:hsluvsample/contrast/inter_color_with_contrast.dart';
-import 'package:hsluvsample/dashboard_screen.dart';
+import 'package:hsluvsample/mdc/util/color_blind_from_index.dart';
 import 'package:hsluvsample/mdc/showcase.dart';
 import 'package:hsluvsample/mdc/templates.dart';
-import 'package:hsluvsample/single_color_blind.dart';
+import 'package:hsluvsample/screens/single_color_blindness.dart';
 import 'package:hsluvsample/util/constants.dart';
 import 'package:hsluvsample/util/selected.dart';
 

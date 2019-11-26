@@ -13,9 +13,9 @@ import 'package:hsluvsample/util/selected.dart';
 import 'package:hsluvsample/vertical_picker/picker_list.dart';
 
 import '../color_with_inter.dart';
-import '../screen_about.dart';
+import '../screens/about.dart';
 import '../util/constants.dart';
-import 'app_bar.dart';
+import 'app_bar_actions.dart';
 import 'hsluv_selector.dart';
 import 'hsv_selector.dart';
 
@@ -37,14 +37,25 @@ class HSVerticalPicker extends StatefulWidget {
 }
 
 class _HSVerticalPickerState extends State<HSVerticalPicker> {
-  bool useHSLuv = true;
+  int currentSegment;
 
-  int currentSegment = 0;
+  @override
+  void initState() {
+    currentSegment = PageStorage.of(context).readState(context,
+            identifier: const ValueKey("verticalSelected")) ??
+        0;
+
+    super.initState();
+  }
 
   void onValueChanged(int newValue) {
     setState(() {
       currentSegment = newValue;
-      useHSLuv = currentSegment == 0;
+      PageStorage.of(context).writeState(
+        context,
+        currentSegment,
+        identifier: const ValueKey("verticalSelected"),
+      );
     });
   }
 
@@ -57,7 +68,7 @@ class _HSVerticalPickerState extends State<HSVerticalPicker> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("${useHSLuv ? "HSLuv" : "HSV"} Picker"),
+        title: Text("${currentSegment == 0 ? "HSLuv" : "HSV"} Picker"),
         elevation: 0,
         backgroundColor: widget.color,
         actions: <Widget>[
@@ -71,16 +82,16 @@ class _HSVerticalPickerState extends State<HSVerticalPicker> {
                     return AlertDialog(
                       contentPadding: const EdgeInsets.all(24),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                       backgroundColor: widget.color,
                       content: Card(
                         clipBehavior: Clip.antiAlias,
                         margin: EdgeInsets.zero,
-                        color: compositeColors(
-                          Theme.of(context).colorScheme.background,
-                          Theme.of(context).colorScheme.primary,
-                          kVeryTransparent,
-                        ),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .background
+                            .withOpacity(kVeryTransparent),
                         elevation: 0,
                         child: MoreColors(
                           activeColor: Colors.green,
@@ -105,6 +116,7 @@ class _HSVerticalPickerState extends State<HSVerticalPicker> {
                 backgroundColor:
                     Theme.of(context).colorScheme.onSurface.withOpacity(0.20),
                 thumbColor: compositeColors(
+                  // this is needed, else component gets ugly with shadow.
                   Theme.of(context).colorScheme.background,
                   Theme.of(context).colorScheme.primary,
                   0.20,
@@ -118,7 +130,7 @@ class _HSVerticalPickerState extends State<HSVerticalPicker> {
           Expanded(
             child: WatchBoxBuilder(
               box: Hive.box<dynamic>("settings"),
-              builder: (BuildContext context, Box box) => useHSLuv
+              builder: (BuildContext context, Box box) => currentSegment == 0
                   ? HSLuvSelector(
                       color: widget.color,
                       moreColors: box.get("moreItems", defaultValue: false),

@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:bloc/bloc.dart';
 import 'package:hsluvsample/blocs/slider_color/slider_color_state.dart';
-import 'package:hsluvsample/dashboard_screen.dart';
+import 'package:hsluvsample/mdc/util/color_blind_from_index.dart';
 import 'package:hsluvsample/util/constants.dart';
 
 import './mdc_selected.dart';

@@ -18,7 +18,7 @@ class HSVSelector extends StatelessWidget {
 
     // maximum number of items
     final int itemsOnScreen =
-        ((MediaQuery.of(context).size.height - 168) / 56).ceil();
+        ((MediaQuery.of(context).size.height - 56*4) / 56).ceil();
 
     final int toneSize = moreColors ? itemsOnScreen * 2 : itemsOnScreen;
     final int hueSize = moreColors ? 90 : 60;

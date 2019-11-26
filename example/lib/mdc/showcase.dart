@@ -8,7 +8,7 @@ import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/widgets/color_sliders/slider_that_works.dart';
 
 import 'components.dart';
-import 'elevation_overlay.dart';
+import 'util/elevation_overlay.dart';
 import 'widgets/FAProgressBar.dart';
 
 class Showcase extends StatelessWidget {

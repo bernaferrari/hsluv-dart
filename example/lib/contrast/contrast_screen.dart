@@ -110,16 +110,8 @@ class _MultipleContrastScreenState extends State<MultipleContrastScreen> {
                 ),
               ),
             ),
-//              backgroundColor: blendColorWithBackground(widget.color),
           ),
-          body: Column(
-            children: <Widget>[
-              if (contrastMode)
-                Expanded(child: buildFlex(list))
-              else
-                Expanded(child: InfoScreen(list))
-            ],
-          ),
+          body: contrastMode ? buildFlex(list) : InfoScreen(list),
         ),
       );
     });
@@ -132,6 +124,7 @@ class _MultipleContrastScreenState extends State<MultipleContrastScreen> {
           final bool more = false; //box.get("moreItems", defaultValue: false);
 
           return ListView(
+            key: const PageStorageKey("ContrastCompareKey"),
             children: <Widget>[
               HSLuvSelector2(
                 index: 0,

@@ -1,32 +1,31 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hsluvsample/mdc/components.dart';
-import 'package:hsluvsample/multiple_sliders.dart';
-import 'package:hsluvsample/screen_about.dart';
+import 'package:hsluvsample/screens/about.dart';
+import 'package:hsluvsample/screens/multiple_sliders.dart';
 import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/util/selected.dart';
 import 'package:hsluvsample/util/when.dart';
 import 'package:hsluvsample/vertical_picker/vertical_picker_main.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
+import 'package:hsluvsample/widgets/update_color_dialog.dart';
 
-import 'blocs/blocs.dart';
-import 'blocs/slider_color/slider_color.dart';
-import 'util/constants.dart';
+import '../blocs/blocs.dart';
+import '../util/constants.dart';
 
-class ColorHome extends StatefulWidget {
-  const ColorHome({this.initialColor});
+class Home extends StatefulWidget {
+  const Home({this.initialColor});
 
   final Color initialColor;
 
   @override
-  _ColorHomeState createState() => _ColorHomeState();
+  _HomeState createState() => _HomeState();
 }
 
-class _ColorHomeState extends State<ColorHome> {
+class _HomeState extends State<Home> {
   final TextEditingController _textEditingController = TextEditingController();
 
   @override
@@ -92,9 +91,9 @@ class _ColorHomeState extends State<ColorHome> {
                   Expanded(
                     child: TabBarView(
                       children: [
-                        const ColorSliders(),
+                        const MultipleSliders(),
                         HSVerticalPicker(color: color),
-                        const AboutScreen(),
+                        const About(),
                       ],
                     ),
                   ),
@@ -113,7 +112,6 @@ class _ColorHomeState extends State<ColorHome> {
                       ),
                     ),
                     tabs: [
-//                      Tab(icon: Icon(FeatherIcons.home)),
                       Tab(
                         icon: Transform.rotate(
                           angle: 0.5 * math.pi,
@@ -122,7 +120,6 @@ class _ColorHomeState extends State<ColorHome> {
                       ),
                       const Tab(icon: Icon(FeatherIcons.barChart2)),
                       Tab(icon: Icon(FeatherIcons.info)),
-//                      const Tab(icon: Icon(FeatherIcons.layers)),
                     ],
                   ),
                 ],
@@ -232,12 +229,11 @@ class ThemeBar extends StatelessWidget {
                                 BlocProvider.of<MultipleContrastColorBloc>(
                                         context)
                                     .add(
-                                  MCMoveColor(
-                                    list[i].rgbColor,
-                                    i,
-                                  ),
+                                  MCMoveColor(list[i].rgbColor, i),
                                 );
-                                colorSelected(context, list[i].rgbColor);
+                              },
+                              onLongPress: () {
+                                showSlidersDialog(context, list[i].rgbColor, i);
                               },
                               fillColor: list[i].rgbColor,
                               shape: CircleBorder(
@@ -318,55 +314,5 @@ class RoundSelectableColor extends StatelessWidget {
         ),
       );
     });
-  }
-}
-
-class TextFormColored extends StatelessWidget {
-  const TextFormColored({this.controller, this.radius});
-
-  final double radius;
-  final TextEditingController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    final borderRadius = BorderRadius.only(
-      topLeft: Radius.circular(radius),
-      topRight: Radius.circular(radius),
-    );
-
-    return TextFormField(
-      autofocus: true,
-      controller: controller,
-      onChanged: (str) {
-        BlocProvider.of<SliderColorBloc>(context).add(
-            MoveColor(Color(int.parse("0xFF${str.padRight(6, "F")}")), false));
-      },
-      inputFormatters: [
-        LengthLimitingTextInputFormatter(6),
-      ],
-      decoration: InputDecoration(
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white38, width: 2),
-          borderRadius: borderRadius,
-        ),
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.black26, width: 2),
-          borderRadius: borderRadius,
-        ),
-        filled: true,
-        fillColor: (Theme.of(context).colorScheme.primary.computeLuminance() >
-                kLumContrast)
-            ? Colors.black12
-            : Colors.white24,
-        isDense: true,
-        prefix: Padding(
-          padding: const EdgeInsets.only(right: 8.0),
-          child: Icon(FeatherIcons.hash, size: 16),
-        ),
-      ),
-      style: Theme.of(context).textTheme.title.copyWith(
-            color: Theme.of(context).colorScheme.onBackground,
-          ),
-    );
   }
 }

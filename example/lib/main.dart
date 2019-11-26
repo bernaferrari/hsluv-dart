@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:hsluvsample/mdc/mdc_home.dart';
-import 'package:hsluvsample/screen_color_home.dart';
+import 'package:hsluvsample/screens/home.dart';
 import 'package:hsluvsample/util/constants.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -64,18 +64,7 @@ class _BoxedAppState extends State<BoxedApp> {
         BlocProvider<MultipleContrastColorBloc>(
           builder: (context) => MultipleContrastColorBloc(_sliderBloc)
             ..add(
-              MultipleLoadInit(
-                [
-                  Colors.orange[200],
-                  getShuffleColor(),
-                  getShuffleColor(),
-                  Colors.white,
-                  Colors.black,
-                  getShuffleColor(),
-                  getShuffleColor(),
-                  getShuffleColor(),
-                ],
-              ),
+              MultipleLoadInit(getShuffledColors()),
             ),
         ),
         BlocProvider<SliderColorBloc>(
@@ -93,7 +82,7 @@ class _BoxedAppState extends State<BoxedApp> {
         routes: {
           "/": (context) {
 //            return MultipleContrastScreen(color: Colors.red);
-            return ColorHome(initialColor: Colors.orange[200]);
+            return Home(initialColor: Colors.orange[200]);
           },
           "/theme": (context) => MDCHome()
         },

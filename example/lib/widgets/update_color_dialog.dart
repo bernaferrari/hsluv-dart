@@ -4,19 +4,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_bloc.dart';
 import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_event.dart';
 import 'package:hsluvsample/widgets/selectable_sliders.dart';
-import 'package:hsluvsample/screen_color_home.dart';
+import 'package:hsluvsample/screens/home.dart';
 import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/util/constants.dart';
 import 'package:hsluvsample/widgets/color_sliders.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
+import 'package:hsluvsample/widgets/text_form_colored.dart';
 
 import '../blocs/slider_color/slider_color.dart';
 
 Future<void> showSlidersDialog(BuildContext context, Color color,
     [int index]) async {
-  if (index != null) {
-    BlocProvider.of<SliderColorBloc>(context).add(MoveColor(color, true));
-  }
 
   final dynamic result = await showDialog<dynamic>(
       context: context,
