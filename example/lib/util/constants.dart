@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
 
 const double kLumContrast = 0.34;
+const double kVeryTransparent = 0.20;
+
 const String kPrimary = "Primary";
 const String kSurface = "Surface";
 

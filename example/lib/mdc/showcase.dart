@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hsluvsample/util/color_util.dart';
-import 'package:hsluvsample/widgets/slider_that_works.dart';
+import 'package:hsluvsample/widgets/color_sliders/slider_that_works.dart';
 
 import 'components.dart';
 import 'elevation_overlay.dart';

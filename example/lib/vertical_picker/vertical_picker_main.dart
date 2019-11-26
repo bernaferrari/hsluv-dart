@@ -79,7 +79,7 @@ class _HSVerticalPickerState extends State<HSVerticalPicker> {
                         color: compositeColors(
                           Theme.of(context).colorScheme.background,
                           Theme.of(context).colorScheme.primary,
-                          0.20,
+                          kVeryTransparent,
                         ),
                         elevation: 0,
                         child: MoreColors(

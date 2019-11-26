@@ -6,197 +6,47 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hsluvsample/contrast/contrast_screen.dart';
-import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/util/constants.dart';
-import 'package:hsluvsample/widgets/dismiss_keyboard_on_scroll.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'dashboard_screen.dart';
+import 'single_color_blind.dart';
 
 class AboutScreen extends StatelessWidget {
-  const AboutScreen({this.color});
-
-  final Color color;
+  const AboutScreen();
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: ThemeData.from(
-        colorScheme: (color.computeLuminance() > kLumContrast)
-            ? ColorScheme.light(
-                primary: color,
-              )
-            : ColorScheme.dark(
-                surface: blendColorWithBackground(color),
-                primary: color,
-              ),
-      ).copyWith(cardTheme: Theme.of(context).cardTheme),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 818),
-          child: ListView(
-            key: const PageStorageKey("about"),
-            shrinkWrap: true,
-            children: [
-              const Padding(padding: EdgeInsets.all(4)),
-              _TranslucentCard(
-                child: _ContactInfo(),
-              ),
-              _TranslucentCard(
-                child: ColorCompare(color: color),
-              ),
-              _TranslucentCard(
-                child: ColorBlindSection(color: color),
-              ),
-              _TranslucentCard(
-                child: GDPR(),
-              ),
-              const Padding(padding: EdgeInsets.all(4)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _TranslucentCard extends StatelessWidget {
-  const _TranslucentCard({this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Theme.of(context).colorScheme.onSurface),
-      ),
-      clipBehavior: Clip.antiAlias,
-      elevation: 0,
-      color: compositeColors(Theme.of(context).colorScheme.background,
-          Theme.of(context).colorScheme.primary, 0.20),
-      margin: const EdgeInsets.only(left: 16, right: 16, top: 8),
-      child: child,
-    );
-  }
-}
-
-class MoreColors extends StatelessWidget {
-  const MoreColors({this.activeColor});
-
-  final Color activeColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return WatchBoxBuilder(
-      box: Hive.box<dynamic>("settings"),
-      builder: (context, box) {
-        return SwitchListTile(
-          contentPadding:
-              const EdgeInsets.only(top: 8, bottom: 8, right: 16, left: 16),
-          value: box.get("moreItems", defaultValue: false),
-          activeColor: activeColor,
-          subtitle: Text(
-            "Duplicate the number of colors in HSLuv/HSV pickers.",
-            style: Theme.of(context).textTheme.caption,
-          ),
-          title: Text(
-            "More Colors",
-            style: Theme.of(context).textTheme.title,
-          ),
-          onChanged: (value) {
-            box.put('moreItems', value);
-          },
-        );
-      },
-    );
-  }
-}
-
-class ColorCompare extends StatelessWidget {
-  const ColorCompare({this.color});
-
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        Navigator.push<dynamic>(
-          context,
-          MaterialPageRoute<dynamic>(
-            builder: (context) => MultipleContrastScreen(color: color),
-          ),
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Icon(FeatherIcons.trendingUp),
-                  const SizedBox(width: 16),
-                  Text(
-                    "Contrast Mode",
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.title,
-                  ),
-                ],
-              ),
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 818),
+        child: ListView(
+          key: const PageStorageKey("about"),
+          shrinkWrap: true,
+          children: const <Widget>[
+            Padding(padding: EdgeInsets.all(4)),
+            TranslucentCard(
+              child: _ContactInfo(),
             ),
-            Icon(FeatherIcons.chevronRight),
-            const SizedBox(width: 16),
+            TranslucentCard(
+              child: ColorCompare(),
+            ),
+            TranslucentCard(
+              child: ColorBlindSection(),
+            ),
+            TranslucentCard(
+              child: GDPR(),
+            ),
+            Padding(padding: EdgeInsets.all(4)),
           ],
         ),
       ),
     );
   }
-}
-
-class GDPR extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(FeatherIcons.shield),
-            const SizedBox(width: 16),
-            Text("Privacy Policy",
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.title),
-          ],
-        ),
-        const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text(
-            "This app respects your privacy.\nThere are no analytics, no data collection. Your colors are yours and no one else will know them.",
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-Widget wrapInCard({@required Widget child}) {
-  return ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: 850),
-    child: Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      clipBehavior: Clip.antiAlias,
-      child: DismissKeyboardOnScroll(child: child),
-    ),
-  );
 }
 
 class _ContactInfo extends StatelessWidget {
+  const _ContactInfo();
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -287,5 +137,181 @@ class _ContactInfo extends StatelessWidget {
 
   Future<void> _launchURL(String url) async {
     await launch(url);
+  }
+}
+
+class ColorCompare extends StatelessWidget {
+  const ColorCompare();
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.push<dynamic>(
+          context,
+          MaterialPageRoute<dynamic>(
+            builder: (context) => const MultipleContrastScreen(),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(FeatherIcons.trendingUp),
+                  const SizedBox(width: 16),
+                  Text(
+                    "Compare Colors",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                ],
+              ),
+            ),
+            Icon(FeatherIcons.chevronRight),
+            const SizedBox(width: 16),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ColorBlindSection extends StatelessWidget {
+  const ColorBlindSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.push<dynamic>(
+          context,
+          MaterialPageRoute<dynamic>(
+            builder: (context) => const BlindScreen(),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(FeatherIcons.globe),
+                  const SizedBox(width: 16),
+                  Text(
+                    "Color Blindness",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                ],
+              ),
+            ),
+            Icon(FeatherIcons.chevronRight),
+            const SizedBox(width: 16),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class MoreColors extends StatelessWidget {
+  const MoreColors({this.activeColor});
+
+  final Color activeColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return WatchBoxBuilder(
+      box: Hive.box<dynamic>("settings"),
+      builder: (context, box) {
+        return SwitchListTile(
+          contentPadding:
+              const EdgeInsets.only(top: 8, bottom: 8, right: 16, left: 16),
+          value: box.get("moreItems", defaultValue: false),
+          activeColor: activeColor,
+          subtitle: Text(
+            "Duplicate the number of colors in HSLuv/HSV pickers.",
+            style: Theme.of(context).textTheme.caption,
+          ),
+          title: Text(
+            "More Colors",
+            style: Theme.of(context).textTheme.title,
+          ),
+          onChanged: (value) {
+            box.put('moreItems', value);
+          },
+        );
+      },
+    );
+  }
+}
+
+class GDPR extends StatelessWidget {
+  const GDPR();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(FeatherIcons.shield),
+            const SizedBox(width: 16),
+            Text("Privacy Policy",
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.title),
+          ],
+        ),
+        const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            "This app respects your privacy.\nThere are no analytics, no data collection. Your colors are yours and no one else will know them.",
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class TranslucentCard extends StatelessWidget {
+  const TranslucentCard({
+    this.child,
+    this.margin = const EdgeInsets.only(left: 16, right: 16, top: 8),
+  });
+
+  final Widget child;
+  final EdgeInsetsGeometry margin;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withOpacity(2 * kVeryTransparent)),
+      ),
+      clipBehavior: Clip.antiAlias,
+      elevation: 0,
+      color: Theme.of(context)
+          .colorScheme
+          .background
+          .withOpacity(kVeryTransparent),
+      margin: margin,
+      child: child,
+    );
   }
 }

@@ -10,7 +10,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_bloc.dart';
 import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_event.dart';
 import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_state.dart';
-import 'package:hsluvsample/contrast/color_with_contrast.dart';
+import 'package:hsluvsample/contrast/inter_color_with_contrast.dart';
 import 'package:hsluvsample/contrast/reorder_list.dart';
 import 'package:hsluvsample/contrast/shuffle_color.dart';
 import 'package:hsluvsample/hsinter.dart';
@@ -22,15 +22,13 @@ import 'package:hsluvsample/util/selected.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
 
 import '../util/constants.dart';
-import 'contrast_dialog.dart';
+import '../widgets/update_color_dialog.dart';
 import 'contrast_list.dart';
 import 'contrast_util.dart';
 import 'info_screen.dart';
 
 class MultipleContrastScreen extends StatefulWidget {
-  const MultipleContrastScreen({this.color});
-
-  final Color color;
+  const MultipleContrastScreen();
 
   @override
   _MultipleContrastScreenState createState() => _MultipleContrastScreenState();
@@ -101,7 +99,7 @@ class _MultipleContrastScreenState extends State<MultipleContrastScreen> {
                   thumbColor: compositeColors(
                     colorScheme.background,
                     list[0].rgbColor,
-                    0.20,
+                    kVeryTransparent,
                   ),
                   children: const <int, Widget>{
                     0: Text('Contrast'),
@@ -576,36 +574,6 @@ class _Buttons extends StatelessWidget {
 //          ),
       ],
     );
-  }
-
-  Future<void> showReorderDialog(
-      BuildContext builderContext, Color color, Color otherColor) async {
-    final dynamic result = await showDialog<dynamic>(
-        context: builderContext,
-        builder: (BuildContext ctx) {
-          return AlertDialog(
-            title: const Text("Modify"),
-            contentPadding: const EdgeInsets.only(top: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            content: Card(
-              clipBehavior: Clip.antiAlias,
-              margin: EdgeInsets.zero,
-              color: compositeColors(
-                Theme.of(builderContext).colorScheme.background,
-                Theme.of(builderContext).colorScheme.primary,
-                0.20,
-              ),
-              child: SelectorDialog(color, otherColor, list),
-            ),
-          );
-        });
-
-    if (result != null) {
-      BlocProvider.of<MultipleContrastColorBloc>(builderContext)
-          .add(MultipleLoadInit(result));
-    }
   }
 }
 

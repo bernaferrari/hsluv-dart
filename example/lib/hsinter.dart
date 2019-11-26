@@ -6,6 +6,9 @@ import 'package:flutter/foundation.dart';
 import 'package:hsluv/flutter/hsluvcolor.dart';
 import 'package:hsluvsample/util/when.dart';
 
+/// HSInterColor means Hue Saturation Interchangeable Color.
+/// It is made to wrap both HSV and HSLuv with the same interface.
+/// It could also be easily extended to HSL and others.
 @immutable
 class HSInterColor {
   /// Creates a color.
@@ -47,8 +50,12 @@ class HSInterColor {
   final double hue;
   final double saturation;
   final double lightness;
+
+  /// [maxValue] is 100.0 for HSLuv and 1.0 for HSV.
+  /// They use different scales, so this is necessary.
   final double maxValue;
 
+  /// output [saturation] in [0-100] interval.
   int outputSaturation() {
     return when({
       () => kind == "HSLuv": () => saturation,
@@ -56,6 +63,7 @@ class HSInterColor {
     }).toInt();
   }
 
+  /// output [lightness] in [0-100] interval.
   int outputLightness() {
     return when({
       () => kind == "HSLuv": () => lightness,
@@ -83,7 +91,8 @@ class HSInterColor {
         hue, saturation, math.min(lightness, maxValue), kind, maxValue);
   }
 
-  /// Returns this HSL color in RGB.
+  /// Returns this color in RGB.
+  /// Calls the [toColor] method from either HSLuvColor or HSVColor.
   Color toColor() {
     return when({
       () => kind == "HSLuv": () =>
@@ -106,6 +115,7 @@ class HSInterColor {
   @override
   int get hashCode => hashValues(hue, saturation, lightness);
 
+  /// Returns this color as a String in the H:250 S:100 L:60 format.
   @override
   String toString() {
     return when({

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hsluvsample/blocs/blocs.dart';
-import 'package:hsluvsample/contrast/color_with_contrast.dart';
+import 'package:hsluvsample/contrast/inter_color_with_contrast.dart';
 import 'package:hsluvsample/contrast/shuffle_color.dart';
 import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/util/constants.dart';
 import 'package:hsluvsample/util/selected.dart';
-import 'package:hsluvsample/widgets/slider_that_works.dart';
+import 'package:hsluvsample/widgets/color_sliders/slider_that_works.dart';
 
 import 'elevation_overlay.dart';
 

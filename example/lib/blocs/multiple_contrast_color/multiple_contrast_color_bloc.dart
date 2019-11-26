@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:hsluvsample/contrast/color_with_contrast.dart';
+import 'package:hsluvsample/contrast/inter_color_with_contrast.dart';
 
 import '../blocs.dart';
 import 'multiple_contrast_color_event.dart';
@@ -69,10 +69,11 @@ class MultipleContrastColorBloc
     // this is necessary, else you modify the original list but this change
     // is gone when you call yield, so it appears the list didn't change.
     final newList = List<ContrastedColor>.from(loadedState.colorsList);
+    final index = load.index ?? loadedState.selected;
 
     final initColor = newList[0].rgbColor;
 
-    newList[load.index] = ContrastedColor(
+    newList[index] = ContrastedColor(
       load.color,
       calculateContrast(
         load.color,
@@ -80,7 +81,7 @@ class MultipleContrastColorBloc
       ),
     );
 
-    if (load.index == 0) {
+    if (index == 0) {
       for (int i = 1; i < newList.length; i++) {
         newList[i] = ContrastedColor(
           newList[i].rgbColor,
@@ -92,6 +93,6 @@ class MultipleContrastColorBloc
       }
     }
     
-    yield MultipleContrastColorLoaded(newList, load.index);
+    yield MultipleContrastColorLoaded(newList, index);
   }
 }

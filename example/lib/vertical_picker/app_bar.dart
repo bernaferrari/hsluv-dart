@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hsluvsample/contrast/contrast_dialog.dart';
 import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/util/constants.dart';
+import 'package:hsluvsample/widgets/update_color_dialog.dart';
 
 class ColorSearchButton extends StatelessWidget {
   const ColorSearchButton({this.color});

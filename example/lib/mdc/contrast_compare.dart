@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hsluvsample/contrast/color_with_contrast.dart';
+import 'package:hsluvsample/contrast/inter_color_with_contrast.dart';
 import 'package:hsluvsample/contrast/contrast_util.dart';
 import 'package:hsluvsample/mdc/container_with_number.dart';
 import 'package:hsluvsample/util/color_util.dart';

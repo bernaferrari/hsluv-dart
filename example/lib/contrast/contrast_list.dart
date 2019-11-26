@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_listview/infinite_listview.dart';
 
-import 'color_with_contrast.dart';
 import 'contrast_item.dart';
+import 'inter_color_with_contrast.dart';
 
 class ContrastList extends StatelessWidget {
   const ContrastList({

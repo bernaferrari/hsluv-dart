@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_bloc.dart';
 import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_event.dart';
-import 'package:hsluvsample/contrast/selectable_sliders.dart';
+import 'package:hsluvsample/widgets/selectable_sliders.dart';
 import 'package:hsluvsample/screen_color_home.dart';
 import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/util/constants.dart';
@@ -23,7 +23,7 @@ Future<void> showSlidersDialog(BuildContext context, Color color,
       builder: (BuildContext ctx) {
         return BlocProvider(
           builder: (context) => SliderColorBloc()..add(MoveColor(color, true)),
-          child: DialogWidget(color),
+          child: UpdateColorDialog(color),
         );
       });
 
@@ -37,8 +37,8 @@ Future<void> showSlidersDialog(BuildContext context, Color color,
   }
 }
 
-class DialogWidget extends StatelessWidget {
-  const DialogWidget(this.color);
+class UpdateColorDialog extends StatelessWidget {
+  const UpdateColorDialog(this.color);
 
   final Color color;
 
@@ -138,7 +138,6 @@ class DialogWidget extends StatelessWidget {
                   height: 36,
                   child: FlatButton(
                     color: selectableColor,
-//                      color: selectableColor,
                     onPressed: () {
                       Navigator.of(context).pop(color);
                     },
@@ -157,14 +156,14 @@ class DialogWidget extends StatelessWidget {
       },
     );
   }
-}
 
-// this is necessary because of https://github.com/flutter/flutter/issues/11416
-void setTextAndPosition(TextEditingController controller, String newText,
-    {int caretPosition}) {
-  final int offset = caretPosition ?? newText.length;
-  controller.value = controller.value.copyWith(
-      text: newText,
-      selection: TextSelection.collapsed(offset: offset),
-      composing: TextRange.empty);
+  // this is necessary because of https://github.com/flutter/flutter/issues/11416
+  void setTextAndPosition(TextEditingController controller, String newText,
+      {int caretPosition}) {
+    final int offset = caretPosition ?? newText.length;
+    controller.value = controller.value.copyWith(
+        text: newText,
+        selection: TextSelection.collapsed(offset: offset),
+        composing: TextRange.empty);
+  }
 }

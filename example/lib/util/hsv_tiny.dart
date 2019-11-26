@@ -40,7 +40,6 @@ List<Color> hsvValues(Color color,
     [int size, double start = 0.05, double stop = 0.95]) {
   final HSVColor hsv = HSVColor.fromColor(color);
   final step = (stop - start) / (size - 1);
-  print("step is $step | size is $size | ${step * size} | $start | $stop");
 
   return [
     // (n = size; n > 0) won't work because n * step will be wrong. Unless you

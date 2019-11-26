@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hsluvsample/blocs/blocs.dart';
 import 'package:hsluvsample/util/color_blindness.dart';
 import 'package:hsluvsample/util/selected.dart';
 import 'package:hsluvsample/vertical_picker/app_bar.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
 
-import 'blocs/slider_color/slider_color_bloc.dart';
-import 'blocs/slider_color/slider_color_state.dart';
-import 'dashboard_screen.dart';
 import 'mdc/components.dart';
 import 'util/color_util.dart';
 
@@ -19,13 +17,14 @@ class BlindScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SliderColorBloc, SliderColorState>(
+    return BlocBuilder<MultipleContrastColorBloc, MultipleContrastColorState>(
       builder: (context, state) {
-        if (state is SliderColorLoading) {
+        if (state is MultipleContrastColorLoading) {
           return const Scaffold(body: Center(child: LoadingIndicator()));
         }
 
-        final color = (state as SliderColorLoaded).rgbColor;
+        final currentState = state as MultipleContrastColorLoaded;
+        final color = currentState.colorsList[currentState.selected].rgbColor;
         final surfaceColor = blendColorWithBackground(color);
         final values = retrieveColorBlind(color);
 
@@ -120,6 +119,14 @@ class BlindScreen extends StatelessWidget {
       ],
     };
   }
+}
+
+class ColorWithBlind {
+  ColorWithBlind(this.color, this.name, this.affects);
+
+  final Color color;
+  final String name;
+  final String affects;
 }
 
 class _ColorBlindCard extends StatelessWidget {

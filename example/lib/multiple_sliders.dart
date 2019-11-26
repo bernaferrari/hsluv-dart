@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hsluvsample/widgets/dismiss_keyboard_on_scroll.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
 
 import 'blocs/slider_color/slider_color.dart';
+import 'widgets/color_sliders.dart';
 
 class ColorSliders extends StatelessWidget {
-  const ColorSliders(this.rgb, this.hsv, this.hsl);
-
-  final Widget rgb;
-  final Widget hsv;
-  final Widget hsl;
+  const ColorSliders();
 
   @override
   Widget build(BuildContext context) {
@@ -20,18 +16,34 @@ class ColorSliders extends StatelessWidget {
         return const Scaffold(body: Center(child: LoadingIndicator()));
       }
 
+      final Widget rgb = RGBSlider(
+          color: (state as SliderColorLoaded).rgbColor,
+          onChanged: (r, g, b) {
+            BlocProvider.of<SliderColorBloc>(context).add(MoveRGB(r, g, b));
+          });
+
+      final Widget hsl = HSLuvSlider(
+          color: (state as SliderColorLoaded).hsluvColor,
+          onChanged: (h, s, l) {
+            BlocProvider.of<SliderColorBloc>(context).add(MoveHSLuv(h, s, l));
+          });
+
+      final Widget hsv = HSVSlider(
+          color: (state as SliderColorLoaded).hsvColor,
+          onChanged: (h, s, v) {
+            BlocProvider.of<SliderColorBloc>(context).add(MoveHSV(h, s, v));
+          });
+
       return Center(
-        child: DismissKeyboardOnScroll(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 818),
-            child: ListView(
-              shrinkWrap: true,
-              children: <Widget>[
-                wrapInCard(rgb),
-                wrapInCard(hsv),
-                wrapInCard(hsl),
-              ],
-            ),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 818),
+          child: ListView(
+            shrinkWrap: true,
+            children: <Widget>[
+              wrapInCard(rgb),
+              wrapInCard(hsv),
+              wrapInCard(hsl),
+            ],
           ),
         ),
       );

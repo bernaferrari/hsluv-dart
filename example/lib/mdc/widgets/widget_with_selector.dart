@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hsluvsample/widgets/dismiss_keyboard_on_scroll.dart';
 
 class WidgetWithSelector extends StatelessWidget {
   const WidgetWithSelector({this.child, this.selector});
@@ -25,7 +24,7 @@ Widget wrapInCard({@required Widget child}) {
     child: Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       clipBehavior: Clip.antiAlias,
-      child: DismissKeyboardOnScroll(child: child),
+      child: child,
     ),
   );
 }

@@ -11,7 +11,6 @@ import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/util/selected.dart';
 import 'package:hsluvsample/util/when.dart';
 import 'package:hsluvsample/vertical_picker/vertical_picker_main.dart';
-import 'package:hsluvsample/widgets/color_sliders.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
 
 import 'blocs/blocs.dart';
@@ -38,44 +37,18 @@ class _ColorHomeState extends State<ColorHome> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SliderColorBloc, SliderColorState>(
+    return BlocBuilder<MultipleContrastColorBloc, MultipleContrastColorState>(
         builder: (context, state) {
-      if (state is SliderColorLoading) {
+      if (state is MultipleContrastColorLoading) {
         return Scaffold(
           backgroundColor: widget.initialColor,
           body: const LoadingIndicator(),
         );
       }
 
-      final color = (state as SliderColorLoaded).rgbColor;
+      final currentState = state as MultipleContrastColorLoaded;
 
-      if ((state as SliderColorLoaded).updateTextField) {
-        final clrStr = color.toStr();
-        // without this, the cursor will be on the first position, not on last,
-        // when keyboard is open.
-        // this is also where the controller updates.
-        if (_textEditingController.text != clrStr) {
-          _textEditingController.text = clrStr;
-        }
-      }
-
-      final rgb = RGBSlider(
-          color: (state as SliderColorLoaded).rgbColor,
-          onChanged: (r, g, b) {
-            BlocProvider.of<SliderColorBloc>(context).add(MoveRGB(r, g, b));
-          });
-
-      final hsl = HSLuvSlider(
-          color: (state as SliderColorLoaded).hsluvColor,
-          onChanged: (h, s, l) {
-            BlocProvider.of<SliderColorBloc>(context).add(MoveHSLuv(h, s, l));
-          });
-
-      final hsv = HSVSlider(
-          color: (state as SliderColorLoaded).hsvColor,
-          onChanged: (h, s, v) {
-            BlocProvider.of<SliderColorBloc>(context).add(MoveHSV(h, s, v));
-          });
+      final color = currentState.colorsList[currentState.selected].rgbColor;
 
       final contrastedColor = (color.computeLuminance() > kLumContrast)
           ? Colors.black
@@ -110,16 +83,6 @@ class _ColorHomeState extends State<ColorHome> {
         ),
         child: Scaffold(
           backgroundColor: color,
-//          appBar: AppBar(
-//            centerTitle: false,
-//            elevation: 0,
-//            backgroundColor: color,
-//            iconTheme: IconThemeData(color: contrastedColor),
-////            actions: <Widget>[
-////              _CopyColorButton(color: color),
-////            ],
-////            title: TextFormColored(controller: _textEditingController),
-//          ),
           body: DefaultTabController(
             length: 3,
             initialIndex: 1,
@@ -129,11 +92,9 @@ class _ColorHomeState extends State<ColorHome> {
                   Expanded(
                     child: TabBarView(
                       children: [
-                        ColorSliders(rgb, hsv, hsl),
+                        const ColorSliders(),
                         HSVerticalPicker(color: color),
-                        AboutScreen(color: color),
-//                        ContrastScreen(color: color),
-//                        MDCHome(),
+                        const AboutScreen(),
                       ],
                     ),
                   ),
@@ -203,8 +164,10 @@ class ThemeBar extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       elevation: 0,
-      color: compositeColors(Theme.of(context).colorScheme.background,
-          Theme.of(context).colorScheme.primary, 0.20),
+      color: Theme.of(context)
+          .colorScheme
+          .background
+          .withOpacity(kVeryTransparent),
       margin: const EdgeInsets.only(bottom: 12, left: 16, right: 16),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),

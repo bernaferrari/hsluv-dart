@@ -76,6 +76,8 @@ class ExpandableColorBar extends StatelessWidget {
   }
 }
 
+/// Title that expands horizontally.
+/// For example, "H" => "Hue", "S" => "Saturation" and so on...
 class _ExpandableTitle extends StatelessWidget {
   const _ExpandableTitle({
     this.title,

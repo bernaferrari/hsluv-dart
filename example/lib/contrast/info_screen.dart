@@ -4,6 +4,7 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_state.dart';
 import 'package:hsluvsample/mdc/components.dart';
 import 'package:hsluvsample/util/color_util.dart';
+import 'package:hsluvsample/util/constants.dart';
 import 'package:hsluvsample/util/when.dart';
 
 class InfoScreen extends StatefulWidget {
@@ -46,7 +47,7 @@ class _InfoScreenState extends State<InfoScreen> {
               thumbColor: compositeColors(
                 Theme.of(context).colorScheme.background,
                 Theme.of(context).colorScheme.primary,
-                0.20,
+                kVeryTransparent,
               ),
               children: children,
               onValueChanged: onValueChanged,

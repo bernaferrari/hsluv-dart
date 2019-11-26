@@ -3,8 +3,8 @@ import 'package:hsluvsample/util/constants.dart';
 import 'package:hsluvsample/util/when.dart';
 
 import '../hsinter.dart';
-import 'color_with_contrast.dart';
 import 'contrast_util.dart';
+import 'inter_color_with_contrast.dart';
 
 class ContrastItem extends StatelessWidget {
   const ContrastItem({
@@ -50,7 +50,8 @@ class ContrastItem extends StatelessWidget {
         children: <Widget>[
           Text(
             writtenValue,
-            style: Theme.of(context).textTheme.caption.copyWith(color: textColor),
+            style:
+                Theme.of(context).textTheme.caption.copyWith(color: textColor),
           ),
           Text(
             contrast.toStringAsPrecision(3),
@@ -69,7 +70,7 @@ class ContrastItem extends StatelessWidget {
         ],
       );
     }
-    
+
     return SizedBox(
       width: 56,
       child: MaterialButton(
