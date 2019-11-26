@@ -7,6 +7,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hsluvsample/contrast/contrast_screen.dart';
 import 'package:hsluvsample/util/color_util.dart';
+import 'package:hsluvsample/util/constants.dart';
 import 'package:hsluvsample/widgets/dismiss_keyboard_on_scroll.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -21,9 +22,14 @@ class AboutScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Theme(
       data: ThemeData.from(
-        colorScheme: ColorScheme.dark(
-          surface: blendColorWithBackground(color),
-        ),
+        colorScheme: (color.computeLuminance() > kLumContrast)
+            ? ColorScheme.light(
+                primary: color,
+              )
+            : ColorScheme.dark(
+                surface: blendColorWithBackground(color),
+                primary: color,
+              ),
       ).copyWith(cardTheme: Theme.of(context).cardTheme),
       child: Center(
         child: ConstrainedBox(
@@ -33,26 +39,45 @@ class AboutScreen extends StatelessWidget {
             shrinkWrap: true,
             children: [
               const Padding(padding: EdgeInsets.all(4)),
-              Card(
-                margin: const EdgeInsets.only(left: 16, right: 16, top: 8),
+              _TranslucentCard(
                 child: _ContactInfo(),
               ),
-              Card(
-                clipBehavior: Clip.antiAlias,
-                margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
+              _TranslucentCard(
                 child: ColorCompare(color: color),
               ),
-              Card(
-                clipBehavior: Clip.antiAlias,
-                margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
+              _TranslucentCard(
                 child: ColorBlindSection(color: color),
               ),
-              GDPR(),
+              _TranslucentCard(
+                child: GDPR(),
+              ),
               const Padding(padding: EdgeInsets.all(4)),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _TranslucentCard extends StatelessWidget {
+  const _TranslucentCard({this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Theme.of(context).colorScheme.onSurface),
+      ),
+      clipBehavior: Clip.antiAlias,
+      elevation: 0,
+      color: compositeColors(Theme.of(context).colorScheme.background,
+          Theme.of(context).colorScheme.primary, 0.20),
+      margin: const EdgeInsets.only(left: 16, right: 16, top: 8),
+      child: child,
     );
   }
 }
@@ -68,11 +93,13 @@ class MoreColors extends StatelessWidget {
       box: Hive.box<dynamic>("settings"),
       builder: (context, box) {
         return SwitchListTile(
-          contentPadding: const EdgeInsets.only(top: 8, bottom: 8, right: 16, left: 16),
+          contentPadding:
+              const EdgeInsets.only(top: 8, bottom: 8, right: 16, left: 16),
           value: box.get("moreItems", defaultValue: false),
           activeColor: activeColor,
-          subtitle: Text("Duplicate the number of colors in HSLuv/HSV pickers.",
-          style: Theme.of(context).textTheme.caption,
+          subtitle: Text(
+            "Duplicate the number of colors in HSLuv/HSV pickers.",
+            style: Theme.of(context).textTheme.caption,
           ),
           title: Text(
             "More Colors",
@@ -133,29 +160,27 @@ class ColorCompare extends StatelessWidget {
 class GDPR extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return wrapInCard(
-      child: Column(
-        children: <Widget>[
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Icon(FeatherIcons.shield),
-              const SizedBox(width: 16),
-              Text("Privacy Policy",
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.title),
-            ],
+    return Column(
+      children: <Widget>[
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(FeatherIcons.shield),
+            const SizedBox(width: 16),
+            Text("Privacy Policy",
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.title),
+          ],
+        ),
+        const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            "This app respects your privacy.\nThere are no analytics, no data collection. Your colors are yours and no one else will know them.",
+            textAlign: TextAlign.center,
           ),
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text(
-              "This app respects your privacy.\nThere are no analytics, no data collection. Your colors are yours and no one else will know them.",
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -188,7 +213,14 @@ class _ContactInfo extends StatelessWidget {
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.subtitle),
         const SizedBox(height: 8),
-        Text("This app is open source",
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Text("If you have ideas or suggestions, please get in touch!",
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.caption),
+        ),
+        const SizedBox(height: 8),
+        Text("This app is open source.",
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.caption),
         const SizedBox(height: 8),
@@ -211,10 +243,12 @@ class _ContactInfo extends StatelessWidget {
                   _launchURL("https://twitter.com/bernaferrari");
                 }),
             IconButton(
-              icon: Icon(FeatherIcons.globe),
+              icon: Icon(FeatherIcons.tag),
               tooltip: "Reddit",
               onPressed: () async {
                 _launchURL("https://www.reddit.com/user/bernaferrari");
+                // unfortunately at this moment there is no icon for Reddit.
+                // I thought 'tag' is better than 'message-square'.
                 // https://github.com/feathericons/feather/issues/274
               },
             ),
