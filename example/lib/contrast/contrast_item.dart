@@ -11,7 +11,7 @@ class ContrastItem extends StatelessWidget {
     this.color,
     this.onPressed,
     this.contrast,
-    this.compactText = true,
+    this.compactText = false,
     this.category = "",
     this.kind,
   });
@@ -38,30 +38,38 @@ class ContrastItem extends StatelessWidget {
           "${inter.outputLightness()}",
     });
 
-    final Widget cornerText = Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Text(
-          writtenValue,
-          style: Theme.of(context).textTheme.caption.copyWith(color: textColor),
-        ),
-        Text(
-          contrast.toStringAsPrecision(3),
-          style: Theme.of(context)
-              .textTheme
-              .caption
-              .copyWith(fontSize: 10, color: textColor),
-        ),
-        Text(
-          getContrastLetters(contrast),
-          style: Theme.of(context)
-              .textTheme
-              .caption
-              .copyWith(fontSize: 8, color: textColor),
-        )
-      ],
-    );
-
+    Widget cornerText;
+    if (compactText) {
+      cornerText = Text(
+        writtenValue,
+        style: Theme.of(context).textTheme.caption.copyWith(color: textColor),
+      );
+    } else {
+      cornerText = Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            writtenValue,
+            style: Theme.of(context).textTheme.caption.copyWith(color: textColor),
+          ),
+          Text(
+            contrast.toStringAsPrecision(3),
+            style: Theme.of(context)
+                .textTheme
+                .caption
+                .copyWith(fontSize: 10, color: textColor),
+          ),
+          Text(
+            getContrastLetters(contrast),
+            style: Theme.of(context)
+                .textTheme
+                .caption
+                .copyWith(fontSize: 8, color: textColor),
+          )
+        ],
+      );
+    }
+    
     return SizedBox(
       width: 56,
       child: MaterialButton(

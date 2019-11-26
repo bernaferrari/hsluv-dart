@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
+import 'package:hsluvsample/contrast/contrast_screen_deprecated.dart';
 import 'package:hsluvsample/mdc/mdc_home.dart';
 import 'package:hsluvsample/screen_color_home.dart';
 import 'package:hsluvsample/util/constants.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'blocs/blocs.dart';
+import 'contrast/contrast_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,8 +56,8 @@ class _BoxedAppState extends State<BoxedApp> {
   Widget build(BuildContext context) {
     final ThemeData base = ThemeData.from(
       colorScheme: const ColorScheme.dark(
-        surface: Color(0xffffd54f),
-      ),
+//        surface: Color(0xffffd54f),
+          ),
     );
 
     return MultiBlocProvider(
@@ -74,6 +76,7 @@ class _BoxedAppState extends State<BoxedApp> {
         title: 'Flutter Demo',
         routes: {
           "/": (context) {
+//            return MultipleContrastScreen(color: Colors.red);
             return ColorHome(initialColor: Colors.orange[200]);
           },
           "/theme": (context) => MDCHome()

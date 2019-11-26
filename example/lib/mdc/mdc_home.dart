@@ -4,7 +4,6 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hsluvsample/blocs/blocs.dart';
 import 'package:hsluvsample/contrast/color_with_contrast.dart';
 import 'package:hsluvsample/dashboard_screen.dart';
-import 'package:hsluvsample/mdc/settings.dart';
 import 'package:hsluvsample/mdc/showcase.dart';
 import 'package:hsluvsample/mdc/templates.dart';
 import 'package:hsluvsample/util/constants.dart';
@@ -60,9 +59,10 @@ class MDCHome extends StatelessWidget {
         ),
         child: SafeArea(
           child: Scaffold(
+            backgroundColor: surfaceColor,
             appBar: AppBar(),
             body: DefaultTabController(
-              length: 6,
+              length: 5,
               initialIndex: 1,
               child: Column(
                 children: <Widget>[
@@ -80,7 +80,6 @@ class MDCHome extends StatelessWidget {
                         ),
                       ),
                       Tab(icon: Icon(FeatherIcons.briefcase)),
-                      Tab(icon: Icon(FeatherIcons.columns)),
                       Tab(icon: Icon(FeatherIcons.globe)),
                       // globe because of accessibility
                     ],
@@ -108,7 +107,6 @@ class MDCHome extends StatelessWidget {
                           surfaceColor: surfaceColor,
                           backgroundColor: backgroundColor,
                         ),
-                        Settings(),
                         ColorBlindnessTheme(
                           // it should receive them pure, not the colorblind color.
                           primaryColor: pureColors[kPrimary],

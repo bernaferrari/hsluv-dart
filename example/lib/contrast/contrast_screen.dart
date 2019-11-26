@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,245 +7,213 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:hsluvsample/blocs/contrast_color/contrast_color_event.dart';
-import 'package:hsluvsample/blocs/contrast_color/contrast_color_state.dart';
+import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_bloc.dart';
+import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_event.dart';
+import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_state.dart';
 import 'package:hsluvsample/contrast/color_with_contrast.dart';
+import 'package:hsluvsample/contrast/reorder_list.dart';
 import 'package:hsluvsample/contrast/shuffle_color.dart';
 import 'package:hsluvsample/hsinter.dart';
+import 'package:hsluvsample/mdc/components.dart';
 import 'package:hsluvsample/util/color_util.dart';
 import 'package:hsluvsample/util/constants.dart';
 import 'package:hsluvsample/util/hsluv_tiny.dart';
 import 'package:hsluvsample/util/selected.dart';
-import 'package:hsluvsample/util/tiny_color.dart';
-import 'package:hsluvsample/util/when.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
 
-import '../blocs/contrast_color/contrast_color.dart';
 import '../util/constants.dart';
 import 'contrast_dialog.dart';
 import 'contrast_list.dart';
 import 'contrast_util.dart';
+import 'info_screen.dart';
 
-class ContrastScreen extends StatefulWidget {
-  const ContrastScreen({this.color});
+class MultipleContrastScreen extends StatefulWidget {
+  const MultipleContrastScreen({this.color});
 
   final Color color;
 
   @override
-  _ContrastScreenState createState() => _ContrastScreenState();
+  _MultipleContrastScreenState createState() => _MultipleContrastScreenState();
 }
 
-class _ContrastScreenState extends State<ContrastScreen> {
-  bool useHSLuv = true;
-
-  final int r = Random().nextInt(102);
+class _MultipleContrastScreenState extends State<MultipleContrastScreen> {
+  bool contrastMode = true;
 
   int currentSegment = 0;
 
   void onValueChanged(int newValue) {
     setState(() {
       currentSegment = newValue;
-      useHSLuv = currentSegment == 0;
+      contrastMode = currentSegment == 0;
     });
   }
 
-  final Map<int, Widget> children = const <int, Widget>{
-    0: Text('HSLuv'),
-    1: Text('HSV'),
-  };
-
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<ContrastColorBloc>(
-      builder: (ctx) => ContrastColorBloc()
-        ..add(LoadInit(widget.color, Color(int.parse("0xFF${colorClaim[r]}")))),
-      child: Theme(
-        data: ThemeData.from(colorScheme: const ColorScheme.dark()),
-        child: Scaffold(
-          appBar: buildAppBar(),
-          body: Column(
-            children: <Widget>[
-              SizedBox(
-                width: 500,
-                child: Padding(
+    return BlocProvider<MultipleContrastColorBloc>(
+      builder: (ctx) => MultipleContrastColorBloc()
+        ..add(
+          MultipleLoadInit(
+            [
+              widget.color,
+              getShuffleColor(),
+              getShuffleColor(),
+              Colors.white,
+              Colors.black,
+              getShuffleColor(),
+              getShuffleColor(),
+              getShuffleColor(),
+              getShuffleColor(),
+              getShuffleColor(),
+            ],
+          ),
+        ),
+      child: BlocBuilder<MultipleContrastColorBloc, MultipleContrastColorState>(
+          builder:
+              (BuildContext builderContext, MultipleContrastColorState state) {
+        if (state is MultipleContrastColorLoading) {
+          return const Scaffold(body: Center(child: LoadingIndicator()));
+        }
+
+        final list = (state as MultipleContrastColorLoaded).colorsList;
+
+        ColorScheme colorScheme;
+
+        if (list[0].rgbColor.computeLuminance() > kLumContrast) {
+          colorScheme = ColorScheme.light(
+            primary: list[0].rgbColor,
+            surface: list[0].rgbColor,
+          );
+        } else {
+          colorScheme = ColorScheme.dark(
+            primary: list[0].rgbColor,
+            surface: list[0].rgbColor,
+          );
+        }
+
+        return Theme(
+          data: ThemeData.from(
+            colorScheme: colorScheme,
+          ),
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Text("Contrast Compare"),
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(FeatherIcons.list),
+                  onPressed: () => showReorderDialog(builderContext, list),
+                )
+              ],
+              bottom: PreferredSize(
+                preferredSize: const Size(500, 56),
+                child: Container(
+                  width: 500,
                   padding: const EdgeInsets.only(
-                      left: 16.0, right: 16, top: 16, bottom: 12),
+                    left: 16.0,
+                    right: 16,
+                    top: 16,
+                    bottom: 12,
+                  ),
                   child: CupertinoSlidingSegmentedControl<int>(
-                    backgroundColor: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.20),
+                    backgroundColor: colorScheme.onSurface.withOpacity(0.20),
                     thumbColor: compositeColors(
-                      Theme.of(context).colorScheme.background,
-                      Theme.of(context).colorScheme.primary,
+                      colorScheme.background,
+                      list[0].rgbColor,
                       0.20,
                     ),
-                    children: children,
+                    children: const <int, Widget>{
+                      0: Text('Contrast'),
+                      1: Text('Info'),
+                    },
                     onValueChanged: onValueChanged,
                     groupValue: currentSegment,
                   ),
                 ),
               ),
-              Expanded(child: buildFlex()),
-            ],
+//              backgroundColor: blendColorWithBackground(widget.color),
+            ),
+            body: Column(
+              children: <Widget>[
+                if (contrastMode)
+                  Expanded(child: buildFlex(list))
+                else
+                  Expanded(child: InfoScreen(list))
+              ],
+            ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildFlex() {
-    return WatchBoxBuilder(
-      box: Hive.box<dynamic>("settings"),
-      builder: (BuildContext context, Box box) {
-        final bool more = box.get("moreItems", defaultValue: false);
-
-        return Flex(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          // on iPad, always vertical.
-          direction: MediaQuery.of(context).size.shortestSide > 600
-              ? Axis.vertical
-              : MediaQuery.of(context).orientation == Orientation.landscape
-                  ? Axis.horizontal
-                  : Axis.vertical,
-          children: <Widget>[
-            Expanded(
-              child: useHSLuv
-                  ? HSLuvSelector2(isFirst: true, moreColors: more)
-                  : HSVSelector2(isFirst: true, moreColors: more),
-            ),
-            Expanded(
-              child: useHSLuv
-                  ? HSLuvSelector2(isFirst: false, moreColors: more)
-                  : HSVSelector2(isFirst: false, moreColors: more),
-            ),
-          ],
         );
-      },
+      }),
     );
   }
 
-  Widget buildAppBar() {
-    return AppBar(
-      title: const Text("Contrast Compare"),
-      backgroundColor: blendColorWithBackground(widget.color),
-      elevation: 0,
-      actions: [
-//            IconButton(
-//              icon: Icon(Icons.help_outline),
-//              onPressed: () {
-//                showDialog<dynamic>(context: context, builder: (BuildContext context) {
-//                  return AlertDialog(
-//                    title: Text("WCAG 2.1"),
-//                    content: Text(
-//                      "\n3.0:1 minimum for texts larger than 18pt (AA+).\n4.5:1 minimum for texts smaller than 18pt (AA).\n7.0:1 minimum is preferred, when possible (AAA).",
-//                    ),
-//                  );
-//                });
-//              },
-//            ),
-//        IconButton(
-//          icon: RawMaterialButton(
-//            onPressed: null,
-//            child: Text(
-//              useHSLuv ? "HSV" : "HSL",
-//              style: const TextStyle(fontSize: 12),
-//            ),
-//            shape: CircleBorder(
-//              side: BorderSide(color: Theme.of(context).colorScheme.onSurface),
-//            ),
-//            elevation: 0.0,
-//            padding: EdgeInsets.zero,
-//          ),
-//          onPressed: () {
-//            setState(() {
-//              useHSLuv = !useHSLuv;
-//            });
-//          },
-//        ),
+  Widget buildFlex(List<ContrastedColor> list) {
+    return WatchBoxBuilder(
+        box: Hive.box<dynamic>("settings"),
+        builder: (BuildContext context, Box box) {
+          final bool more = false; //box.get("moreItems", defaultValue: false);
 
-//        ToggleButtons(
-//          children: const [
-//            Padding(
-//              padding: EdgeInsets.symmetric(horizontal: 12.0),
-//              child: Text(
-//                "HSV",
-//                style: TextStyle(fontFamily: "B612Mono"),
-//              ),
-//            ),
-//            Padding(
-//              padding: EdgeInsets.symmetric(horizontal: 12.0),
-//              child: Text(
-//                "HSLuv",
-//                style: TextStyle(fontFamily: "B612Mono"),
-//              ),
-//            ),
-//          ],
-//          isSelected: [
-//            useHSLuv == false,
-//            useHSLuv == true,
-//          ],
-//          onPressed: (selectedIndex) {
-//            setState(() {
-//              useHSLuv = selectedIndex != 0;
-//            });
-//          },
-//        ),
-      ],
-    );
+          return ListView(
+            children: <Widget>[
+              HSLuvSelector2(
+                index: 0,
+                moreColors: more,
+                colorsMap: list,
+              ),
+              for (int i = 1; i < list.length; i++)
+                HSLuvSelector2(
+                  index: i,
+                  moreColors: more,
+                  colorsMap: list,
+                )
+            ],
+          );
+        });
   }
-}
 
-class HSVSelector2 extends StatelessWidget {
-  const HSVSelector2({
-    this.isFirst,
-    this.moreColors,
-  });
+  Future<void> showReorderDialog(
+      BuildContext builderContext, List<ContrastedColor> list) async {
+    final dynamic result = await showDialog<dynamic>(
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            title: const Text("Drag to reorder"),
+            contentPadding: const EdgeInsets.only(top: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            content: Card(
+              clipBehavior: Clip.antiAlias,
+              margin: EdgeInsets.zero,
+              color: compositeColors(
+                Theme.of(context).colorScheme.background,
+                Theme.of(context).colorScheme.primary,
+                0.20,
+              ),
+              child: ReorderList(list),
+            ),
+          );
+        });
 
-  // maximum number of items
-  final bool moreColors;
-
-  final bool isFirst;
-
-  @override
-  Widget build(BuildContext context) {
-    const String kind = hsvStr;
-
-    // maximum number of items
-    final int itemsOnScreen =
-        ((MediaQuery.of(context).size.height - 112) / 56).ceil();
-
-    final int toneSize = moreColors ? itemsOnScreen * 2 : itemsOnScreen;
-    final int hueSize = moreColors ? 90 : 45;
-
-    return ContrastHorizontalPicker(
-      kind: kind,
-      fetchHue: (Color c) => hueVariations(c, hueSize),
-      fetchSat: (Color c, Color otherColor) =>
-          tonesHSV(c, toneSize, 1 / toneSize, 0)
-              .convertToContrast(kind, otherColor),
-      fetchLight: (Color c, Color otherColor) =>
-          valueVariations(c, toneSize, 1 / toneSize, 0)
-              .convertToContrast(kind, otherColor),
-      hueTitle: hueStr,
-      satTitle: satStr,
-      lightTitle: valueStr,
-      toneSize: toneSize,
-      isFirst: isFirst,
-    );
+    if (result != null) {
+      BlocProvider.of<MultipleContrastColorBloc>(builderContext)
+          .add(MultipleLoadInit(result));
+    }
   }
 }
 
 class HSLuvSelector2 extends StatelessWidget {
   const HSLuvSelector2({
     this.moreColors = false,
-    this.isFirst,
+    this.index,
+    this.colorsMap,
   });
 
   // maximum number of items
   final bool moreColors;
 
-  final bool isFirst;
+  final List<ContrastedColor> colorsMap;
+
+  final int index;
 
   @override
   Widget build(BuildContext context) {
@@ -256,27 +223,29 @@ class HSLuvSelector2 extends StatelessWidget {
     final double width = MediaQuery.of(context).size.width - 24;
     final int itemsOnScreen = (math.min(width, 818) / 56).ceil();
 
-    final int toneSize = moreColors ? itemsOnScreen * 2 : itemsOnScreen;
+    final int toneSize = 19; //moreColors ? itemsOnScreen * 2 : itemsOnScreen;
     final int hueSize = moreColors ? 90 : 45;
 
     return ContrastHorizontalPicker(
       kind: kind,
+      isShrink: true,
       fetchHue: (Color c) => hsluvAlternatives(c, hueSize),
-      fetchSat: (Color c, Color otherColor) =>
-          hsluvTones(c, toneSize, 5, 100).convertToContrast(kind, otherColor),
+      fetchSat: (Color c, Color otherColor) => hsluvTones(c, toneSize, 10, 100)
+          .convertToInterContrast(kind, otherColor),
       fetchLight: (Color c, Color otherColor) =>
-          hsluvLightness(c, toneSize, 5, 90)
-              .convertToContrast(kind, otherColor),
+          hsluvLightness(c, toneSize, 5, 95)
+              .convertToInterContrast(kind, otherColor),
       hueTitle: hueStr,
       satTitle: satStr,
       lightTitle: lightStr,
       toneSize: toneSize,
-      isFirst: isFirst,
+      colorsList: colorsMap,
+      index: index,
     );
   }
 }
 
-class ContrastHorizontalPicker extends StatefulWidget {
+class ContrastHorizontalPicker extends StatelessWidget {
   const ContrastHorizontalPicker({
     this.kind,
     this.fetchHue,
@@ -286,11 +255,15 @@ class ContrastHorizontalPicker extends StatefulWidget {
     this.satTitle,
     this.lightTitle,
     this.toneSize,
-    this.isFirst,
+    this.index,
+    this.isShrink,
+    this.colorsList,
   });
 
   final String kind;
-  final bool isFirst;
+  final bool isShrink;
+  final int index;
+  final List<ContrastedColor> colorsList;
   final List<Color> Function(Color) fetchHue;
   final List<InterColorWithContrast> Function(Color, Color) fetchSat;
   final List<InterColorWithContrast> Function(Color, Color) fetchLight;
@@ -300,224 +273,178 @@ class ContrastHorizontalPicker extends StatefulWidget {
   final String satTitle;
   final String lightTitle;
 
-  @override
-  _ContrastHorizontalPickerState createState() =>
-      _ContrastHorizontalPickerState();
-}
-
-class _ContrastHorizontalPickerState extends State<ContrastHorizontalPicker> {
-  double opacity = 0.0;
-
-  @override
-  void initState() {
-    Future.delayed(const Duration(milliseconds: 500), () {
-      setState(() {
-        opacity = 1.0;
-      });
-    });
-    super.initState();
-  }
-
   double interval(double value, double min, double max) {
     return math.min(math.max(value, min), max);
   }
 
   List<InterColorWithContrast> parseHue(Color color, Color otherColor) {
-    return widget.fetchHue(color).map((Color c) {
-      final HSInterColor hsluv = HSInterColor.fromColor(c, widget.kind);
+    return fetchHue(color).map((Color c) {
+      final HSInterColor hsluv = HSInterColor.fromColor(c, kind);
       final color = hsluv.toColor();
       return InterColorWithContrast(color, hsluv, otherColor);
     }).toList();
   }
 
   void contrastColorSelected(BuildContext context, Color color) {
-    BlocProvider.of<ContrastColorBloc>(context)
-        .add(CMoveColor(color, widget.isFirst));
+    BlocProvider.of<MultipleContrastColorBloc>(context)
+        .add(MCMoveColor(color, index));
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ContrastColorBloc, ContrastColorState>(
-        builder: (BuildContext context, ContrastColorState state) {
-      if (state is ContrastColorLoading) {
-        return const Scaffold(body: Center(child: LoadingIndicator()));
-      }
+    final Color rgbColor = colorsList[index].rgbColor;
 
-      final Color rgbColor = when({
-        () => widget.isFirst: () => (state as ContrastColorLoaded).rgbColor1,
-        () => !widget.isFirst: () => (state as ContrastColorLoaded).rgbColor2,
-      });
+    final Color otherColor = colorsList[0].rgbColor;
 
-      final Color otherColor = when({
-        () => widget.isFirst: () => (state as ContrastColorLoaded).rgbColor2,
-        () => !widget.isFirst: () => (state as ContrastColorLoaded).rgbColor1,
-      });
+    final contrast = colorsList[index].contrast;
 
-      final contrast = calculateContrast(rgbColor, otherColor);
+    final List<InterColorWithContrast> values =
+        fetchLight(rgbColor, otherColor);
 
+    final Color borderColor = (rgbColor.computeLuminance() > kLumContrast)
+        ? Colors.black.withOpacity(0.40)
+        : Colors.white.withOpacity(0.40);
+
+    final List<Widget> widgets = <Widget>[];
+
+    if (index == 0) {
       final hue = parseHue(rgbColor, otherColor);
       final hueLen = hue.length;
 
       // in the ideal the world they could be calculated in the Bloc &/or in parallel.
-      final List<InterColorWithContrast> tones =
-          widget.fetchSat(rgbColor, otherColor);
-      final List<InterColorWithContrast> values =
-          widget.fetchLight(rgbColor, otherColor);
-
-      final Color borderColor = (rgbColor.computeLuminance() > kLumContrast)
-          ? Colors.black.withOpacity(0.40)
-          : Colors.white.withOpacity(0.40);
+      final List<InterColorWithContrast> tones = fetchSat(rgbColor, otherColor);
 
       final Widget hueWidget = ContrastList(
-        pageKey: widget.kind,
-        title: widget.hueTitle,
+        pageKey: kind,
+        title: hueTitle,
         sectionIndex: 0,
         listSize: hueLen,
         isInfinite: true,
         colorsList: hue,
+        isFirst: index == 0,
         buildWidget: (int index) {},
         onColorPressed: (Color c) => contrastColorSelected(context, c),
       );
+      widgets.add(hueWidget);
 
       final satWidget = ContrastList(
-        pageKey: widget.kind,
-        title: widget.satTitle,
+        pageKey: kind,
+        title: satTitle,
         sectionIndex: 1,
-        listSize: widget.toneSize,
+        listSize: toneSize,
+        isFirst: index == 0,
         colorsList: tones,
         onColorPressed: (Color c) => contrastColorSelected(context, c),
       );
+      widgets.add(satWidget);
+    }
 
-      final valueWidget = ContrastList(
-        pageKey: widget.kind,
-        title: widget.lightTitle,
-        sectionIndex: 2,
-        listSize: widget.toneSize,
-        colorsList: values,
-        onColorPressed: (Color c) => contrastColorSelected(context, c),
-      );
+    final valueWidget = ContrastList(
+      pageKey: kind,
+      title: lightTitle,
+      sectionIndex: 2,
+      isFirst: index == 0,
+      listSize: toneSize,
+      colorsList: values,
+      onColorPressed: (Color c) => contrastColorSelected(context, c),
+    );
+    widgets.add(valueWidget);
 
-      final List<Widget> widgets = <Widget>[hueWidget, satWidget, valueWidget];
+    final shape = RoundedRectangleBorder(
+      side: BorderSide(color: borderColor),
+      borderRadius: BorderRadius.circular(defaultRadius),
+    );
 
-      final shape = RoundedRectangleBorder(
-        side: BorderSide(color: borderColor),
-        borderRadius: BorderRadius.circular(defaultRadius),
-      );
+    final forCond = index == 0 ? 3 : 1;
 
-      return Theme(
-        data: ThemeData.from(
-          colorScheme: (rgbColor.computeLuminance() > kLumContrast)
-              ? ColorScheme.light(surface: rgbColor)
-              : ColorScheme.dark(surface: rgbColor),
-          textTheme: const TextTheme(
-            caption: TextStyle(fontFamily: "B612Mono"),
-            button: TextStyle(fontFamily: "B612Mono"),
-          ),
-        ).copyWith(
-          buttonTheme: ButtonThemeData(shape: shape),
-          cardTheme: Theme.of(context).cardTheme.copyWith(
-                margin: EdgeInsets.zero,
-                clipBehavior: Clip.antiAlias,
-                shape: shape,
-              ),
+    return Theme(
+      data: ThemeData.from(
+        colorScheme: (rgbColor.computeLuminance() > kLumContrast)
+            ? ColorScheme.light(surface: rgbColor)
+            : ColorScheme.dark(surface: rgbColor),
+        textTheme: const TextTheme(
+          caption: TextStyle(fontFamily: "B612Mono"),
+          button: TextStyle(fontFamily: "B612Mono"),
         ),
-        child: Scaffold(
-          backgroundColor: rgbColor,
-          body: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 818),
-            child: Flex(
-              mainAxisAlignment: MainAxisAlignment.center,
-              direction: Axis.vertical,
-              children: <Widget>[
-                const SizedBox(height: 8),
-                AnimatedOpacity(
-                  opacity: opacity,
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeIn,
-                  child: _UpperPart(
-                      rgbColor, otherColor, contrast, widget.isFirst),
-                ),
-                Flex(
-                  direction: Axis.vertical,
-                  children: <Widget>[
-                    const SizedBox(height: 8),
-                    for (int i = 0; i < 3; i++) ...<Widget>[
-                      const SizedBox(height: 4),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16, right: 8),
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: SizedBox(
-                                // make items larger on iPad
-                                height:
-                                    MediaQuery.of(context).size.shortestSide <
-                                            600
-                                        ? 56
-                                        : 64,
-                                child: widgets[i],
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            SizedBox(
-                              width: 48,
-                              child: Text(
-                                HSInterColor.fromColor(rgbColor, widget.kind)
-                                    .toPartialStr(i),
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                    fontFamily: "B612Mono", fontSize: 12),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                    ],
-                  ],
-                ),
-//                if (widget.isFirst) const SizedBox(height: 16),
-
-//                  AnimatedOpacity(
-//                    opacity: opacity,
-//                    duration: const Duration(milliseconds: 500),
-//                    curve: Curves.easeIn,
-//                    child: _BottomPart(
-//                      rgbColor,
-//                      otherColor,
-//                      widget.kind,
-//                      widget.isFirst,
-//                    ),
-//                  ),
-              ],
+      ).copyWith(
+        buttonTheme: ButtonThemeData(shape: shape),
+        cardTheme: Theme.of(context).cardTheme.copyWith(
+              margin: EdgeInsets.zero,
+              clipBehavior: Clip.antiAlias,
+              shape: shape,
             ),
+      ),
+      child: Container(
+        color: rgbColor,
+        padding: const EdgeInsets.all(8),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 818),
+          child: Flex(
+            mainAxisAlignment: MainAxisAlignment.center,
+            direction: Axis.vertical,
+            children: <Widget>[
+              _UpperPart(rgbColor, otherColor, contrast, index, colorsList),
+              Flex(
+                direction: Axis.vertical,
+                children: <Widget>[
+                  const SizedBox(height: 8),
+                  for (int i = 0; i < forCond; i++) ...<Widget>[
+                    const SizedBox(height: 4),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16, right: 8),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: SizedBox(
+                              // make items larger on iPad
+                              height:
+                                  MediaQuery.of(context).size.shortestSide < 600
+                                      ? 56
+                                      : 64,
+                              child: widgets[i],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          SizedBox(
+                            width: 48,
+                            child: Text(
+                              HSInterColor.fromColor(rgbColor, kind)
+                                  .toPartialStr((index == 0) ? i : 2),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: "B612Mono",
+                                fontSize: 12,
+                                color: contrastingColor(rgbColor),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                  ],
+                ],
+              ),
+            ],
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 }
 
 class _UpperPart extends StatelessWidget {
-  const _UpperPart(this.color, this.otherColor, this.contrast, this.isFirst);
+  const _UpperPart(
+      this.color, this.otherColor, this.contrast, this.index, this.list);
 
   final Color otherColor;
   final Color color;
   final double contrast;
-  final bool isFirst;
+  final int index;
+  final List<ContrastedColor> list;
 
   @override
   Widget build(BuildContext context) {
-    final checkIcon = Icon(
-      FeatherIcons.checkCircle,
-      color: otherColor,
-    );
-
-    final removeIcon = Icon(
-      FeatherIcons.xCircle,
-      color: otherColor,
-    );
-
     final style = TextStyle(
       fontSize: 10,
       fontWeight: FontWeight.w500,
@@ -528,129 +455,74 @@ class _UpperPart extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         const SizedBox(width: 16),
-        SizedBox(
-          width: 56,
-          child: Column(
-            children: <Widget>[
-              RichText(
-                text: TextSpan(style: style, children: [
-                  TextSpan(
-                    text: contrast.toStringAsPrecision(3),
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
+        if (index != 0)
+          SizedBox(
+            width: 56,
+            child: Column(
+              children: <Widget>[
+                RichText(
+                  text: TextSpan(style: style, children: [
+                    TextSpan(
+                      text: contrast.toStringAsPrecision(3),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                  TextSpan(
-                    text: ":1",
-                    style: style.copyWith(
-                      fontSize: 14,
+                    TextSpan(
+                      text: ":1",
+                      style: style.copyWith(
+                        fontSize: 14,
+                      ),
                     ),
-                  ),
-                ]),
-              ),
-              Text(
-                getContrastLetters(contrast),
-                style: style.copyWith(fontSize: 12),
-              ),
-            ],
+                  ]),
+                ),
+                Text(
+                  getContrastLetters(contrast),
+                  style: style.copyWith(fontSize: 12),
+                ),
+              ],
+            ),
+          )
+        else
+          Text(
+            "Main Color",
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontWeight: FontWeight.w700,
+            ),
           ),
-        ),
+        const SizedBox(width: 16),
         Expanded(
           child: Center(
             child: Container(
-              width: 1,
+              width: 0,
               height: 32,
               color: otherColor,
             ),
           ),
         ),
-        _Buttons(color: color, otherColor: otherColor, isFirst: isFirst),
+        _Buttons(
+          color: color,
+          otherColor: (index == 0)
+              ? Theme.of(context).colorScheme.onSurface
+              : otherColor,
+          index: index,
+          list: list,
+        ),
         const SizedBox(width: 16),
-
-//        Row(
-//          children: <Widget>[
-//            if (contrast > 3.0) checkIcon else removeIcon,
-//            const SizedBox(width: 8),
-////                            Icon(
-////                              Icons.wb_sunny,
-////                              color: otherColor,
-////                            ),
-//            const SizedBox(width: 8),
-//            Column(
-//              children: <Widget>[
-//                Text(
-//                  "Large",
-//                  style: TextStyle(
-//                    // similar to H6
-//                    fontSize: 18,
-//                    fontWeight: FontWeight.w500,
-//                    color: otherColor,
-//                  ),
-//                ),
-//                Text("AA Large", style: style),
-//              ],
-//            ),
-//          ],
-//        ),
-//        Row(
-//          children: <Widget>[
-//            if (contrast > 4.5) checkIcon else removeIcon,
-//            const SizedBox(width: 8),
-//            Column(
-//              children: <Widget>[
-//                Text(
-//                  "Small",
-//                  style: TextStyle(
-//                    fontSize: 14,
-//                    color: otherColor,
-//                  ),
-//                ),
-//                Text("AA", style: style),
-//              ],
-//            ),
-//          ],
-//        ),
       ],
     );
   }
 }
 
-class _BottomPart extends StatelessWidget {
-  const _BottomPart(this.color, this.otherColor, this.kind, this.isFirst);
-
-  final Color color;
-  final Color otherColor;
-  final String kind;
-  final bool isFirst;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          Text(
-            HSInterColor.fromColor(color, kind).toString(),
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontFamily: "B612Mono",
-            ),
-          ),
-          _Buttons(color: color, otherColor: otherColor, isFirst: isFirst),
-        ],
-      ),
-    );
-  }
-}
-
 class _Buttons extends StatelessWidget {
-  const _Buttons({this.color, this.otherColor, this.isFirst});
+  const _Buttons({this.color, this.otherColor, this.index, this.list});
 
   final Color color;
   final Color otherColor;
-  final bool isFirst;
+  final int index;
+  final List<ContrastedColor> list;
 
   @override
   Widget build(BuildContext context) {
@@ -666,13 +538,14 @@ class _Buttons extends StatelessWidget {
           borderSide: BorderSide(color: otherColor),
           label: Text(color.toHexStr()),
           onPressed: () {
-            showSlidersDialog(context, color, isFirst);
+            showSlidersDialog(context, color, index);
           },
           onLongPress: () {
             copyToClipboard(context, color.toHexStr());
           },
         ),
         const SizedBox(width: 16),
+//        if (index == 0)
         MaterialButton(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(defaultRadius),
@@ -689,14 +562,92 @@ class _Buttons extends StatelessWidget {
             FeatherIcons.shuffle,
             size: 16,
           ),
-//          color: color,
           padding: EdgeInsets.zero,
           onPressed: () {
-            BlocProvider.of<ContrastColorBloc>(context)
-                .add(CMoveColor(shuffleColor(otherColor), isFirst));
+            BlocProvider.of<MultipleContrastColorBloc>(context).add(
+              MCMoveColor(
+                getShuffleColor(),
+                index,
+              ),
+            );
           },
         ),
+//        if (index != 0) const SizedBox(width: 16),
+//        if (index != 0)
+//          MaterialButton(
+//            shape: RoundedRectangleBorder(
+//              borderRadius: BorderRadius.circular(defaultRadius),
+//              side: BorderSide(
+//                color: otherColor,
+//                width: 1.0,
+//              ),
+//            ),
+//            highlightColor:
+//                Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+//            minWidth: 48,
+//            elevation: 0,
+//            child: Icon(
+//              FeatherIcons.maximize2,
+//              size: 16,
+//            ),
+//            padding: EdgeInsets.zero,
+//            onPressed: () => showReorderDialog(context, color, otherColor),
+//          ),
       ],
+    );
+  }
+
+  Future<void> showReorderDialog(
+      BuildContext builderContext, Color color, Color otherColor) async {
+    final dynamic result = await showDialog<dynamic>(
+        context: builderContext,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            title: const Text("Modify"),
+            contentPadding: const EdgeInsets.only(top: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            content: Card(
+              clipBehavior: Clip.antiAlias,
+              margin: EdgeInsets.zero,
+              color: compositeColors(
+                Theme.of(builderContext).colorScheme.background,
+                Theme.of(builderContext).colorScheme.primary,
+                0.20,
+              ),
+              child: SelectorDialog(color, otherColor, list),
+            ),
+          );
+        });
+
+    if (result != null) {
+      BlocProvider.of<MultipleContrastColorBloc>(builderContext)
+          .add(MultipleLoadInit(result));
+    }
+  }
+}
+
+class SelectorDialog extends StatelessWidget {
+  const SelectorDialog(this.color, this.otherColor, this.list);
+
+  final Color color;
+  final Color otherColor;
+  final List<ContrastedColor> list;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          HSLuvSelector2(
+            index: 1,
+            moreColors: false,
+            colorsMap: list,
+          ),
+        ],
+      ),
     );
   }
 }

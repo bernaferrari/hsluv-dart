@@ -6,7 +6,7 @@ import 'package:hsluvsample/hsinter.dart';
 import 'package:hsluvsample/util/color_util.dart';
 
 extension ListConversion<T> on List<Color> {
-  List<InterColorWithContrast> convertToContrast(String kind, Color otherColor) =>
+  List<InterColorWithContrast> convertToInterContrast(String kind, Color otherColor) =>
       map((Color c) => InterColorWithContrast(
             c,
             HSInterColor.fromColor(c, kind),

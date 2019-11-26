@@ -14,6 +14,7 @@ class ContrastList extends StatelessWidget {
     this.onColorPressed,
     this.buildWidget,
     this.isInfinite = false,
+    this.isFirst = false,
   });
 
   final Function(Color) onColorPressed;
@@ -25,13 +26,14 @@ class ContrastList extends StatelessWidget {
   final int sectionIndex;
   final int listSize;
   final bool isInfinite;
+  final bool isFirst;
 
   Widget colorCompare(int index) {
     return ContrastItem(
       kind: pageKey,
       color: colorsList[index],
       contrast: colorsList[index].contrast,
-      compactText: true,
+      compactText: isFirst,
       category: title,
       onPressed: () => onColorPressed(colorsList[index].color),
     );

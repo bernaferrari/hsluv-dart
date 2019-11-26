@@ -74,17 +74,18 @@ class _HSVerticalPickerState extends State<HSVerticalPicker> {
                           borderRadius: BorderRadius.circular(16)),
                       backgroundColor: widget.color,
                       content: Card(
-                          clipBehavior: Clip.antiAlias,
-                          margin: EdgeInsets.zero,
-                          color: compositeColors(
-                            Theme.of(context).colorScheme.background,
-                            Theme.of(context).colorScheme.primary,
-                            0.20,
-                          ),
-                          elevation: 0,
-                          child: MoreColors(
-                            activeColor: Colors.green,
-                          )),
+                        clipBehavior: Clip.antiAlias,
+                        margin: EdgeInsets.zero,
+                        color: compositeColors(
+                          Theme.of(context).colorScheme.background,
+                          Theme.of(context).colorScheme.primary,
+                          0.20,
+                        ),
+                        elevation: 0,
+                        child: MoreColors(
+                          activeColor: Colors.green,
+                        ),
+                      ),
                     );
                   });
             },

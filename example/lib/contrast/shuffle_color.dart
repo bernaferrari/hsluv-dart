@@ -27,6 +27,11 @@ Color shuffleColor(Color currentColor) {
   }
 }
 
+Color getShuffleColor() {
+  final colorsList = colorClaim.toList()..shuffle();
+  return Color(int.parse("0xFF${colorsList.first}"));
+}
+
 // https://www.vanschneider.com/colors
 const List<String> colorClaim = [
   "FF8B8B",

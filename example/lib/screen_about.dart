@@ -99,7 +99,7 @@ class ColorCompare extends StatelessWidget {
         Navigator.push<dynamic>(
           context,
           MaterialPageRoute<dynamic>(
-            builder: (context) => ContrastScreen(color: color),
+            builder: (context) => MultipleContrastScreen(color: color),
           ),
         );
       },

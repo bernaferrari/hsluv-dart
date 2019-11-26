@@ -1,6 +1,8 @@
 // user defined function
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_bloc.dart';
+import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_event.dart';
 import 'package:hsluvsample/contrast/selectable_sliders.dart';
 import 'package:hsluvsample/screen_color_home.dart';
 import 'package:hsluvsample/util/color_util.dart';
@@ -8,13 +10,11 @@ import 'package:hsluvsample/util/constants.dart';
 import 'package:hsluvsample/widgets/color_sliders.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
 
-import '../blocs/contrast_color/contrast_color_bloc.dart';
-import '../blocs/contrast_color/contrast_color_event.dart';
 import '../blocs/slider_color/slider_color.dart';
 
 Future<void> showSlidersDialog(BuildContext context, Color color,
-    [bool isFirst]) async {
-  if (isFirst != null) {
+    [int index]) async {
+  if (index != null) {
     BlocProvider.of<SliderColorBloc>(context).add(MoveColor(color, true));
   }
 
@@ -23,24 +23,23 @@ Future<void> showSlidersDialog(BuildContext context, Color color,
       builder: (BuildContext ctx) {
         return BlocProvider(
           builder: (context) => SliderColorBloc()..add(MoveColor(color, true)),
-          child: DialogWidget(color, isFirst),
+          child: DialogWidget(color),
         );
       });
 
   if (result != null) {
-    if (isFirst == null && result is Color) {
+    if (index == null && result is Color) {
       BlocProvider.of<SliderColorBloc>(context).add(MoveColor(result, true));
     } else if (result is Color) {
-      BlocProvider.of<ContrastColorBloc>(context)
-          .add(CMoveColor(result, isFirst));
+      BlocProvider.of<MultipleContrastColorBloc>(context)
+          .add(MCMoveColor(result, index));
     }
   }
 }
 
 class DialogWidget extends StatelessWidget {
-  const DialogWidget(this.color, this.isFirst);
+  const DialogWidget(this.color);
 
-  final bool isFirst;
   final Color color;
 
   @override

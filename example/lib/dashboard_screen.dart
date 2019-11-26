@@ -2,8 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hsluvsample/blocs/blocs.dart';
 import 'package:hsluvsample/contrast/shuffle_color.dart';
+import 'package:hsluvsample/single_color_blind.dart';
 import 'package:hsluvsample/util/selected.dart';
 import 'package:hsluvsample/util/tiny_color.dart';
 import 'package:hsluvsample/util/when.dart';
@@ -54,22 +56,38 @@ class ColorBlindSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorWithBlind = retrieveColorBlind(color);
-    return LayoutBuilder(
-      builder: (context, builder) {
-        const numOfItems = 4; //(builder.maxWidth / 56).floor();
-
-        return Wrap(
-          children: <Widget>[
-            for (String key in colorWithBlind.keys)
-              for (ColorWithBlind item in colorWithBlind[key])
-                ColoredBlindButton(
-                  item,
-                  width: builder.maxWidth / numOfItems,
-                )
-          ],
+    return InkWell(
+      onTap: () {
+        Navigator.push<dynamic>(
+          context,
+          MaterialPageRoute<dynamic>(
+            builder: (context) => const BlindScreen(),
+          ),
         );
       },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(FeatherIcons.globe),
+                  const SizedBox(width: 16),
+                  Text(
+                    "Color Blindness",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                ],
+              ),
+            ),
+            Icon(FeatherIcons.chevronRight),
+            const SizedBox(width: 16),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -100,7 +118,6 @@ class ContrastSection extends StatelessWidget {
         .where((f) => f.contrast > 4)
         .toList(growable: false);
 
-    print("total len: ${filteredList.length}");
     filteredList.sort((a, b) => HSVColor.fromColor(b.color)
         .hue
         .compareTo(HSVColor.fromColor(a.color).hue));
@@ -199,11 +216,6 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double itemWidth = MediaQuery.of(context).size.width;
-    const double itemHeight = 56;
-
-    print("ONSURFACE IS ${Theme.of(context).colorScheme.onSurface}");
-
     return BlocBuilder<SliderColorBloc, SliderColorState>(
         builder: (BuildContext context, SliderColorState state) {
       if (state is SliderColorLoading) {

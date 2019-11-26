@@ -40,8 +40,8 @@ List<Color> hsluvLightness(Color color,
     [int size, double start = 5.0, double stop = 95.0]) {
   final HSLuvColor hsluv = HSLuvColor.fromColor(color);
   final step = (stop - start) / (size - 1);
-
-  return [
+  for (int n = size - 1; n >= 0; n -= 1)
+    return [
     // (n = size; n > 0) won't work because n * step will be wrong. Unless you
     // you use (n-1) * step, but then it is an extra calculation per operation.
     for (int n = size - 1; n >= 0; n -= 1)

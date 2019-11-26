@@ -64,8 +64,9 @@ class ContrastComparison extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32.0),
               child: Text(
-                "In a dark theme, at higher levels of elevation, components express depth by displaying lighter surface color.\n"
-                "The higher a surface’s elevation (raising it closer to an implied light source), the lighter that surface becomes. That lightness is expressed through the application of a semi-transparent overlay using the On Surface color (default: white).",
+                "In a dark theme, at higher levels of elevation, components express depth by displaying lighter surface color. "
+                "The higher a surface’s elevation (raising it closer to an implied light source), the lighter that surface becomes.",
+//                    "That lightness is expressed through the application of a semi-transparent overlay using the On Surface color (default: white).",
                 style: Theme.of(context).textTheme.caption,
                 textAlign: TextAlign.justify,
               ),
