@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_bloc.dart';
 import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_event.dart';
 import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_state.dart';
@@ -23,6 +21,7 @@ import 'package:hsluvsample/widgets/loading_indicator.dart';
 
 import '../util/constants.dart';
 import '../widgets/update_color_dialog.dart';
+import 'contrast_item.dart';
 import 'contrast_list.dart';
 import 'contrast_util.dart';
 import 'info_screen.dart';
@@ -74,6 +73,17 @@ class _MultipleContrastScreenState extends State<MultipleContrastScreen> {
       return Theme(
         data: ThemeData.from(
           colorScheme: colorScheme,
+          textTheme: const TextTheme(
+            caption: TextStyle(fontFamily: "B612Mono"),
+            button: TextStyle(fontFamily: "B612Mono"),
+          ),
+        ).copyWith(
+          buttonTheme: Theme.of(context).buttonTheme.copyWith(
+                  shape: RoundedRectangleBorder(
+                side: BorderSide(color: list[0].rgbColor),
+                borderRadius: BorderRadius.circular(defaultRadius),
+              )),
+          cardTheme: Theme.of(context).cardTheme,
         ),
         child: Scaffold(
           appBar: AppBar(
@@ -117,29 +127,60 @@ class _MultipleContrastScreenState extends State<MultipleContrastScreen> {
     });
   }
 
-  Widget buildFlex(List<ContrastedColor> list) {
-    return WatchBoxBuilder(
-        box: Hive.box<dynamic>("settings"),
-        builder: (BuildContext context, Box box) {
-          final bool more = false; //box.get("moreItems", defaultValue: false);
+  Widget buildFlex(List<ContrastedColor> colorsList) {
+    const bool more = false;
+    final interListOfLists = <List<InterColorWithContrast>>[];
 
-          return ListView(
-            key: const PageStorageKey("ContrastCompareKey"),
-            children: <Widget>[
-              HSLuvSelector2(
-                index: 0,
-                moreColors: more,
-                colorsMap: list,
-              ),
-              for (int i = 1; i < list.length; i++)
-                HSLuvSelector2(
-                  index: i,
-                  moreColors: more,
-                  colorsMap: list,
-                )
-            ],
+    for (var element in colorsList) {
+      final interList = <InterColorWithContrast>[];
+      for (int i = -10; i < 15; i += 5) {
+        final luv = HSInterColor.fromColor(element.rgbColor, "HSLuv");
+        // if lightness becomes 0 or 100 the hue value might be lost
+        // because app is always converting HSLuv to RGB and vice-versa.
+        final updatedLuv =
+            luv.withLightness(interval(luv.lightness + i, 5.0, 95.0));
+
+        interList.add(
+          InterColorWithContrast(
+            updatedLuv.toColor(),
+            updatedLuv,
+            colorsList[0].rgbColor,
+          ),
+        );
+      }
+      interListOfLists.add(interList);
+    }
+
+    return ListView.builder(
+      key: const PageStorageKey("ContrastCompareKey"),
+      itemCount: colorsList.length,
+      itemBuilder: (BuildContext context, int index) {
+        if (index == 0) {
+          return HSLuvSelector2(
+            index: index,
+            moreColors: more,
+            colorsMap: colorsList,
           );
-        });
+        } else {
+          return Container(
+            padding: const EdgeInsets.only(top: 12, bottom: 16),
+            color: colorsList[index].rgbColor,
+            child: Column(
+              children: <Widget>[
+                _UpperPart(
+                  colorsList[index].rgbColor,
+                  colorsList[0].rgbColor,
+                  colorsList[index].contrast,
+                  index,
+                  colorsList,
+                ),
+                _Minimized("HSLuv", index, interListOfLists[index]),
+              ],
+            ),
+          );
+        }
+      },
+    );
   }
 
   Future<void> showReorderDialog(
@@ -279,37 +320,35 @@ class ContrastHorizontalPicker extends StatelessWidget {
 
     final List<Widget> widgets = <Widget>[];
 
-    if (index == 0) {
-      final hue = parseHue(rgbColor, otherColor);
-      final hueLen = hue.length;
+    final hue = parseHue(rgbColor, otherColor);
+    final hueLen = hue.length;
 
-      // in the ideal the world they could be calculated in the Bloc &/or in parallel.
-      final List<InterColorWithContrast> tones = fetchSat(rgbColor, otherColor);
+    // in the ideal the world they could be calculated in the Bloc &/or in parallel.
+    final List<InterColorWithContrast> tones = fetchSat(rgbColor, otherColor);
 
-      final Widget hueWidget = ContrastList(
-        pageKey: kind,
-        title: hueTitle,
-        sectionIndex: 0,
-        listSize: hueLen,
-        isInfinite: true,
-        colorsList: hue,
-        isFirst: index == 0,
-        buildWidget: (int index) {},
-        onColorPressed: (Color c) => contrastColorSelected(context, c),
-      );
-      widgets.add(hueWidget);
+    final Widget hueWidget = ContrastList(
+      pageKey: kind,
+      title: hueTitle,
+      sectionIndex: 0,
+      listSize: hueLen,
+      isInfinite: true,
+      colorsList: hue,
+      isFirst: index == 0,
+      buildWidget: (int index) {},
+      onColorPressed: (Color c) => contrastColorSelected(context, c),
+    );
+    widgets.add(hueWidget);
 
-      final satWidget = ContrastList(
-        pageKey: kind,
-        title: satTitle,
-        sectionIndex: 1,
-        listSize: toneSize,
-        isFirst: index == 0,
-        colorsList: tones,
-        onColorPressed: (Color c) => contrastColorSelected(context, c),
-      );
-      widgets.add(satWidget);
-    }
+    final satWidget = ContrastList(
+      pageKey: kind,
+      title: satTitle,
+      sectionIndex: 1,
+      listSize: toneSize,
+      isFirst: index == 0,
+      colorsList: tones,
+      onColorPressed: (Color c) => contrastColorSelected(context, c),
+    );
+    widgets.add(satWidget);
 
     final valueWidget = ContrastList(
       pageKey: kind,
@@ -326,8 +365,6 @@ class ContrastHorizontalPicker extends StatelessWidget {
       side: BorderSide(color: borderColor),
       borderRadius: BorderRadius.circular(defaultRadius),
     );
-
-    final forCond = index == 0 ? 3 : 1;
 
     return Theme(
       data: ThemeData.from(
@@ -360,7 +397,7 @@ class ContrastHorizontalPicker extends StatelessWidget {
                 direction: Axis.vertical,
                 children: <Widget>[
                   const SizedBox(height: 8),
-                  for (int i = 0; i < forCond; i++) ...<Widget>[
+                  for (int i = 0; i < 3; i++) ...<Widget>[
                     const SizedBox(height: 4),
                     Padding(
                       padding: const EdgeInsets.only(left: 16, right: 8),
@@ -405,6 +442,47 @@ class ContrastHorizontalPicker extends StatelessWidget {
   }
 }
 
+class _Minimized extends StatelessWidget {
+  const _Minimized(this.kind, this.index, this.hsInter);
+
+  final String kind;
+  final int index;
+  final List<InterColorWithContrast> hsInter;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        clipBehavior: Clip.antiAlias,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            for (int i = 0; i < hsInter.length; i++)
+              SizedBox(
+                width: 56,
+                height: 56,
+                child: ContrastItem(
+                  kind: kind,
+                  color: hsInter[i],
+                  contrast: hsInter[i].contrast,
+                  compactText: false,
+                  category: "Lightness",
+                  onPressed: () {
+                    BlocProvider.of<MultipleContrastColorBloc>(context)
+                        .add(MCMoveColor(hsInter[i].color, index));
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _UpperPart extends StatelessWidget {
   const _UpperPart(
       this.color, this.otherColor, this.contrast, this.index, this.list);
@@ -424,7 +502,7 @@ class _UpperPart extends StatelessWidget {
     );
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         const SizedBox(width: 16),
         if (index != 0)
@@ -465,15 +543,15 @@ class _UpperPart extends StatelessWidget {
             ),
           ),
         const SizedBox(width: 16),
-        Expanded(
-          child: Center(
-            child: Container(
-              width: 0,
-              height: 32,
-              color: otherColor,
-            ),
-          ),
-        ),
+//        Expanded(
+//          child: Center(
+//            child: Container(
+//              width: 0,
+//              height: 32,
+//              color: otherColor,
+//            ),
+//          ),
+//        ),
         _Buttons(
           color: color,
           otherColor: (index == 0)

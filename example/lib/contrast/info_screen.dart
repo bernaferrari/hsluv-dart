@@ -64,34 +64,37 @@ class _InfoScreenState extends State<InfoScreen> {
   Widget buildInfo() {
     final list = widget.list;
 
-    return ListView(
+    return ListView.builder(
       key: const PageStorageKey("InfoKey"),
-      children: <Widget>[
-        header(list),
-        for (int i = 1; i < list.length; i++)
-          SizedBox(
-            height: 112,
-            child: Material(
-              color: list[i].rgbColor,
-              child: InkWell(
-                onTap: () {
-                  showSlidersDialog(context, list[i].rgbColor);
-                },
-                onLongPress: () {
-                  showSlidersDialog(context, list[i].rgbColor);
-                },
-                child: when({
-                  () => currentSegment == 0: () =>
-                      rgbInfo(list[0].rgbColor, list[i].rgbColor, false, 1.0),
-                  () => currentSegment == 1: () =>
-                      hsluvInfo(list[0].rgbColor, list[i].rgbColor, false, 1.0),
-                  () => currentSegment == 2: () =>
-                      hsvInfo(list[0].rgbColor, list[i].rgbColor, false, 1.0),
-                }),
-              ),
+      itemCount: list.length,
+      itemBuilder: (BuildContext context, int i) {
+        if (i == 0) {
+          return header(list);
+        }
+
+        return SizedBox(
+          height: 112,
+          child: Material(
+            color: list[i].rgbColor,
+            child: InkWell(
+              onTap: () {
+                showSlidersDialog(context, list[i].rgbColor);
+              },
+              onLongPress: () {
+                showSlidersDialog(context, list[i].rgbColor);
+              },
+              child: when({
+                () => currentSegment == 0: () =>
+                    rgbInfo(list[0].rgbColor, list[i].rgbColor, false, 1.0),
+                () => currentSegment == 1: () =>
+                    hsluvInfo(list[0].rgbColor, list[i].rgbColor, false, 1.0),
+                () => currentSegment == 2: () =>
+                    hsvInfo(list[0].rgbColor, list[i].rgbColor, false, 1.0),
+              }),
             ),
           ),
-      ],
+        );
+      },
     );
   }
 
