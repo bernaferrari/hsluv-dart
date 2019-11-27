@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hsluv/flutter/hsluvcolor.dart';
 
 extension on Color {
   List<double> toRGBList() {

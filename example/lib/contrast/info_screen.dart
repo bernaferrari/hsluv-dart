@@ -236,13 +236,13 @@ class _InfoScreenState extends State<InfoScreen> {
       sign = "+";
     }
 
-    final percentValue = ((valueNew - valueOrig).abs() / valueOrig) * 100;
-    String percentDescription;
-    if (percentValue > 200) {
-      percentDescription = ">200";
-    } else {
-      percentDescription = percentValue.toStringAsFixed(0);
-    }
+//    final percentValue = ((valueNew - valueOrig).abs() / valueOrig) * 100;
+//    String percentDescription;
+//    if (percentValue > 200) {
+//      percentDescription = ">200";
+//    } else {
+//      percentDescription = percentValue.toStringAsFixed(0);
+//    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,

@@ -21,7 +21,7 @@ class HSLuvSelector extends StatelessWidget {
         ((MediaQuery.of(context).size.height - 56*4) / 56).ceil();
 
     final int toneSize = moreColors ? itemsOnScreen * 2 : itemsOnScreen;
-    final int hueSize = moreColors ? 90 : 60;
+    final int hueSize = moreColors ? 90 : 45;
 
     return HSGenericScreen(
       color: color,

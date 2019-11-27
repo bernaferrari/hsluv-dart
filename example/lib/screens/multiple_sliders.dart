@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hsluvsample/vertical_picker/app_bar_actions.dart';
 import 'package:hsluvsample/widgets/loading_indicator.dart';
 
 import '../blocs/slider_color/slider_color.dart';
@@ -43,6 +44,10 @@ class MultipleSliders extends StatelessWidget {
               wrapInCard(rgb),
               wrapInCard(hsv),
               wrapInCard(hsl),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: ColorSearchButton(color: (state as SliderColorLoaded).rgbColor),
+              ),
             ],
           ),
         ),

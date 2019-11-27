@@ -118,8 +118,8 @@ class MDCHome extends StatelessWidget {
                   ),
                   BlocBuilder<ColorBlindBloc, int>(
                       builder: (BuildContext context, int state) {
-                    final ColorWithBlind blindSurface =
-                        getColorBlindFromIndex(surfaceColor, state);
+//                    final ColorWithBlind blindSurface =
+//                        getColorBlindFromIndex(surfaceColor, state);
 
                     final ColorWithBlind blindPrimary =
                         getColorBlindFromIndex(primaryColor, state);

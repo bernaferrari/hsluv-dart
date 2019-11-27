@@ -2,22 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class FAProgressBar extends StatelessWidget {
-  FAProgressBar(
-      {Key key,
-      this.currentValue = 0,
-      this.maxValue = 100,
-      this.size = 30,
-      this.direction = Axis.horizontal,
-      this.verticalDirection = VerticalDirection.down,
-      this.borderRadius = 8,
-      this.borderColor = const Color(0xFFFA7268),
-      this.borderWidth = 0.2,
-      this.backgroundColor = const Color(0x00FFFFFF),
-      this.progressColor = const Color(0xFFFA7268),
-      this.changeColorValue,
-      this.changeProgressColor = const Color(0xFF5F4B8B),
-      this.displayText})
-      : super(key: key);
+  const FAProgressBar({
+    Key key,
+    this.currentValue = 0,
+    this.maxValue = 100,
+    this.size = 30,
+    this.direction = Axis.horizontal,
+    this.verticalDirection = VerticalDirection.down,
+    this.borderRadius = 8,
+    this.borderColor = const Color(0xFFFA7268),
+    this.borderWidth = 0.2,
+    this.backgroundColor = const Color(0x00FFFFFF),
+    this.progressColor = const Color(0xFFFA7268),
+    this.changeColorValue,
+    this.changeProgressColor = const Color(0xFF5F4B8B),
+    this.displayText,
+  }) : super(key: key);
 
   final int currentValue;
   final int maxValue;

@@ -232,11 +232,7 @@ class HSLuvSelector2 extends StatelessWidget {
   Widget build(BuildContext context) {
     const String kind = hsluvStr;
 
-    // maximum number of items
-    final double width = MediaQuery.of(context).size.width - 24;
-    final int itemsOnScreen = (math.min(width, 818) / 56).ceil();
-
-    final int toneSize = 19; //moreColors ? itemsOnScreen * 2 : itemsOnScreen;
+    const int toneSize = 19; //moreColors ? itemsOnScreen * 2 : itemsOnScreen;
     final int hueSize = moreColors ? 90 : 45;
 
     return ContrastHorizontalPicker(

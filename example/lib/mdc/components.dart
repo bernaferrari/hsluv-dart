@@ -139,7 +139,7 @@ class Components extends StatelessWidget {
             ),
           ),
           const Padding(
-            padding: const EdgeInsets.only(top: 8.0),
+            padding: EdgeInsets.only(top: 8.0),
             child: Text(
               "out of creativity?",
               textAlign: TextAlign.center,
@@ -227,10 +227,10 @@ class Components extends StatelessWidget {
                   },
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
             ],
           ),
-          Padding(padding: EdgeInsets.all(8)),
+          const Padding(padding: EdgeInsets.all(8)),
         ],
       ),
     );
@@ -504,7 +504,7 @@ class _ComponentsSampleState extends State<ComponentsSample> {
                 onPressed: () {},
               ),
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             Expanded(
               child: RaisedButton.icon(
                 label: Text("Moon"),
@@ -514,7 +514,7 @@ class _ComponentsSampleState extends State<ComponentsSample> {
                 onPressed: () {},
               ),
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
           ],
         ),
       ],

@@ -26,7 +26,6 @@ class SingleColorBlindness extends StatelessWidget {
 
         final currentState = state as MultipleContrastColorLoaded;
         final color = currentState.colorsList[currentState.selected].rgbColor;
-        final surfaceColor = blendColorWithBackground(color);
         final values = retrieveColorBlind(color);
 
         return Scaffold(

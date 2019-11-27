@@ -31,6 +31,10 @@ Color shuffleColor(Color currentColor) {
   }
 }
 
+List<Color> getColorClaim() {
+  return colorClaim.map((f) => f.hexToColor()).toList();
+}
+
 Color getShuffleColor() {
   final colorsList = colorClaim.toList()..shuffle();
   return colorsList.first.hexToColor();

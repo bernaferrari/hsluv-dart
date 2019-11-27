@@ -12,7 +12,7 @@ import 'util/elevation_overlay.dart';
 import 'widgets/FAProgressBar.dart';
 
 class Showcase extends StatelessWidget {
-  Showcase({this.primaryColor, this.surfaceColor, this.backgroundColor});
+  const Showcase({this.primaryColor, this.surfaceColor, this.backgroundColor});
 
   final Color primaryColor;
   final Color surfaceColor;
@@ -648,7 +648,7 @@ class _PrevPhotosTransparencyState extends State<PrevPhotosTransparency> {
   @override
   void initState() {
     sliderValue = PageStorage.of(context)
-            .readState(context, identifier: ValueKey("prevPhotosState")) ??
+            .readState(context, identifier: const ValueKey("prevPhotosState")) ??
         3 / 6;
     super.initState();
   }
@@ -700,7 +700,7 @@ class _PrevPhotosTransparencyState extends State<PrevPhotosTransparency> {
 }
 
 class _PrevPhotos extends StatelessWidget {
-  _PrevPhotos({this.primary, this.surface});
+  const _PrevPhotos({this.primary, this.surface});
 
   final Color primary;
   final Color surface;
@@ -738,7 +738,7 @@ class _PrevPhotos extends StatelessWidget {
 }
 
 class _ShowcaseTitle extends StatelessWidget {
-  _ShowcaseTitle(this.title);
+  const _ShowcaseTitle(this.title);
 
   final String title;
 
@@ -749,7 +749,7 @@ class _ShowcaseTitle extends StatelessWidget {
 }
 
 class _PrevSDKMonitor extends StatefulWidget {
-  _PrevSDKMonitor({this.primary});
+  const _PrevSDKMonitor({this.primary});
 
   final Color primary;
 

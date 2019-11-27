@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hsluvsample/blocs/blocs.dart';
 import 'package:hsluvsample/util/color_blindness.dart';
 
-import 'util/color_blind_from_index.dart';
 import '../screens/single_color_blindness.dart';
 
 class ColorBlindnessTheme extends StatelessWidget {
