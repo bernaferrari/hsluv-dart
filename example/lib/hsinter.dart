@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:hsluv/flutter/hsluvcolor.dart';
+import 'package:hsluv/hsluvcolor.dart';
 import 'package:hsluvsample/util/when.dart';
 
 /// HSInterColor means Hue Saturation Interchangeable Color.

@@ -291,50 +291,52 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
               ),
             ),
       ),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 818),
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const SizedBox(width: 8),
-                  for (int i = 0; i < 3; i++) ...<Widget>[
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 818),
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
                     const SizedBox(width: 8),
-                    Flexible(
-                      flex: (i == expanded) ? 1 : 0,
-                      child: LayoutBuilder(
-                        // thanks Remi Rousselet for the idea!
-                        builder: (BuildContext ctx, BoxConstraints builder) {
-                          return AnimatedContainer(
-                            width: (i == expanded) ? builder.maxWidth : 64,
-                            duration: const Duration(milliseconds: 250),
-                            curve: (i == expanded)
-                                ? Curves.easeOut
-                                : Curves.easeIn,
-                            child: widgets[i],
-                          );
-                        },
+                    for (int i = 0; i < 3; i++) ...<Widget>[
+                      const SizedBox(width: 8),
+                      Flexible(
+                        flex: (i == expanded) ? 1 : 0,
+                        child: LayoutBuilder(
+                          // thanks Remi Rousselet for the idea!
+                          builder: (BuildContext ctx, BoxConstraints builder) {
+                            return AnimatedContainer(
+                              width: (i == expanded) ? builder.maxWidth : 64,
+                              duration: const Duration(milliseconds: 250),
+                              curve: (i == expanded)
+                                  ? Curves.easeOut
+                                  : Curves.easeIn,
+                              child: widgets[i],
+                            );
+                          },
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                    ],
                     const SizedBox(width: 8),
                   ],
-                  const SizedBox(width: 8),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 12, bottom: 12),
-              child: Text(
-                HSInterColor.fromColor(rgbColor, widget.kind).toString(),
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontFamily: "B612Mono",
                 ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.only(top: 12, bottom: 12),
+                child: Text(
+                  HSInterColor.fromColor(rgbColor, widget.kind).toString(),
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontFamily: "B612Mono",
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

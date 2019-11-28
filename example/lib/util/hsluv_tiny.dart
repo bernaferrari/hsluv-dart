@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hsluv/flutter/hsluvcolor.dart';
+import 'package:hsluv/hsluvcolor.dart';
 
 extension on Color {
   List<double> toRGBList() {
@@ -21,7 +21,7 @@ List<Color> hsluvAlternatives(Color color, [int n = 6]) {
   // this was modified to ignore luv.hue value because the
   // list that is observing would miss the current position every time
   // the color changes.
-  return [for (; n > 0; n--) luv.withHue((div * n) % 360.0).toColor()];
+  return [for (int i = 0; i < n; i++) luv.withHue((div * i) % 360.0).toColor()];
 }
 
 List<Color> hsluvTones(Color color,

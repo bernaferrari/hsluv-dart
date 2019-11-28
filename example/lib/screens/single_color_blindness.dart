@@ -39,61 +39,69 @@ class SingleColorBlindness extends StatelessWidget {
             ],
           ),
           backgroundColor: color,
-          body: Card(
-            color: Theme.of(context).colorScheme.background.withOpacity(0.20),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(
+          body: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 818),
+              child: Card(
                 color:
-                    Theme.of(context).colorScheme.onSurface.withOpacity(0.40),
+                    Theme.of(context).colorScheme.background.withOpacity(0.20),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.40),
+                  ),
+                ),
+                elevation: 0,
+                margin: const EdgeInsets.all(16),
+                child: ListView(
+                  key: const PageStorageKey("color_blind"),
+                  children: <Widget>[
+                    const SizedBox(height: 24),
+                    for (var key in values.keys) ...[
+                      Text(
+                        key,
+                        style: Theme.of(context).textTheme.title,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: LayoutBuilder(
+                          builder: (context, builder) {
+                            final numOfItems = (builder.maxWidth / 280).floor();
+                            return Wrap(
+                              children: <Widget>[
+                                for (var value in values[key]) ...[
+                                  SizedBox(
+                                    width: builder.maxWidth / numOfItems,
+                                    height: 80,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: _ColorBlindCard(value, color),
+                                    ),
+                                  )
+                                ],
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      if (key != "Monochromacy")
+                        Divider(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.40),
+                        ),
+                      const SizedBox(height: 12),
+                    ],
+                  ],
+                ),
               ),
-            ),
-            elevation: 0,
-            margin: const EdgeInsets.all(16),
-            child: ListView(
-              key: const PageStorageKey("color_blind"),
-              children: <Widget>[
-                const SizedBox(height: 24),
-                for (var key in values.keys) ...[
-                  Text(
-                    key,
-                    style: Theme.of(context).textTheme.title,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: LayoutBuilder(
-                      builder: (context, builder) {
-                        final numOfItems = (builder.maxWidth / 280).floor();
-                        return Wrap(
-                          children: <Widget>[
-                            for (var value in values[key]) ...[
-                              SizedBox(
-                                width: builder.maxWidth / numOfItems,
-                                height: 80,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(4.0),
-                                  child: _ColorBlindCard(value, color),
-                                ),
-                              )
-                            ],
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  if (key != "Monochromacy")
-                    Divider(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacity(0.40),
-                    ),
-                  const SizedBox(height: 12),
-                ],
-              ],
             ),
           ),
         );

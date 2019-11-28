@@ -18,7 +18,7 @@ Future<void> showSlidersDialog(BuildContext context, Color color,
       context: context,
       builder: (BuildContext ctx) {
         return BlocProvider(
-          builder: (context) => SliderColorBloc()..add(MoveColor(color, true)),
+          create: (context) => SliderColorBloc()..add(MoveColor(color, true)),
           child: UpdateColorDialog(color),
         );
       });

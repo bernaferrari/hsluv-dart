@@ -47,8 +47,7 @@ class ContrastList extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               key: PageStorageKey<String>("$pageKey $sectionIndex"),
               itemBuilder: (BuildContext context, int absoluteIndex) {
-                final int index = absoluteIndex.abs() % listSize;
-                return colorCompare(index);
+                return colorCompare(absoluteIndex % listSize);
               },
             )
           : MediaQuery.removePadding(

@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hsluv/flutter/hsluvcolor.dart';
+import 'package:hsluv/hsluvcolor.dart';
 import 'package:meta/meta.dart';
 
 @immutable

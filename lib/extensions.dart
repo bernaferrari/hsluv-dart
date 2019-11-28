@@ -19,7 +19,8 @@ List<double> toRGBList(Color color) {
 }
 
 Color toColor(List<double> rgb) {
-  return Color.fromARGB(255, (rgb[0] * 255).toInt(), (rgb[1] * 255).toInt(), (rgb[2] * 255).toInt());
+  return Color.fromARGB(255, (rgb[0] * 255).toInt(), (rgb[1] * 255).toInt(),
+      (rgb[2] * 255).toInt());
 }
 
 /// HSLuv values are ranging in [0;360], [0;100] and [0;100] and RGB in [0;1].

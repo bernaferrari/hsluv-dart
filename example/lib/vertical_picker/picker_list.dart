@@ -53,8 +53,7 @@ class ExpandableColorBar extends StatelessWidget {
               ? InfiniteListView.builder(
                   key: PageStorageKey<String>("$pageKey $sectionIndex"),
                   itemBuilder: (BuildContext context, int absoluteIndex) {
-                    final int index = absoluteIndex.abs() % listSize;
-                    return colorCompare(index);
+                    return colorCompare(absoluteIndex % listSize);
                   },
                 )
               : MediaQuery.removePadding(

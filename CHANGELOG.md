@@ -1,2 +1,2 @@
-## [1.0.0] 
-* Initial port of HSLuv and a nice sample.
+## [1.0.4] 
+* Initial port of HSLuv with a nice sample app.

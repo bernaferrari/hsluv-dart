@@ -62,19 +62,19 @@ class _BoxedAppState extends State<BoxedApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider<MultipleContrastColorBloc>(
-          builder: (context) => MultipleContrastColorBloc(_sliderBloc)
+          create: (context) => MultipleContrastColorBloc(_sliderBloc)
             ..add(
               MultipleLoadInit(getShuffledColors()),
             ),
         ),
         BlocProvider<SliderColorBloc>(
-          builder: (context) => _sliderBloc,
+          create: (context) => _sliderBloc,
         ),
         BlocProvider<MdcSelectedBloc>(
-          builder: (context) => MdcSelectedBloc(_sliderBloc, colorBlindBloc),
+          create: (context) => MdcSelectedBloc(_sliderBloc, colorBlindBloc),
         ),
         BlocProvider<ColorBlindBloc>(
-          builder: (context) => colorBlindBloc,
+          create: (context) => colorBlindBloc,
         )
       ],
       child: MaterialApp(

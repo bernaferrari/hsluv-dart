@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hsluvsample/contrast/shuffle_color.dart';
@@ -37,8 +39,11 @@ class _ColorLibraryState extends State<ColorLibrary> {
         backgroundColor: widget.color,
         elevation: 0,
       ),
-      body: Column(
-        children: <Widget>[
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 818),
+          child: Column(
+            children: <Widget>[
 //          CupertinoSlidingSegmentedControl<int>(
 //            backgroundColor:
 //                Theme.of(context).colorScheme.onSurface.withOpacity(0.20),
@@ -56,54 +61,58 @@ class _ColorLibraryState extends State<ColorLibrary> {
 //            onValueChanged: onValueChanged,
 //            groupValue: currentSegment,
 //          ),
-          Expanded(
-            child: Card(
-              color: Theme.of(context)
-                  .colorScheme
-                  .background
-                  .withOpacity(kVeryTransparent),
-              elevation: 0,
-              margin: const EdgeInsets.all(16),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacity(0.40))),
-              child: CustomScrollView(
-                key: const PageStorageKey("ColorLibrary"),
-                primary: false,
-                slivers: <Widget>[
-                  SliverPadding(
-                    padding: const EdgeInsets.all(20),
-                    sliver: SliverGrid.count(
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                      crossAxisCount:
-                          (MediaQuery.of(context).size.width / 120).ceil(),
-                      children: <Widget>[
-                        for (int i = 0; i < colorsList.length; i++)
-                          RawMaterialButton(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(
+              Expanded(
+                child: Card(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .background
+                      .withOpacity(kVeryTransparent),
+                  elevation: 0,
+                  margin: const EdgeInsets.all(16),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: BorderSide(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.40))),
+                  child: CustomScrollView(
+                    key: const PageStorageKey("ColorLibrary"),
+                    primary: false,
+                    slivers: <Widget>[
+                      SliverPadding(
+                        padding: const EdgeInsets.all(20),
+                        sliver: SliverGrid.count(
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                          crossAxisCount: (math.min(
+                                      MediaQuery.of(context).size.width, 818) /
+                                  120)
+                              .ceil(),
+                          children: <Widget>[
+                            for (int i = 0; i < colorsList.length; i++)
+                              RawMaterialButton(
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
                                     color: Theme.of(context)
                                         .colorScheme
                                         .onSurface
-                                        .withOpacity(kVeryTransparent)),
-                                borderRadius: BorderRadius.circular(16)),
-                            elevation: 0,
-                            onPressed: () {
-                              colorSelected(context, colorsList[i]);
-                            },
-                            onLongPress: () {
-                              showSlidersDialog(context, colorsList[i]);
-                            },
-                            fillColor: colorsList[i],
-                            padding: const EdgeInsets.all(8),
-                            child: Center(
-                              child: Text(
-                                colorsList[i].toHexStr(),
+                                        .withOpacity(kVeryTransparent),
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                elevation: 0,
+                                onPressed: () {
+                                  colorSelected(context, colorsList[i]);
+                                },
+                                onLongPress: () {
+                                  showSlidersDialog(context, colorsList[i]);
+                                },
+                                fillColor: colorsList[i],
+                                padding: const EdgeInsets.all(8),
+                                child: Center(
+                                  child: Text(
+                                    colorsList[i].toHexStr(),
 //                                when<String>({
 //                                  () => currentSegment == 0: () =>
 //                                      colorsList[i].toHexStr(),
@@ -112,25 +121,27 @@ class _ColorLibraryState extends State<ColorLibrary> {
 //                                  () => currentSegment == 2: () =>
 //                                      "H:${colorsList[i].red}\nS:${colorsList[i].green}\nV${colorsList[i].blue}",
 //                                }),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .caption
-                                    .copyWith(
-                                      fontFamily: "B612Mono",
-                                      color: contrastingColor(colorsList[i])
-                                          .withOpacity(0.70),
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .caption
+                                        .copyWith(
+                                          fontFamily: "B612Mono",
+                                          color: contrastingColor(colorsList[i])
+                                              .withOpacity(0.70),
+                                        ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                      ],
-                    ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

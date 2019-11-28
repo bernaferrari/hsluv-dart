@@ -1,18 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hsluvsample/blocs/blocs.dart';
-import 'package:hsluvsample/contrast/shuffle_color.dart';
 import 'package:hsluvsample/screens/single_color_blindness.dart';
-import 'package:hsluvsample/util/selected.dart';
-import 'package:hsluvsample/util/tiny_color.dart';
 import 'package:hsluvsample/util/when.dart';
-import 'package:hsluvsample/widgets/loading_indicator.dart';
-import 'package:infinite_listview/infinite_listview.dart';
 
-import '../../contrast/inter_color_with_contrast.dart';
 import '../../util/color_blindness.dart';
 
 ColorWithBlind getColorBlindFromIndex(Color color, int i) {
