@@ -1,8 +1,7 @@
 name: hsluv
-description: Dart port of HSluv.
-author: Bernardo Ferrari <bernaferrari2@gmail.com>
-homepage: https://github.com/bernaferrari/hsluv
-version: 1.0.0
+description: Dart port of HSLuv, a human-friendly alternative to HSL based on human experiments.
+homepage: https://github.com/bernaferrari/hsluv-dart
+version: 1.0.2
 
 environment:
   sdk: ">=2.5.0 <3.0.0"

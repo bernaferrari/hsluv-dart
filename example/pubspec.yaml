@@ -14,7 +14,7 @@ description: HSLuv sample.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.6.0-dev.1.0.flutter-d6c6d12ebf <3.0.0"
+  sdk: ">=2.6.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -23,7 +23,7 @@ dependencies:
     path: ../
 
   bloc: ^2.0.0
-  flutter_bloc: ^2.0.1
+  flutter_bloc: ^2.1.1
   equatable: ^1.0.1
   rxdart: ^0.22.6
   flutter_feather_icons: ^1.0.3
@@ -32,7 +32,6 @@ dependencies:
   hive: ^1.1.1
   hive_flutter: ^0.2.1
   path_provider: ^1.4.5
-  flutter_markdown: ^0.3.1
 
 dev_dependencies:
   hive_generator: ^0.5.2

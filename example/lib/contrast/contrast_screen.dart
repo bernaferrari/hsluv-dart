@@ -572,6 +572,8 @@ class _Buttons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final contrastColor = contrastingColor(color);
+
     return Row(
       children: <Widget>[
         OutlineButton.icon(
@@ -580,6 +582,7 @@ class _Buttons extends StatelessWidget {
             size: 16,
           ),
           color: color,
+          textColor: contrastColor,
           highlightedBorderColor: otherColor,
           borderSide: BorderSide(color: otherColor),
           label: Text(color.toHexStr()),
@@ -604,6 +607,7 @@ class _Buttons extends StatelessWidget {
               Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
           minWidth: 48,
           elevation: 0,
+          textColor: contrastColor,
           child: Icon(
             FeatherIcons.shuffle,
             size: 16,

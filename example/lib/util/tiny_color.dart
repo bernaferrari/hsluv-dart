@@ -2,7 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:hsluv/flutter/hsluvcolor.dart';
+import 'package:hsluv/hsluvcolor.dart';
 
 import 'color_util.dart';
 
