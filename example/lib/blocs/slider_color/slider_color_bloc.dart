@@ -14,7 +14,7 @@ class SliderColorBloc extends Bloc<SliderColorEvent, SliderColorState> {
 
   @override
   Stream<SliderColorState> transformEvents(events, next) {
-    return (events as Observable<SliderColorEvent>).switchMap(next);
+    return events.switchMap(next);
   }
 
   @override

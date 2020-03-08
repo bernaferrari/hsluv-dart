@@ -26,7 +26,7 @@ class ColorTemplates extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             "Dark Templates",
-            style: Theme.of(context).textTheme.title,
+            style: Theme.of(context).textTheme.headline6,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
@@ -94,7 +94,7 @@ class ColorTemplates extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             "Light Templates",
-            style: Theme.of(context).textTheme.title,
+            style: Theme.of(context).textTheme.headline6,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
@@ -162,7 +162,7 @@ class _TemplateItem extends StatelessWidget {
                     child: Text(
                       title,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.subtitle.copyWith(
+                      style: Theme.of(context).textTheme.subtitle2.copyWith(
                         color: colors[0]
                       ),
                     ),
@@ -190,7 +190,7 @@ class _TemplateItem extends StatelessWidget {
                       color.toHexStr(),
                       style: Theme.of(context)
                           .textTheme
-                          .body2
+                          .bodyText1
                           .copyWith(color: contrastingColor(color)),
                       textAlign: TextAlign.center,
                     )),

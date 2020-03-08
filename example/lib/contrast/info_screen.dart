@@ -35,11 +35,11 @@ class _InfoScreenState extends State<InfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: widget.list[0].rgbColor,
       body: Column(
         children: <Widget>[
           Container(
             width: 500,
-            color: widget.list[0].rgbColor,
             padding: const EdgeInsets.only(
                 left: 16.0, right: 16, top: 16, bottom: 12),
             child: CupertinoSlidingSegmentedControl<int>(
@@ -144,7 +144,7 @@ class _InfoScreenState extends State<InfoScreen> {
 
     return Text(
       title,
-      style: Theme.of(context).textTheme.body2.copyWith(
+      style: Theme.of(context).textTheme.bodyText1.copyWith(
             color: contrasted.withOpacity(currentSegment == index ? 1.0 : 0.5),
           ),
       textAlign: TextAlign.center,
@@ -254,7 +254,7 @@ class _InfoScreenState extends State<InfoScreen> {
             textAlign: TextAlign.center,
             style: Theme.of(context)
                 .textTheme
-                .title
+                .headline6
                 .copyWith(color: oppositeColor),
           ),
         ),

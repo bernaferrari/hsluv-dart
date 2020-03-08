@@ -57,12 +57,12 @@ class _ContactInfo extends StatelessWidget {
             textAlign: TextAlign.center,
             style: Theme.of(context)
                 .textTheme
-                .headline
+                .headline5
                 .copyWith(fontWeight: FontWeight.w600)),
         const SizedBox(height: 8),
         Text("Designed & developed by Bernardo Ferrari.",
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.subtitle),
+            style: Theme.of(context).textTheme.subtitle2),
         const SizedBox(height: 8),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -168,7 +168,7 @@ class ColorCompare extends StatelessWidget {
                   Text(
                     "Compare Colors",
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.title,
+                    style: Theme.of(context).textTheme.headline6,
                   ),
                 ],
               ),
@@ -206,7 +206,7 @@ class ShuffleSection extends StatelessWidget {
                   Text(
                     "Shuffle colors",
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.title,
+                    style: Theme.of(context).textTheme.headline6,
                   ),
                 ],
               ),
@@ -241,7 +241,7 @@ class MoreColors extends StatelessWidget {
           ),
           title: Text(
             "More Colors",
-            style: Theme.of(context).textTheme.title,
+            style: Theme.of(context).textTheme.headline6,
           ),
           onChanged: (value) {
             box.put('moreItems', value);
@@ -267,7 +267,7 @@ class GDPR extends StatelessWidget {
             const SizedBox(width: 16),
             Text("Privacy Policy",
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.title),
+                style: Theme.of(context).textTheme.headline6),
           ],
         ),
         const Padding(

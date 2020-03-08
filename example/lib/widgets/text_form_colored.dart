@@ -48,7 +48,7 @@ class TextFormColored extends StatelessWidget {
           child: Icon(FeatherIcons.hash, size: 16),
         ),
       ),
-      style: Theme.of(context).textTheme.title.copyWith(
+      style: Theme.of(context).textTheme.headline6.copyWith(
             color: Theme.of(context).colorScheme.onBackground,
           ),
     );

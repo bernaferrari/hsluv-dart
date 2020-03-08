@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,7 +21,7 @@ Future<void> main() async {
 }
 
 Future openBox() async {
-  if (!false) {
+  if (!kIsWeb) {
     final dir = await getApplicationDocumentsDirectory();
     Hive.init(dir.path);
   }
@@ -87,7 +88,7 @@ class _BoxedAppState extends State<BoxedApp> {
           "/theme": (context) => MDCHome()
         },
         theme: base.copyWith(
-          typography: Typography().copyWith(
+          typography: Typography.material2018().copyWith(
             black: Typography.dense2018,
             tall: Typography.tall2018,
             englishLike: Typography.englishLike2018,

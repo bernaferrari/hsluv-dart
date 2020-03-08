@@ -31,10 +31,10 @@ class Components extends StatelessWidget {
       child: ListView(
         key: const PageStorageKey("mdc"),
         children: <Widget>[
-          Padding(padding: EdgeInsets.all(4)),
+          const Padding(padding: EdgeInsets.all(4)),
           Text(
             "Material Components",
-            style: Theme.of(context).textTheme.title,
+            style: Theme.of(context).textTheme.headline6,
             textAlign: TextAlign.center,
           ),
           ComponentsSample(
@@ -159,7 +159,7 @@ class Components extends StatelessWidget {
 
                 while (primary == Colors.black) {
                   // generates a pseudo-random list
-                  List<String> randomList = getColorsListShuffled();
+                  final List<String> randomList = getColorsListShuffled();
                   surface = findDarkMatchingPair(randomList);
                   primary = findMatchingPair(randomList, surface, 5.5);
                 }
@@ -283,7 +283,7 @@ class CheckedButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final contrastedColor = isSelected
         ? contrastingColor(color)
-        : Theme.of(context).textTheme.body2.color;
+        : Theme.of(context).textTheme.bodyText1.color;
 
     final Widget area = Row(
       children: <Widget>[
@@ -365,7 +365,7 @@ class ElevatedCardSample extends StatelessWidget {
           children: <Widget>[
             Text(
               "${entry.elevation.toInt()} pt",
-              style: Theme.of(context).textTheme.title.copyWith(color: primary),
+              style: Theme.of(context).textTheme.headline6.copyWith(color: primary),
             ),
             SizedBox(height: 4),
             Text(

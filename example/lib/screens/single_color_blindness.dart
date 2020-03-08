@@ -63,7 +63,7 @@ class SingleColorBlindness extends StatelessWidget {
                     for (var key in values.keys) ...[
                       Text(
                         key,
-                        style: Theme.of(context).textTheme.title,
+                        style: Theme.of(context).textTheme.headline6,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
@@ -176,7 +176,7 @@ class _ColorBlindCard extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             blindColor.name[0],
-            style: Theme.of(context).textTheme.headline.copyWith(
+            style: Theme.of(context).textTheme.headline5.copyWith(
                   fontWeight: FontWeight.w700,
                   color: defaultColor,
                   fontSize: 48,
@@ -190,7 +190,7 @@ class _ColorBlindCard extends StatelessWidget {
               children: <Widget>[
                 Text(
                   blindColor.name,
-                  style: Theme.of(context).textTheme.title.copyWith(
+                  style: Theme.of(context).textTheme.headline6.copyWith(
                         fontSize: 18,
                         color: contrastedColor,
                       ),

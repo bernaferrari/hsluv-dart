@@ -192,7 +192,7 @@ class ThemeBar extends StatelessWidget {
                         color: Theme.of(context).colorScheme.onSurface),
                     label: Text(
                       "Theming",
-                      style: Theme.of(context).textTheme.body2.copyWith(
+                      style: Theme.of(context).textTheme.bodyText1.copyWith(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.w600,
                           ),

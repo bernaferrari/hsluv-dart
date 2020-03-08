@@ -23,7 +23,7 @@ class ColorBlindnessTheme extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24.0),
           child: Text(
             "Color Blindness",
-            style: Theme.of(context).textTheme.title,
+            style: Theme.of(context).textTheme.headline6,
             textAlign: TextAlign.center,
           ),
         ),
@@ -141,7 +141,7 @@ class _RadioTile extends StatelessWidget {
                     title,
                     style: Theme.of(context)
                         .textTheme
-                        .title
+                        .headline6
                         .copyWith(fontSize: 18),
                   ),
                   Text(subtitle, style: Theme.of(context).textTheme.caption),

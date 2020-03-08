@@ -86,6 +86,7 @@ class _MultipleContrastScreenState extends State<MultipleContrastScreen> {
           cardTheme: Theme.of(context).cardTheme,
         ),
         child: Scaffold(
+          backgroundColor: list[0].rgbColor,
           appBar: AppBar(
             title: const Text("Contrast Compare"),
             actions: <Widget>[

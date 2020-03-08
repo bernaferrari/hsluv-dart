@@ -37,7 +37,7 @@ class ContrastComparison extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             "Contrast Ratio",
-            style: Theme.of(context).textTheme.title,
+            style: Theme.of(context).textTheme.headline6,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
@@ -74,7 +74,7 @@ class ContrastComparison extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               "Primary vs Surface",
-              style: Theme.of(context).textTheme.title,
+              style: Theme.of(context).textTheme.headline6,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
@@ -234,7 +234,7 @@ class RowContrastCompare extends StatelessWidget {
                         colorWithContrast.name,
                         style: Theme.of(context)
                             .textTheme
-                            .title
+                            .headline6
                             .copyWith(fontSize: 18),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -277,11 +277,11 @@ class ContrastText extends StatelessWidget {
     final widget = RichText(
       text: TextSpan(
         text: contrast.toStringAsPrecision(3),
-        style: Theme.of(context).textTheme.title.copyWith(fontSize: 18),
+        style: Theme.of(context).textTheme.headline6.copyWith(fontSize: 18),
         children: <TextSpan>[
           TextSpan(
             text: ':1',
-            style: Theme.of(context).textTheme.title.copyWith(fontSize: 14),
+            style: Theme.of(context).textTheme.headline6.copyWith(fontSize: 14),
           ),
         ],
       ),
@@ -410,13 +410,13 @@ class VerticalContrastCompare extends StatelessWidget {
                     RichText(
                       text: TextSpan(
                         text: contrast.toStringAsPrecision(3),
-                        style: Theme.of(context).textTheme.headline,
+                        style: Theme.of(context).textTheme.headline5,
                         children: <TextSpan>[
                           TextSpan(
                             text: ':1',
                             style: Theme.of(context)
                                 .textTheme
-                                .headline
+                                .headline5
                                 .copyWith(fontSize: 18),
                           ),
                         ],
@@ -453,7 +453,7 @@ class ColorCompareWidget extends StatelessWidget {
           child: Center(
             child: Text(
               secondData.name[0],
-              style: Theme.of(context).textTheme.headline.copyWith(
+              style: Theme.of(context).textTheme.headline5.copyWith(
                     fontWeight: FontWeight.w500,
                     color: secondData.color,
                   ),
@@ -479,7 +479,7 @@ class ColorCompareWidget extends StatelessWidget {
               ),
               Text(
                 firstData.name,
-                style: Theme.of(context).textTheme.title.copyWith(fontSize: 18),
+                style: Theme.of(context).textTheme.headline6.copyWith(fontSize: 18),
                 overflow: TextOverflow.ellipsis,
               ),
             ],

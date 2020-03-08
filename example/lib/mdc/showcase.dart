@@ -126,7 +126,7 @@ class _PrevPodcast extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Text(
               "Podcast",
-              style: Theme.of(context).textTheme.title,
+              style: Theme.of(context).textTheme.headline6,
               textAlign: TextAlign.center,
             ),
           ),
@@ -282,14 +282,14 @@ class _PrevClock extends StatelessWidget {
               text: "4:39",
               style: Theme.of(context)
                   .textTheme
-                  .headline
+                  .headline5
                   .copyWith(fontSize: 36, color: primary),
               children: <TextSpan>[
                 TextSpan(
                   text: ' 17',
                   style: Theme.of(context)
                       .textTheme
-                      .title
+                      .headline6
                       .copyWith(fontSize: 24, color: primary),
                 ),
               ],
@@ -922,14 +922,14 @@ class _SdkListTile extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       title,
-                      style: Theme.of(context).textTheme.title,
+                      style: Theme.of(context).textTheme.headline6,
                     ),
                     if (subtitle != null)
                       Text(subtitle,
-                          style: Theme.of(context).textTheme.subhead.copyWith(
+                          style: Theme.of(context).textTheme.subtitle1.copyWith(
                               color: Theme.of(context)
                                   .textTheme
-                                  .subhead
+                                  .subtitle1
                                   .color
                                   .withOpacity(0.75))),
                   ],

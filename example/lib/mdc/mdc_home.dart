@@ -149,7 +149,7 @@ class MDCHome extends StatelessWidget {
                                       Text(blindPrimary.name,
                                           style: Theme.of(context)
                                               .textTheme
-                                              .body2),
+                                              .bodyText1),
                                       Text(
                                         blindPrimary.affects,
                                         style:
