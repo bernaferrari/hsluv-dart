@@ -95,5 +95,5 @@ class HSLuvColor {
   int get hashCode => hashValues(hue, saturation, lightness);
 
   @override
-  String toString() => 'H:$hue S:$saturation L:$lightness)';
+  String toString() => 'H:$hue S:$saturation L:$lightness';
 }
