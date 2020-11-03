@@ -42,18 +42,14 @@ class HSLuvColor {
   /// this as selecting which color filter is placed over a light.
   final double hue;
 
-  /// Saturation, from 0.0 to 1.0. This describes how colorful the color is.
-  /// 0.0 implies a shade of grey (i.e. no pigment), and 1.0 implies a color as
+  /// Saturation, from 0.0 to 100.0. This describes how colorful the color is.
+  /// 0.0 implies a shade of grey (i.e. no pigment), and 100.0 implies a color as
   /// vibrant as that hue gets. You can think of this as the purity of the
   /// color filter over the light.
   final double saturation;
 
-  /// Lightness, from 0.0 to 1.0. The lightness of a color describes how bright
-  /// a color is. A value of 0.0 indicates black, and 1.0 indicates white. You
-  /// can think of this as the intensity of the light behind the filter. As the
-  /// lightness approaches 0.5, the colors get brighter and appear more
-  /// saturated, and over 0.5, the colors start to become less saturated and
-  /// approach white at 1.0.
+  /// Lightness, from 0.0 to 100.0. The lightness of a color describes how bright
+  /// a color is. A value of 0.0 indicates black, and 100.0 indicates white.
   final double lightness;
 
   /// Returns a copy of this color with the [hue] parameter replaced with the

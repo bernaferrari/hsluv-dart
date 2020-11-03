@@ -2,7 +2,7 @@
 
 # HSLuv for Dart & Flutter
 
-Dart port of [HSLuv](http://www.hsluv.org) (revision 4) with a [Flutter sample](example). This was a direct conversion of the [reference implementation](https://github.com/hsluv/hsluv/tree/master/haxe).
+Dart port of [HSLuv](https://www.hsluv.org) (revision 4) with a [Flutter sample](example). This was a direct conversion of the [reference implementation](https://github.com/hsluv/hsluv/tree/master/haxe).
 
 [<p align="center"><img src="https://github.com/bernaferrari/hsluv-dart/raw/master/assets/sample_app.jpg?raw=true" width="400"/></p>](example)
 

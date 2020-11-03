@@ -1,3 +1,6 @@
+## [1.0.5+1]
+* Fix lightness and saturation documentation. It was saying they range from [0, 1] instead of [0, 100].
+
 ## [1.0.5]
 * Remove additional "(" in toString method from HSLuvColor.
 
