@@ -5,18 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
-import 'package:hsluvsample/mdc/mdc_home.dart';
-import 'package:hsluvsample/screens/home.dart';
-import 'package:hsluvsample/util/constants.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'blocs/blocs.dart';
 import 'contrast/shuffle_color.dart';
+import 'screen_colors_compare/colors_compare_screen.dart';
+import 'screens/home.dart';
+import 'util/constants.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await openBox();
-  BlocSupervisor.delegate = SimpleBlocDelegate();
+  Bloc.observer = SimpleBlocObserver();
   runApp(BoxedApp());
 }
 
@@ -35,57 +35,54 @@ class BoxedApp extends StatefulWidget {
 }
 
 class _BoxedAppState extends State<BoxedApp> {
-  SliderColorBloc _sliderBloc;
-  ColorBlindBloc colorBlindBloc;
+  SliderColorBloc _sliderColorBloc;
+  ColorsCubit _colorsCubit;
 
   @override
   void initState() {
     super.initState();
-    _sliderBloc = SliderColorBloc()..add(MoveColor(Colors.orange[200], true));
-    colorBlindBloc = ColorBlindBloc();
+
+    _sliderColorBloc = SliderColorBloc()
+      ..add(MoveColor(Colors.orange[200], true));
+    _colorsCubit = ColorsCubit(
+      _sliderColorBloc,
+      ColorsCubit.initialState(getShuffledColors()),
+    );
   }
 
   @override
   void dispose() {
     super.dispose();
-    _sliderBloc.close();
-    colorBlindBloc.close();
+    _sliderColorBloc.close();
   }
 
   @override
   Widget build(BuildContext context) {
     final ThemeData base = ThemeData.from(
-      colorScheme: const ColorScheme.dark(
-//        surface: Color(0xffffd54f),
-          ),
+      colorScheme: const ColorScheme.dark(),
     );
 
     return MultiBlocProvider(
       providers: [
-        BlocProvider<MultipleContrastColorBloc>(
-          create: (context) => MultipleContrastColorBloc(_sliderBloc)
-            ..add(
-              MultipleLoadInit(getShuffledColors()),
-            ),
-        ),
         BlocProvider<SliderColorBloc>(
-          create: (context) => _sliderBloc,
+          create: (context) => _sliderColorBloc,
         ),
-        BlocProvider<MdcSelectedBloc>(
-          create: (context) => MdcSelectedBloc(_sliderBloc, colorBlindBloc),
+        BlocProvider<ColorsCubit>(
+          create: (context) => _colorsCubit,
         ),
-        BlocProvider<ColorBlindBloc>(
-          create: (context) => colorBlindBloc,
-        )
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
         routes: {
           "/": (context) {
-//            return MultipleContrastScreen(color: Colors.red);
             return Home(initialColor: Colors.orange[200]);
           },
-          "/theme": (context) => MDCHome()
+          "compare": (context) {
+            return BlocProvider<MultipleContrastCompareCubit>(
+              create: (context) => MultipleContrastCompareCubit(_colorsCubit),
+              child: ColorsCompareScreen(),
+            );
+          }
         },
         theme: base.copyWith(
           typography: Typography.material2018().copyWith(

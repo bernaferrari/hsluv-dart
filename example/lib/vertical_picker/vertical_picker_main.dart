@@ -4,20 +4,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:hsluvsample/hsinter.dart';
-import 'package:hsluvsample/util/color_util.dart';
-import 'package:hsluvsample/util/constants.dart';
-import 'package:hsluvsample/util/selected.dart';
-import 'package:hsluvsample/vertical_picker/picker_list.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hsluv/hsluvcolor.dart';
 
 import '../color_with_inter.dart';
+import '../hsinter.dart';
 import '../screens/about.dart';
+import '../util/color_util.dart';
 import '../util/constants.dart';
+import '../util/selected.dart';
+import '../util/widget_space.dart';
 import 'app_bar_actions.dart';
 import 'hsluv_selector.dart';
 import 'hsv_selector.dart';
+import 'picker_list.dart';
 
 const hsvStr = "HSV";
 const hsluvStr = "HSLuv";
@@ -28,9 +28,13 @@ const valueStr = "Value";
 const lightStr = "Lightness";
 
 class HSVerticalPicker extends StatefulWidget {
-  const HSVerticalPicker({this.color});
+  const HSVerticalPicker({
+    @required this.color,
+    @required this.hsLuvColor,
+  });
 
   final Color color;
+  final HSLuvColor hsLuvColor;
 
   @override
   _HSVerticalPickerState createState() => _HSVerticalPickerState();
@@ -68,17 +72,22 @@ class _HSVerticalPickerState extends State<HSVerticalPicker> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("${currentSegment == 0 ? "HSLuv" : "HSV"} Picker"),
+        title: Text(
+          "${currentSegment == 0 ? "HSLuv" : "HSV"} Picker",
+          style: Theme.of(context).textTheme.headline6,
+        ),
         elevation: 0,
+        centerTitle: false,
         backgroundColor: widget.color,
         actions: <Widget>[
-          ColorSearchButton(color: widget.color),
-          BorderedIconButton(
+          Center(child: ColorSearchButton(color: widget.color)),
+          SizedBox(width: 8),
+          OutlinedIconButton(
             child: Icon(FeatherIcons.moreHorizontal, size: 16),
             onPressed: () {
               showDialog<dynamic>(
                   context: context,
-                  builder: (BuildContext ctx) {
+                  builder: (_) {
                     return AlertDialog(
                       contentPadding: const EdgeInsets.all(24),
                       shape: RoundedRectangleBorder(
@@ -93,9 +102,7 @@ class _HSVerticalPickerState extends State<HSVerticalPicker> {
                             .background
                             .withOpacity(kVeryTransparent),
                         elevation: 0,
-                        child: MoreColors(
-                          activeColor: Colors.green,
-                        ),
+                        child: MoreColors(activeColor: Colors.green),
                       ),
                     );
                   });
@@ -111,7 +118,11 @@ class _HSVerticalPickerState extends State<HSVerticalPicker> {
             width: 500,
             child: Padding(
               padding: const EdgeInsets.only(
-                  left: 16.0, right: 16, top: 16, bottom: 12),
+                left: 16.0,
+                right: 16,
+                top: 16,
+                bottom: 12,
+              ),
               child: CupertinoSlidingSegmentedControl<int>(
                 backgroundColor:
                     Theme.of(context).colorScheme.onSurface.withOpacity(0.20),
@@ -128,18 +139,19 @@ class _HSVerticalPickerState extends State<HSVerticalPicker> {
             ),
           ),
           Expanded(
-            child: WatchBoxBuilder(
-              box: Hive.box<dynamic>("settings"),
-              builder: (BuildContext context, Box box) => currentSegment == 0
-                  ? HSLuvSelector(
-                      color: widget.color,
-                      moreColors: box.get("moreItems", defaultValue: false),
-                    )
-                  : HSVSelector(
-                      color: widget.color,
-                      moreColors: box.get("moreItems", defaultValue: false),
-                    ),
-            ),
+            child:
+                // child: WatchBoxBuilder(
+                //   box: Hive.box<dynamic>("settings"),
+                // builder: (_ context, Box box) => currentSegment == 0
+                currentSegment == 0
+                    ? HSLuvSelector(
+                        color: widget.hsLuvColor,
+                        // moreColors: box.get("moreItems", defaultValue: false),
+                      )
+                    : HSVSelector(
+                        color: widget.color,
+                        // moreColors: box.get("moreItems", defaultValue: false),
+                      ),
           ),
         ],
       ),
@@ -160,11 +172,11 @@ class HSGenericScreen extends StatefulWidget {
     this.toneSize,
   });
 
-  final Color color;
-  final String kind;
-  final List<Color> Function() fetchHue;
-  final List<ColorWithInter> Function(Color) fetchSat;
-  final List<ColorWithInter> Function(Color) fetchLight;
+  final HSInterColor color;
+  final HSInterType kind;
+  final List<ColorWithInter> Function() fetchHue;
+  final List<ColorWithInter> Function() fetchSat;
+  final List<ColorWithInter> Function() fetchLight;
 
   final int toneSize;
   final String hueTitle;
@@ -202,35 +214,27 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
     });
   }
 
-  List<ColorWithInter> parseHue() {
-    // fetch the hue. If we call this inside the BlocBuilder,
-    // we will lose the list position because it will refresh every time.
-    final List<Color> hue = widget.fetchHue();
-
-    // apply the diff to the hue.
-    return hue.map((Color c) {
-      final HSInterColor hsluv = HSInterColor.fromColor(c, widget.kind);
-      return ColorWithInter(hsluv.toColor(), hsluv);
-    }).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
-    final Color rgbColor = widget.color;
+    final HSInterColor color = widget.color;
+    final Color rgbColor = widget.color.toColor();
 
     // in the ideal the world they could be calculated in the Bloc &/or in parallel.
-    final List<ColorWithInter> hue = parseHue();
+    final List<ColorWithInter> hue = widget.fetchHue();
     final int hueLen = hue.length;
 
-    final List<ColorWithInter> tones = widget.fetchSat(rgbColor);
-    final List<ColorWithInter> values = widget.fetchLight(rgbColor);
+    final List<ColorWithInter> tones = widget.fetchSat();
+    final List<ColorWithInter> values = widget.fetchLight();
 
-    final Color borderColor = (rgbColor.computeLuminance() > kLumContrast)
-        ? Colors.black.withOpacity(0.40)
-        : Colors.white.withOpacity(0.40);
+    // final isColorBrighterThanContrast =
+    //     color.outputLightness() >= kLightnessThreshold;
+
+    // final Color borderColor = isColorBrighterThanContrast
+    //     ? Colors.black.withOpacity(0.40)
+    //     : Colors.white.withOpacity(0.40);
 
     final Widget hueWidget = ExpandableColorBar(
-        pageKey: widget.kind,
+        kind: widget.kind,
         title: widget.hueTitle,
         expanded: expanded,
         sectionIndex: 0,
@@ -238,33 +242,33 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
         isInfinite: true,
         colorsList: hue,
         onTitlePressed: () => modifyAndSaveExpanded(0),
-        onColorPressed: (Color c) {
+        onColorPressed: (c) {
           modifyAndSaveExpanded(0);
           colorSelected(context, c);
         });
 
     final satWidget = ExpandableColorBar(
-        pageKey: widget.kind,
+        kind: widget.kind,
         title: widget.satTitle,
         expanded: expanded,
         sectionIndex: 1,
         listSize: widget.toneSize,
         colorsList: tones,
         onTitlePressed: () => modifyAndSaveExpanded(1),
-        onColorPressed: (Color c) {
+        onColorPressed: (c) {
           modifyAndSaveExpanded(1);
           colorSelected(context, c);
         });
 
     final valueWidget = ExpandableColorBar(
-      pageKey: widget.kind,
+      kind: widget.kind,
       title: widget.lightTitle,
       expanded: expanded,
       sectionIndex: 2,
       listSize: widget.toneSize,
       colorsList: values,
       onTitlePressed: () => modifyAndSaveExpanded(2),
-      onColorPressed: (Color c) {
+      onColorPressed: (c) {
         modifyAndSaveExpanded(2);
         colorSelected(context, c);
       },
@@ -273,20 +277,21 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
     final List<Widget> widgets = <Widget>[hueWidget, satWidget, valueWidget];
 
     return Theme(
-      data: ThemeData.from(
-        colorScheme: (rgbColor.computeLuminance() > kLumContrast)
-            ? ColorScheme.light(surface: rgbColor)
-            : ColorScheme.dark(surface: rgbColor),
-        textTheme: const TextTheme(
-          caption: TextStyle(fontFamily: "B612Mono"),
-          button: TextStyle(fontFamily: "B612Mono"),
-        ),
-      ).copyWith(
+      data: Theme.of(context).copyWith(
+        textTheme: Theme.of(context).textTheme.copyWith(
+              caption: GoogleFonts.b612Mono(),
+              button: GoogleFonts.b612Mono(),
+            ),
         cardTheme: Theme.of(context).cardTheme.copyWith(
               margin: EdgeInsets.zero,
               clipBehavior: Clip.antiAlias,
               shape: RoundedRectangleBorder(
-                side: BorderSide(color: borderColor),
+                side: BorderSide(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onBackground
+                      .withOpacity(0.40),
+                ),
                 borderRadius: BorderRadius.circular(defaultRadius),
               ),
             ),
@@ -297,42 +302,42 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
           child: Column(
             children: <Widget>[
               Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const SizedBox(width: 8),
-                    for (int i = 0; i < 3; i++) ...<Widget>[
-                      const SizedBox(width: 8),
-                      Flexible(
-                        flex: (i == expanded) ? 1 : 0,
-                        child: LayoutBuilder(
-                          // thanks Remi Rousselet for the idea!
-                          builder: (BuildContext ctx, BoxConstraints builder) {
-                            return AnimatedContainer(
-                              width: (i == expanded) ? builder.maxWidth : 64,
-                              duration: const Duration(milliseconds: 250),
-                              curve: (i == expanded)
-                                  ? Curves.easeOut
-                                  : Curves.easeIn,
-                              child: widgets[i],
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-                    const SizedBox(width: 8),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: spaceRow(
+                      16,
+                      <Widget>[
+                        for (int i = 0; i < 3; i++)
+                          Flexible(
+                            flex: (i == expanded) ? 1 : 0,
+                            child: LayoutBuilder(
+                              // thanks Remi Rousselet for the idea!
+                              builder: (_, builder) {
+                                return AnimatedContainer(
+                                  width:
+                                      (i == expanded) ? builder.maxWidth : 64,
+                                  duration: const Duration(milliseconds: 250),
+                                  curve: (i == expanded)
+                                      ? Curves.easeOut
+                                      : Curves.easeIn,
+                                  child: widgets[i],
+                                );
+                              },
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 12, bottom: 12),
                 child: Text(
-                  HSInterColor.fromColor(rgbColor, widget.kind).toString(),
+                  color.toString(),
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontFamily: "B612Mono",
-                  ),
+                  style: GoogleFonts.b612Mono(),
                 ),
               ),
             ],

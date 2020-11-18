@@ -2,12 +2,14 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hsluvsample/hsinter.dart';
-import 'package:hsluvsample/util/color_util.dart';
+
+import '../hsinter.dart';
+import '../util/color_util.dart';
 
 extension ListConversion<T> on List<Color> {
-  List<InterColorWithContrast> convertToInterContrast(String kind, Color otherColor) =>
-      map((Color c) => InterColorWithContrast(
+  List<InterColorWithContrast> convertToInterContrast(
+          HSInterType kind, Color otherColor) =>
+      map((c) => InterColorWithContrast(
             c,
             HSInterColor.fromColor(c, kind),
             otherColor,

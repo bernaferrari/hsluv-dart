@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hsluvsample/util/constants.dart';
-import 'package:hsluvsample/util/when.dart';
 
 import '../hsinter.dart';
+import '../util/constants.dart';
+import '../util/when.dart';
 import 'contrast_util.dart';
 import 'inter_color_with_contrast.dart';
 

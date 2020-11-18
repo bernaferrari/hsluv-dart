@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hsluvsample/util/color_util.dart';
-import 'package:hsluvsample/util/constants.dart';
-import 'package:hsluvsample/widgets/update_color_dialog.dart';
+
+import '../util/color_util.dart';
+import '../util/constants.dart';
+import '../widgets/update_color_dialog.dart';
 
 class ColorSearchButton extends StatelessWidget {
   const ColorSearchButton({this.color});
@@ -37,26 +38,31 @@ class ColorSearchButton extends StatelessWidget {
   }
 }
 
-class BorderedIconButton extends StatelessWidget {
-  const BorderedIconButton({this.child, this.onPressed});
+class OutlinedIconButton extends StatelessWidget {
+  const OutlinedIconButton({this.child, this.borderColor, this.onPressed});
 
-  final Function onPressed;
+  final VoidCallback onPressed;
   final Widget child;
+  final Color borderColor;
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: RawMaterialButton(
-        onPressed: null,
-        child: child,
-        shape: CircleBorder(
+    return SizedBox(
+      width: 36,
+      height: 36,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          shape: CircleBorder(),
           side: BorderSide(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+            color: borderColor ??
+                Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+          ),
+          primary: Theme.of(context).colorScheme.onSurface,
+          padding: EdgeInsets.zero,
         ),
-        elevation: 0.0,
-        padding: EdgeInsets.zero,
+        child: child,
+        onPressed: onPressed,
       ),
-      onPressed: onPressed,
     );
   }
 }

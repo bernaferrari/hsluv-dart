@@ -46,7 +46,7 @@ class ContrastList extends StatelessWidget {
           ? InfiniteListView.builder(
               scrollDirection: Axis.horizontal,
               key: PageStorageKey<String>("$pageKey $sectionIndex"),
-              itemBuilder: (BuildContext context, int absoluteIndex) {
+              itemBuilder: (_, absoluteIndex) {
                 return colorCompare(absoluteIndex % listSize);
               },
             )
@@ -59,9 +59,7 @@ class ContrastList extends StatelessWidget {
                 itemCount: listSize,
                 scrollDirection: Axis.horizontal,
                 key: PageStorageKey<String>("$pageKey $sectionIndex"),
-                itemBuilder: (BuildContext context, int index) {
-                  return colorCompare(index);
-                },
+                itemBuilder: (_, index) => colorCompare(index),
               ),
             ),
     );

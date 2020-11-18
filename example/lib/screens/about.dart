@@ -6,11 +6,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:hsluvsample/blocs/blocs.dart';
-import 'package:hsluvsample/contrast/contrast_screen.dart';
-import 'package:hsluvsample/contrast/shuffle_color.dart';
-import 'package:hsluvsample/util/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../blocs/blocs.dart';
+import '../contrast/shuffle_color.dart';
+import '../util/constants.dart';
 
 class About extends StatelessWidget {
   const About();
@@ -120,11 +120,11 @@ class _ContactInfo extends StatelessWidget {
                 if (await canLaunch(url)) {
                   await launch(url);
                 } else {
-                  Scaffold.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   const snackBar = SnackBar(
                     content: Text('Error! No email app was found.'),
                   );
-                  Scaffold.of(context).showSnackBar(snackBar);
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
                 }
               },
             ),
@@ -147,14 +147,7 @@ class ColorCompare extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        Navigator.push<dynamic>(
-          context,
-          MaterialPageRoute<dynamic>(
-            builder: (context) => const MultipleContrastScreen(),
-          ),
-        );
-      },
+      onTap: () => Navigator.pushNamed(context, "compare"),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16.0),
         child: Row(
@@ -188,11 +181,9 @@ class ShuffleSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        BlocProvider.of<MultipleContrastColorBloc>(context).add(
-          MultipleLoadInit(getShuffledColors()),
-        );
-      },
+      onTap: () => context
+          .read<ColorsCubit>()
+          .updateAllColors(colors: getShuffledColors()),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16.0),
         child: Row(

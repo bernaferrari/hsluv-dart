@@ -1,4 +1,4 @@
-import 'package:hsluvsample/util/when.dart';
+import '../util/when.dart';
 
 const hsvStr = "HSV";
 const hsluvStr = "HSLuv";

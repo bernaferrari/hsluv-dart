@@ -3,6 +3,9 @@
 # HSLuv for Dart & Flutter
 
 Dart port of [HSLuv](https://www.hsluv.org) (revision 4) with a [Flutter sample](example). This was a direct conversion of the [reference implementation](https://github.com/hsluv/hsluv/tree/master/haxe).
+The sample is available as a web app.
+
+<a href="https://bernaferrari.github.io/hsluv-dart/"><img src="assets/try_here.png" height="50"/></a>
 
 [<p align="center"><img src="https://github.com/bernaferrari/hsluv-dart/raw/master/assets/sample_app.jpg?raw=true" width="400"/></p>](example)
 
@@ -20,6 +23,8 @@ For more information, check: [Designing Color Spaces](https://programmingdesigns
 ## Usage
 
 In the `pubspec.yaml` of your flutter project, add the following dependency:
+
+<a href="https://bernaferrari.github.io/ColorBlindnessFlutter/"><img src="assets/try_here.png" height="50"/></a>
 
 [![pub package](https://img.shields.io/pub/v/hsluv.svg)](https://pub.dev/packages/hsluv)
 

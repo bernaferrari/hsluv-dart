@@ -1,20 +1,24 @@
 import 'dart:math' as math;
 import 'dart:ui';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hsluv/hsluvcolor.dart';
-import 'package:hsluvsample/util/when.dart';
+
+import 'util/when.dart';
+
+enum HSInterType {
+  HSLuv,
+  HSV,
+}
 
 /// HSInterColor means Hue Saturation Interchangeable Color.
 /// It is made to wrap both HSV and HSLuv with the same interface.
 /// It could also be easily extended to HSL and others.
 @immutable
-class HSInterColor {
-  /// Creates a color.
-  ///
-  /// All the arguments must not be null and be in their respective ranges. See
-  /// the fields for each parameter for a description of their ranges.
+class HSInterColor extends Equatable {
+  /// Creates a [HSInterColor].
   const HSInterColor.fromHSInter(
       this.hue, this.saturation, this.lightness, this.kind, this.maxValue)
       : assert(hue != null),
@@ -25,17 +29,17 @@ class HSInterColor {
   ///
   /// This constructor does not necessarily round-trip with [toColor] because
   /// of floating-point imprecision.
-  factory HSInterColor.fromColor(Color color, String kind) {
+  factory HSInterColor.fromColor(Color color, HSInterType kind) {
     final double maxV = when({
-      () => kind == "HSLuv": () => 100.0,
-      () => kind == "HSV": () => 1.0,
+      () => kind == HSInterType.HSLuv: () => 100.0,
+      () => kind == HSInterType.HSV: () => 1.0,
     }, orElse: () => 0.0);
 
-    if (kind == "HSLuv") {
+    if (kind == HSInterType.HSLuv) {
       final luv = HSLuvColor.fromColor(color);
       return HSInterColor.fromHSInter(
           luv.hue, luv.saturation, luv.lightness, kind, maxV);
-    } else if (kind == "HSV") {
+    } else if (kind == HSInterType.HSV) {
       final hsv = HSVColor.fromColor(color);
       return HSInterColor.fromHSInter(
           hsv.hue, hsv.saturation, hsv.value, kind, maxV);
@@ -46,7 +50,19 @@ class HSInterColor {
     }
   }
 
-  final String kind;
+  factory HSInterColor.fromHSLuv(HSLuvColor hsLuvColor) {
+    const double maxV = 100.0;
+
+    return HSInterColor.fromHSInter(
+      hsLuvColor.hue,
+      hsLuvColor.saturation,
+      hsLuvColor.lightness,
+      HSInterType.HSLuv,
+      maxV,
+    );
+  }
+
+  final HSInterType kind;
   final double hue;
   final double saturation;
   final double lightness;
@@ -58,16 +74,16 @@ class HSInterColor {
   /// output [saturation] in [0-100] interval.
   int outputSaturation() {
     return when({
-      () => kind == "HSLuv": () => saturation,
-      () => kind == "HSV": () => saturation * 100,
+      () => kind == HSInterType.HSLuv: () => saturation,
+      () => kind == HSInterType.HSV: () => saturation * 100,
     }).toInt();
   }
 
   /// output [lightness] in [0-100] interval.
   int outputLightness() {
     return when({
-      () => kind == "HSLuv": () => lightness,
-      () => kind == "HSV": () => lightness * 100,
+      () => kind == HSInterType.HSLuv: () => lightness,
+      () => kind == HSInterType.HSV: () => lightness * 100,
     }).toInt();
   }
 
@@ -95,49 +111,37 @@ class HSInterColor {
   /// Calls the [toColor] method from either HSLuvColor or HSVColor.
   Color toColor() {
     return when({
-      () => kind == "HSLuv": () =>
+      () => kind == HSInterType.HSLuv: () =>
           HSLuvColor.fromHSL(hue, saturation, lightness).toColor(),
-      () => kind == "HSV": () =>
+      () => kind == HSInterType.HSV: () =>
           HSVColor.fromAHSV(1.0, hue, saturation, lightness).toColor(),
     });
   }
 
   @override
-  bool operator ==(dynamic other) {
-    if (identical(this, other)) return true;
-    if (other is! HSInterColor) return false;
-    final HSInterColor typedOther = other;
-    return typedOther.hue == hue &&
-        typedOther.saturation == saturation &&
-        typedOther.lightness == lightness;
-  }
-
-  @override
-  int get hashCode => hashValues(hue, saturation, lightness);
+  List<Object> get props => [hue, saturation, lightness];
 
   /// Returns this color as a String in the H:250 S:100 L:60 format.
   @override
   String toString() {
-    return when({
-      () => kind == "HSLuv": () =>
-          "H:${hue.toInt()} S:${outputSaturation()} L:${outputLightness()}",
-      () => kind == "HSV": () =>
-          "H:${hue.toInt()} S:${outputSaturation()} V:${outputLightness()}",
-    });
+    final String valueLetter = kind == HSInterType.HSLuv ? "L" : "V";
+
+    // this is never reached, but is needed for dart analyzer.
+    return "H:${hue.toInt()} S:${outputSaturation()} $valueLetter:${outputLightness()}";
   }
 
   String toPartialStr(int index) {
-    return when({
-      () => kind == "HSLuv": () => when({
-            () => index == 0: () => "H:${hue.toInt()}",
-            () => index == 1: () => "S:${outputSaturation()}",
-            () => index == 2: () => "L:${outputLightness()}",
-          }),
-      () => kind == "HSV": () => when({
-            () => index == 0: () => "H:${hue.toInt()}",
-            () => index == 1: () => "S:${outputSaturation()}",
-            () => index == 2: () => "V:${outputLightness()}",
-          }),
-    });
+    final String valueLetter = kind == HSInterType.HSLuv ? "L" : "V";
+
+    switch (index) {
+      case 0:
+        return "H:${hue.toInt()}";
+      case 1:
+        return "S:${outputSaturation()}";
+      case 2:
+        return "$valueLetter:${outputLightness()}";
+      default:
+        return "error in toPartialStr";
+    }
   }
 }

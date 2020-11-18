@@ -2,25 +2,28 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:hsluv/hsluvcolor.dart';
-import 'package:hsluvsample/blocs/slider_color/slider_color_state.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../blocs.dart';
 import 'slider_color_event.dart';
+import 'slider_color_state.dart';
 
 class SliderColorBloc extends Bloc<SliderColorEvent, SliderColorState> {
-  @override
-  SliderColorState get initialState => SliderColorLoading();
+  SliderColorBloc() : super(SliderColorLoading());
 
   @override
-  Stream<SliderColorState> transformEvents(events, next) {
-    return events.switchMap(next);
+  Stream<Transition<SliderColorEvent, SliderColorState>> transformEvents(
+      Stream<SliderColorEvent> events,
+      TransitionFunction<SliderColorEvent, SliderColorState> transitionFn) {
+    return events.switchMap(transitionFn);
   }
 
   @override
   Stream<SliderColorState> mapEventToState(
-    SliderColorEvent event,
-  ) async* {
+      SliderColorEvent event,
+      ) async* {
     if (event is MoveRGB) {
       yield* _mapRGB(event);
     }

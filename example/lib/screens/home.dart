@@ -3,20 +3,16 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hsluvsample/mdc/components.dart';
-import 'package:hsluvsample/screens/about.dart';
-import 'package:hsluvsample/screens/multiple_sliders.dart';
-import 'package:hsluvsample/screens/single_color_blindness.dart';
-import 'package:hsluvsample/util/color_util.dart';
-import 'package:hsluvsample/util/selected.dart';
-import 'package:hsluvsample/util/when.dart';
-import 'package:hsluvsample/vertical_picker/vertical_picker_main.dart';
-import 'package:hsluvsample/widgets/loading_indicator.dart';
-import 'package:hsluvsample/widgets/update_color_dialog.dart';
 
 import '../blocs/blocs.dart';
+import '../util/color_util.dart';
 import '../util/constants.dart';
+import '../vertical_picker/vertical_picker_main.dart';
+import '../widgets/update_color_dialog.dart';
+import 'about.dart';
 import 'color_library.dart';
+import 'multiple_sliders.dart';
+import 'single_color_blindness.dart';
 
 class Home extends StatefulWidget {
   const Home({this.initialColor});
@@ -38,34 +34,26 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<MultipleContrastColorBloc, MultipleContrastColorState>(
-        builder: (context, state) {
-      if (state is MultipleContrastColorLoading) {
-        return Scaffold(
-          backgroundColor: widget.initialColor,
-          body: const LoadingIndicator(),
-        );
-      }
+    return BlocBuilder<ColorsCubit, ColorsState>(builder: (_, state) {
+      final rgbColor = state.rgbColors[state.selected];
+      final hsluvColor = state.hsluvColors[state.selected];
 
-      final currentState = state as MultipleContrastColorLoaded;
+      final contrastedColor =
+          (state.hsluvColors[state.selected].lightness > kLightnessThreshold)
+              ? Colors.black
+              : Colors.white;
 
-      final color = currentState.colorsList[currentState.selected].rgbColor;
+      final surfaceColor = blendColorWithBackground(rgbColor);
 
-      final contrastedColor = (color.computeLuminance() > kLumContrast)
-          ? Colors.black
-          : Colors.white;
-
-      final surfaceColor = blendColorWithBackground(color);
-
-      final colorScheme = (color.computeLuminance() > kLumContrast)
+      final colorScheme = (rgbColor.computeLuminance() > kLumContrast)
           ? ColorScheme.light(
-              primary: color,
-              secondary: color,
+              primary: rgbColor,
+              secondary: rgbColor,
               surface: surfaceColor,
             )
           : ColorScheme.dark(
-              primary: color,
-              secondary: color,
+              primary: rgbColor,
+              secondary: rgbColor,
               surface: surfaceColor,
             );
 
@@ -83,7 +71,7 @@ class _HomeState extends State<Home> {
               ),
         ),
         child: Scaffold(
-          backgroundColor: color,
+          backgroundColor: rgbColor,
           body: DefaultTabController(
             length: 5,
             initialIndex: 1,
@@ -94,10 +82,11 @@ class _HomeState extends State<Home> {
                     child: TabBarView(
                       children: [
                         const MultipleSliders(),
-                        HSVerticalPicker(color: color),
+                        HSVerticalPicker(
+                            color: rgbColor, hsLuvColor: hsluvColor),
                         const SingleColorBlindness(),
                         const About(),
-                        ColorLibrary(color: color),
+                        ColorLibrary(color: rgbColor),
                       ],
                     ),
                   ),
@@ -108,7 +97,8 @@ class _HomeState extends State<Home> {
                           colorScheme.background.withOpacity(kVeryTransparent),
                       border: Border(
                         top: BorderSide(
-                            color: colorScheme.onSurface.withOpacity(0.40)),
+                          color: colorScheme.onSurface.withOpacity(0.40),
+                        ),
                       ),
                     ),
                     child: Column(
@@ -168,159 +158,59 @@ class _HomeState extends State<Home> {
 }
 
 class ThemeBar extends StatelessWidget {
-  final bool themeMode = false;
-
   @override
   Widget build(BuildContext context) {
-    final accentColor =
-        Theme.of(context).colorScheme.onSurface.withOpacity(0.40);
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: themeMode
-          ? Row(
-              mainAxisSize: MainAxisSize.min,
+      child: BlocBuilder<ColorsCubit, ColorsState>(builder: (_, state) {
+        final list = state.rgbColors;
+
+        return SizedBox(
+          height: 36,
+          child: ListView(
+              physics: const BouncingScrollPhysics(),
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
               children: <Widget>[
-                SizedBox(
-                  height: 36,
-                  child: FlatButton.icon(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/theme');
-                    },
-                    icon: Icon(FeatherIcons.layout,
-                        size: 20,
-                        color: Theme.of(context).colorScheme.onSurface),
-                    label: Text(
-                      "Theming",
-                      style: Theme.of(context).textTheme.bodyText1.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontWeight: FontWeight.w600,
-                          ),
+                const SizedBox(width: 16),
+                for (int i = 0; i < list.length; i++) ...[
+                  SizedBox(
+                    width: 32,
+                    height: 32,
+                    child: RawMaterialButton(
+                      onPressed: () => context
+                          .read<ColorsCubit>()
+                          .updateRgbColor(rgbColor: list[i], selected: i),
+                      onLongPress: () {
+                        showSlidersDialog(context, list[i], i);
+                      },
+                      fillColor: list[i],
+                      shape: CircleBorder(
+                        side: BorderSide(
+                          width: 2,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.7),
+                        ),
+                      ),
+                      child: state.selected == i
+                          ? Icon(
+                              FeatherIcons.check,
+                              size: 16,
+                              color: contrastingColor(list[i]),
+                            )
+                          : null,
+                      elevation: 0.0,
+                      padding: EdgeInsets.zero,
                     ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                ],
                 const SizedBox(width: 8),
-                Container(
-                  width: 1,
-                  height: 24,
-                  color: accentColor,
-                ),
-                const SizedBox(width: 16),
-                const RoundSelectableColor(kPrimary),
-                const SizedBox(width: 8),
-                const RoundSelectableColor(kSurface),
-                const SizedBox(width: 8),
-              ],
-            )
-          : BlocBuilder<MultipleContrastColorBloc, MultipleContrastColorState>(
-              builder: (context, state) {
-              if (state is MultipleContrastColorLoading) {
-                return const Center(child: LoadingIndicator());
-              }
-
-              final selected = (state as MultipleContrastColorLoaded).selected;
-
-              final list = (state as MultipleContrastColorLoaded).colorsList;
-              return SizedBox(
-                height: 36,
-                child: ListView(
-                    physics: const BouncingScrollPhysics(),
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    children: <Widget>[
-                      const SizedBox(width: 16),
-                      for (int i = 0; i < list.length; i++) ...[
-                        SizedBox(
-                          width: 32,
-                          height: 32,
-                          child: RawMaterialButton(
-                            onPressed: () {
-                              BlocProvider.of<MultipleContrastColorBloc>(
-                                      context)
-                                  .add(
-                                MCMoveColor(list[i].rgbColor, i),
-                              );
-                            },
-                            onLongPress: () {
-                              showSlidersDialog(context, list[i].rgbColor, i);
-                            },
-                            fillColor: list[i].rgbColor,
-                            shape: CircleBorder(
-                              side: BorderSide(
-                                width: 2,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurface
-                                    .withOpacity(0.7),
-                              ),
-                            ),
-                            child: selected == i
-                                ? Icon(
-                                    FeatherIcons.check,
-                                    size: 16,
-                                    color: contrastingColor(list[i].rgbColor),
-                                  )
-                                : null,
-                            elevation: 0.0,
-                            padding: EdgeInsets.zero,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                      ],
-                      const SizedBox(width: 8),
-                    ]),
-              );
-            }),
+              ]),
+        );
+      }),
     );
-  }
-}
-
-class RoundSelectableColor extends StatelessWidget {
-  const RoundSelectableColor(this.kind);
-
-  final String kind;
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<MdcSelectedBloc, MdcSelectedState>(
-        builder: (context, state) {
-      final selected = (state as MDCLoadedState).selected;
-      final allItems = (state as MDCLoadedState).blindness;
-
-      final Color primaryColor = allItems[kPrimary];
-      final Color surfaceColor = allItems[kSurface];
-
-      final Color correctColor = when({
-        () => kind == kPrimary: () => primaryColor,
-        () => kind == kSurface: () => surfaceColor,
-      });
-
-      return SizedBox(
-        width: 24,
-        height: 24,
-        child: RawMaterialButton(
-          onPressed: () {
-            BlocProvider.of<MdcSelectedBloc>(context).add(
-              MDCUpdateAllEvent(
-                primaryColor: primaryColor,
-                surfaceColor: surfaceColor,
-                selectedTitle: kind,
-              ),
-            );
-            colorSelected(context, correctColor);
-          },
-          fillColor: correctColor,
-          shape: CircleBorder(
-            side: BorderSide(
-              width: 2,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-            ),
-          ),
-          child: kind == selected ? Icon(FeatherIcons.check, size: 16) : null,
-          elevation: 0.0,
-          padding: EdgeInsets.zero,
-        ),
-      );
-    });
   }
 }

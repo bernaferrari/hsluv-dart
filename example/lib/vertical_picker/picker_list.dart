@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:hsluvsample/util/constants.dart';
-import 'package:hsluvsample/vertical_picker/picker_item.dart';
 import 'package:infinite_listview/infinite_listview.dart';
 
 import '../color_with_inter.dart';
+import '../hsinter.dart';
+import '../util/constants.dart';
+import 'picker_item.dart';
 
 class ExpandableColorBar extends StatelessWidget {
   const ExpandableColorBar({
-    this.pageKey,
+    this.kind,
     this.title,
     this.expanded,
     this.sectionIndex,
@@ -22,7 +23,7 @@ class ExpandableColorBar extends StatelessWidget {
   final Function(Color) onColorPressed;
   final List<ColorWithInter> colorsList;
   final String title;
-  final String pageKey;
+  final HSInterType kind;
   final int expanded;
   final int sectionIndex;
   final int listSize;
@@ -30,7 +31,7 @@ class ExpandableColorBar extends StatelessWidget {
 
   Widget colorCompare(int index) {
     return ColorCompareWidgetDetails(
-      kind: pageKey,
+      kind: kind,
       color: colorsList[index],
       compactText: expanded == sectionIndex,
       category: title,
@@ -41,18 +42,21 @@ class ExpandableColorBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(children: <Widget>[
-      _ExpandableTitle(
-        title: title,
-        index: sectionIndex,
-        expanded: expanded,
-        onTitlePressed: onTitlePressed,
+      SizedBox(
+        width: double.infinity,
+        child: _ExpandableTitle(
+          title: title,
+          index: sectionIndex,
+          expanded: expanded,
+          onTitlePressed: onTitlePressed,
+        ),
       ),
       Expanded(
         child: Card(
           child: isInfinite
               ? InfiniteListView.builder(
-                  key: PageStorageKey<String>("$pageKey $sectionIndex"),
-                  itemBuilder: (BuildContext context, int absoluteIndex) {
+                  key: PageStorageKey<String>("$kind $sectionIndex"),
+                  itemBuilder: (_, absoluteIndex) {
                     return colorCompare(absoluteIndex % listSize);
                   },
                 )
@@ -63,8 +67,8 @@ class ExpandableColorBar extends StatelessWidget {
                   child: ListView.builder(
                     physics: const BouncingScrollPhysics(),
                     itemCount: listSize,
-                    key: PageStorageKey<String>("$pageKey $sectionIndex"),
-                    itemBuilder: (BuildContext context, int index) {
+                    key: PageStorageKey<String>("$kind $sectionIndex"),
+                    itemBuilder: (_, index) {
                       return colorCompare(index);
                     },
                   ),
@@ -85,20 +89,27 @@ class _ExpandableTitle extends StatelessWidget {
     this.onTitlePressed,
   });
 
-  final Function onTitlePressed;
+  final VoidCallback onTitlePressed;
   final String title;
   final int expanded;
   final int index;
 
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
+    return TextButton(
+      style: TextButton.styleFrom(
+        primary: Theme.of(context).colorScheme.onBackground,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(defaultRadius),
+        ),
+      ),
       onPressed: onTitlePressed,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(defaultRadius)),
       child: Text(
         expanded == index ? title : title[0],
         overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onBackground,
+        ),
       ),
     );
   }

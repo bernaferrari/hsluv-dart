@@ -12,7 +12,9 @@ Most color pickers give you 16 million colors and ask you to choose one. I desig
 This app is actually part of another one, which is coming out hopefully soon and will also be open source. The project grew so large I thought it was better to split in two, test the public reception and collect feedback before moving forward. This is why this might be one of the most full-fledged over-engineered sample apps out there.
 It is hard to develop alone. If you have any good or bad feedback, want to be alerted when the bigger app is released or want to be more involved, [please contact me](mailto:bernaferrari2@gmail.com)!
 
-[Download the APK](https://github.com/bernaferrari/hsluv-dart/raw/master/example/assets/hsluv_sample.apk)
+<a href="https://bernaferrari.github.io/hsluv-dart/"><img src="../assets/try_here.png" height="50"/></a>
+
+[Download the Android APK](https://github.com/bernaferrari/hsluv-dart/raw/master/example/assets/hsluv_sample.apk)
 
 This app contains the following screens:
 * Three sliders. RGB, HSV and HSLuv. You can see how they interact with each other.

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hsluvsample/color_with_inter.dart';
-import 'package:hsluvsample/util/hsv_tiny.dart';
 
+import '../color_with_inter.dart';
+import '../hsinter.dart';
+import '../util/hsinter_tiny.dart';
 import 'vertical_picker_main.dart';
 
 class HSVSelector extends StatelessWidget {
@@ -14,23 +15,25 @@ class HSVSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const String kind = hsvStr;
-
     // maximum number of items
     final int itemsOnScreen =
-        ((MediaQuery.of(context).size.height - 56*4) / 56).ceil();
+        ((MediaQuery.of(context).size.height - 56 * 4) / 56).ceil();
 
     final int toneSize = moreColors ? itemsOnScreen * 2 : itemsOnScreen;
     final int hueSize = moreColors ? 90 : 45;
 
+    const HSInterType kind = HSInterType.HSV;
+    final HSInterColor inter = HSInterColor.fromColor(color, kind);
+
     return HSGenericScreen(
-      color: color,
+      color: inter,
       kind: kind,
-      fetchHue: () => hsvAlternatives(color, hueSize),
-      fetchSat: (Color c) =>
-          hsvTones(c, toneSize, 0.05, 1.0).convertToInter(kind),
-      fetchLight: (Color c) =>
-          hsvValues(c, toneSize, 0.05, 1.0).convertToInter(kind),
+      fetchHue: () =>
+          hsinterAlternatives(inter, hueSize).convertToColorWithInter(),
+      fetchSat: () =>
+          hsinterTones(inter, toneSize, 0.0, 1.0).convertToColorWithInter(),
+      fetchLight: () =>
+          hsinterLightness(inter, toneSize, 0.0, 1.0).convertToColorWithInter(),
       hueTitle: hueStr,
       satTitle: satStr,
       lightTitle: valueStr,

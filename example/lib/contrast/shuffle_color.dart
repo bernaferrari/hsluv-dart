@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:hsluvsample/contrast/inter_color_with_contrast.dart';
+import 'inter_color_with_contrast.dart';
 
 class _ColorContrast {
   const _ColorContrast(this.color, this.contrast);

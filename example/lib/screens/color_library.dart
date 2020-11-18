@@ -2,13 +2,12 @@ import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hsluvsample/contrast/shuffle_color.dart';
-import 'package:hsluvsample/mdc/components.dart';
-import 'package:hsluvsample/util/constants.dart';
-import 'package:hsluvsample/util/selected.dart';
-import 'package:hsluvsample/widgets/update_color_dialog.dart';
 
+import '../contrast/shuffle_color.dart';
 import '../util/color_util.dart';
+import '../util/constants.dart';
+import '../util/selected.dart';
+import '../widgets/update_color_dialog.dart';
 
 class ColorLibrary extends StatefulWidget {
   const ColorLibrary({this.color});
@@ -145,4 +144,10 @@ class _ColorLibraryState extends State<ColorLibrary> {
       ),
     );
   }
+}
+
+Color contrastingColor(Color color) {
+  return (color.computeLuminance() > kLumContrast)
+      ? Colors.black
+      : Colors.white;
 }

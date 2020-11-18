@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:hsluvsample/util/constants.dart';
-import 'package:hsluvsample/util/selected.dart';
-import 'package:hsluvsample/util/when.dart';
-import 'package:hsluvsample/widgets/update_color_dialog.dart';
 
 import '../color_with_inter.dart';
 import '../hsinter.dart';
+import '../util/constants.dart';
+import '../util/selected.dart';
+import '../util/when.dart';
+import '../widgets/update_color_dialog.dart';
 import 'vertical_picker_main.dart';
 
 class ColorCompareWidgetDetails extends StatelessWidget {
@@ -18,10 +18,10 @@ class ColorCompareWidgetDetails extends StatelessWidget {
   });
 
   final ColorWithInter color;
-  final Function onPressed;
+  final VoidCallback onPressed;
   final bool compactText;
   final String category;
-  final String kind;
+  final HSInterType kind;
 
   @override
   Widget build(BuildContext context) {
@@ -46,23 +46,18 @@ class ColorCompareWidgetDetails extends StatelessWidget {
     final Widget centeredText =
         richTextColorToHSV(context, inter, textColor, category[0]);
 
-    return Padding(
-      padding: EdgeInsets.zero,
-      child: SizedBox(
-        height: 56,
-        child: MaterialButton(
+    return SizedBox(
+      height: 56,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          primary: color.color,
           elevation: 0,
-          color: color.color,
+          padding: EdgeInsets.zero,
           shape: const RoundedRectangleBorder(),
-          onPressed: onPressed ??
-              () {
-                colorSelected(context, color.color);
-              },
-          onLongPress: () {
-            showSlidersDialog(context, color.color);
-          },
-          child: compactText ? centeredText : cornerText,
         ),
+        onPressed: onPressed ?? () => colorSelected(context, color.color),
+        onLongPress: () => showSlidersDialog(context, color.color),
+        child: compactText ? centeredText : cornerText,
       ),
     );
   }
@@ -88,8 +83,8 @@ class ColorCompareWidgetDetails extends StatelessWidget {
     final shortestSide = MediaQuery.of(context).size.width;
 
     final String letterLorV = when({
-      () => kind == hsluvStr: () => "L",
-      () => kind == hsvStr: () => "V",
+      () => kind == HSInterType.HSLuv: () => "L",
+      () => kind == HSInterType.HSV: () => "V",
     });
 
     return RichText(

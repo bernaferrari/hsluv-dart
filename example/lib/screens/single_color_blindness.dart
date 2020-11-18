@@ -3,29 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hsluvsample/blocs/blocs.dart';
-import 'package:hsluvsample/util/color_blindness.dart';
-import 'package:hsluvsample/util/selected.dart';
-import 'package:hsluvsample/vertical_picker/app_bar_actions.dart';
-import 'package:hsluvsample/widgets/loading_indicator.dart';
-import 'package:hsluvsample/widgets/update_color_dialog.dart';
 
-import '../mdc/components.dart';
+import '../blocs/blocs.dart';
+import '../util/color_blindness.dart';
 import '../util/color_util.dart';
+import '../util/selected.dart';
+import '../vertical_picker/app_bar_actions.dart';
+import '../widgets/update_color_dialog.dart';
+import 'color_library.dart';
 
 class SingleColorBlindness extends StatelessWidget {
   const SingleColorBlindness();
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<MultipleContrastColorBloc, MultipleContrastColorState>(
-      builder: (context, state) {
-        if (state is MultipleContrastColorLoading) {
-          return const Scaffold(body: Center(child: LoadingIndicator()));
-        }
-
-        final currentState = state as MultipleContrastColorLoaded;
-        final color = currentState.colorsList[currentState.selected].rgbColor;
+    return BlocBuilder<ColorsCubit, ColorsState>(
+      builder: (_, state) {
+        final color = state.rgbColors[state.selected];
         final values = retrieveColorBlind(color);
 
         return Scaffold(

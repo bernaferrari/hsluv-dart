@@ -62,29 +62,29 @@ class _HSLSliderState extends State<HSLSlider> {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         SingleSlider("Hue", valueH / 360, "${valueH.round()}", colorH,
-            (double value) {
-          setState(() {
-            valueH = value * 360;
-            updateColorLists();
-            widget.onChanged(valueH, valueS, valueL);
-          });
-        }),
+            scale: 360, onChanged: (value) {
+              setState(() {
+                valueH = value * 360;
+                updateColorLists();
+                widget.onChanged(valueH, valueS, valueL);
+              });
+            }),
         SingleSlider("Saturation", valueS, "${(valueS * 100).round()}", colorS,
-            (double value) {
-          setState(() {
-            valueS = value;
-            updateColorLists();
-            widget.onChanged(valueH, valueS, valueL);
-          });
-        }),
+            scale: 100, onChanged: (value) {
+              setState(() {
+                valueS = value;
+                updateColorLists();
+                widget.onChanged(valueH, valueS, valueL);
+              });
+            }),
         SingleSlider("Lightness", valueL, "${(valueL * 100).round()}", colorL,
-            (double value) {
-          setState(() {
-            valueL = value;
-            updateColorLists();
-            widget.onChanged(valueH, valueS, valueL);
-          });
-        }),
+            scale: 100, onChanged: (value) {
+              setState(() {
+                valueL = value;
+                updateColorLists();
+                widget.onChanged(valueH, valueS, valueL);
+              });
+            }),
       ],
     );
   }

@@ -1,6 +1,7 @@
-import 'dart:ui';
-import 'package:hsluv/hsluv.dart';
 import 'dart:math' as math;
+import 'dart:ui';
+
+import 'package:hsluv/hsluv.dart';
 
 class HSLuvColor {
   /// Creates a color.
@@ -51,6 +52,43 @@ class HSLuvColor {
   /// Lightness, from 0.0 to 100.0. The lightness of a color describes how bright
   /// a color is. A value of 0.0 indicates black, and 100.0 indicates white.
   final double lightness;
+
+  /// Returns a copy of this color with hue being added via the [add] parameter.
+  /// It also accepts a [cycle] parameter, so it circles back when larger than it (default = 360).
+  HSLuvColor addHue(double add, [int cycle = 360]) {
+    return HSLuvColor.fromHSL((hue + add) % cycle, saturation, lightness);
+  }
+
+  /// Returns a copy of this color with saturation being added via the [add] parameter.
+  /// It also accepts a [min] and [max] parameters, where default = 0, 100.
+  HSLuvColor addSaturation(double add, {double min = 0, double max = 100}) {
+    return HSLuvColor.fromHSL(
+      hue,
+      math.max(min, math.min(saturation + add, max)),
+      lightness,
+    );
+  }
+
+  /// Returns a copy of this color with saturation being added via the [add] parameter.
+  /// It also accepts a [min] and [max] parameters, where default = 0, 100.
+  HSLuvColor addLightness(double add, {double min = 0, double max = 100}) {
+    return HSLuvColor.fromHSL(
+      hue,
+      saturation,
+      math.max(min, math.min(lightness + add, max)),
+    );
+  }
+
+  /// Returns a copy of this color with hue, saturation and lightness being added.
+  /// If Saturation or Lightness values is > 100, it will be limited to 100.
+  /// If Saturation or Lightness values is < 0, it will be set to 100.
+  HSLuvColor addHSLuv(double h, double s, double l) {
+    return HSLuvColor.fromHSL(
+      (hue + h) % 360,
+      math.max(0, math.min(saturation + s, 100)),
+      math.max(0, math.min(lightness + l, 100)),
+    );
+  }
 
   /// Returns a copy of this color with the [hue] parameter replaced with the
   /// given value.

@@ -1,22 +1,21 @@
 // user defined function
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_bloc.dart';
-import 'package:hsluvsample/blocs/multiple_contrast_color/multiple_contrast_color_event.dart';
-import 'package:hsluvsample/util/color_util.dart';
-import 'package:hsluvsample/util/constants.dart';
-import 'package:hsluvsample/widgets/color_sliders.dart';
-import 'package:hsluvsample/widgets/loading_indicator.dart';
-import 'package:hsluvsample/widgets/selectable_sliders.dart';
-import 'package:hsluvsample/widgets/text_form_colored.dart';
 
+import '../blocs/colors_cubit.dart';
 import '../blocs/slider_color/slider_color.dart';
+import '../util/color_util.dart';
+import '../util/constants.dart';
+import 'color_sliders.dart';
+import 'loading_indicator.dart';
+import 'selectable_sliders.dart';
+import 'text_form_colored.dart';
 
 Future<void> showSlidersDialog(BuildContext context, Color color,
     [int index]) async {
   final dynamic result = await showDialog<dynamic>(
       context: context,
-      builder: (BuildContext ctx) {
+      builder: (_) {
         return BlocProvider(
           create: (context) => SliderColorBloc()..add(MoveColor(color, true)),
           child: UpdateColorDialog(color),
@@ -27,8 +26,9 @@ Future<void> showSlidersDialog(BuildContext context, Color color,
     if (index == null && result is Color) {
       BlocProvider.of<SliderColorBloc>(context).add(MoveColor(result, true));
     } else if (result is Color) {
-      BlocProvider.of<MultipleContrastColorBloc>(context)
-          .add(MCMoveColor(result, index));
+      context
+          .read<ColorsCubit>()
+          .updateRgbColor(rgbColor: result, selected: index);
     }
   }
 }
