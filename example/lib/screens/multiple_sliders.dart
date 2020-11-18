@@ -41,9 +41,9 @@ class MultipleSliders extends StatelessWidget {
           child: ListView(
             shrinkWrap: true,
             children: <Widget>[
-              wrapInCard(rgb),
-              wrapInCard(hsv),
-              wrapInCard(hsl),
+              wrapInCard(context, rgb),
+              wrapInCard(context, hsv),
+              wrapInCard(context, hsl),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: ColorSearchButton(
@@ -56,10 +56,12 @@ class MultipleSliders extends StatelessWidget {
     });
   }
 
-  Widget wrapInCard(Widget picker) {
+  Widget wrapInCard(BuildContext context, Widget picker) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      elevation: 0,
+      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.20),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
         child: picker,

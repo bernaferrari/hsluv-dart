@@ -72,7 +72,7 @@ class _BoxedAppState extends State<BoxedApp> {
         ),
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'HSLuv Sample',
         routes: {
           "/": (context) {
             return Home(initialColor: Colors.orange[200]);
