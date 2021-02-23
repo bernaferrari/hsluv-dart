@@ -1,3 +1,9 @@
+## [1.1.1]
+* Minor fixes related to null safety.
+
+## [1.1.0]
+* Add null safety.
+
 ## [1.0.6]
 * Add addHue, addSaturation, addLightness, addHSLuv methods.
 

@@ -10,7 +10,7 @@ class Point {
 }
 
 class Line {
-  Line({this.slope, this.intercept});
+  Line({required this.slope, required this.intercept});
 
   double slope;
   double intercept;

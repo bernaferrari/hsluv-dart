@@ -74,46 +74,46 @@ class TestClass {
   static void testHsluv() {
     var snapshot = Snapshot.generateSnapshot();
     for (var fieldName in snapshot.keys) {
-      var field = snapshot[fieldName];
+      var field = snapshot[fieldName]!;
 
       var rgbFromHex = Hsluv.hexToRgb(fieldName);
-      var xyzFromRgb = Hsluv.rgbToXyz(field["rgb"]);
-      var luvFromXyz = Hsluv.xyzToLuv(field["xyz"]);
-      var lchFromLuv = Hsluv.luvToLch(field["luv"]);
-      var hsluvFromLch = Hsluv.lchToHsluv(field["lch"]);
-      var hpluvFromLch = Hsluv.lchToHpluv(field["lch"]);
+      var xyzFromRgb = Hsluv.rgbToXyz(field["rgb"]!);
+      var luvFromXyz = Hsluv.xyzToLuv(field["xyz"]!);
+      var lchFromLuv = Hsluv.luvToLch(field["luv"]!);
+      var hsluvFromLch = Hsluv.lchToHsluv(field["lch"]!);
+      var hpluvFromLch = Hsluv.lchToHpluv(field["lch"]!);
       var hsluvFromHex = Hsluv.hexToHsluv(fieldName);
       var hpluvFromHex = Hsluv.hexToHpluv(fieldName);
 
-      assertTuplesClose(fieldName + "→" + "hexToRgb", field["rgb"], rgbFromHex);
-      assertTuplesClose(fieldName + "→" + "rgbToXyz", field["xyz"], xyzFromRgb);
-      assertTuplesClose(fieldName + "→" + "xyzToLuv", field["luv"], luvFromXyz);
-      assertTuplesClose(fieldName + "→" + "luvToLch", field["lch"], lchFromLuv);
+      assertTuplesClose(fieldName + "→" + "hexToRgb", field["rgb"]!, rgbFromHex);
+      assertTuplesClose(fieldName + "→" + "rgbToXyz", field["xyz"]!, xyzFromRgb);
+      assertTuplesClose(fieldName + "→" + "xyzToLuv", field["luv"]!, luvFromXyz);
+      assertTuplesClose(fieldName + "→" + "luvToLch", field["lch"]!, lchFromLuv);
       assertTuplesClose(
-          fieldName + "→" + "lchToHsluv", field["hsluv"], hsluvFromLch);
+          fieldName + "→" + "lchToHsluv", field["hsluv"]!, hsluvFromLch);
       assertTuplesClose(
-          fieldName + "→" + "lchToHpluv", field["hpluv"], hpluvFromLch);
+          fieldName + "→" + "lchToHpluv", field["hpluv"]!, hpluvFromLch);
       assertTuplesClose(
-          fieldName + "→" + "hexToHsluv", field["hsluv"], hsluvFromHex);
+          fieldName + "→" + "hexToHsluv", field["hsluv"]!, hsluvFromHex);
       assertTuplesClose(
-          fieldName + "→" + "hexToHpluv", field["hpluv"], hpluvFromHex);
+          fieldName + "→" + "hexToHpluv", field["hpluv"]!, hpluvFromHex);
 
       // backward functions
 
-      var lchFromHsluv = Hsluv.hsluvToLch(field["hsluv"]);
-      var lchFromHpluv = Hsluv.hpluvToLch(field["hpluv"]);
-      var luvFromLch = Hsluv.lchToLuv(field["lch"]);
-      var xyzFromLuv = Hsluv.luvToXyz(field["luv"]);
-      var rgbFromXyz = Hsluv.xyzToRgb(field["xyz"]);
-      var hexFromRgb = Hsluv.rgbToHex(field["rgb"]);
-      var hexFromHsluv = Hsluv.hsluvToHex(field["hsluv"]);
-      var hexFromHpluv = Hsluv.hpluvToHex(field["hpluv"]);
+      var lchFromHsluv = Hsluv.hsluvToLch(field["hsluv"]!);
+      var lchFromHpluv = Hsluv.hpluvToLch(field["hpluv"]!);
+      var luvFromLch = Hsluv.lchToLuv(field["lch"]!);
+      var xyzFromLuv = Hsluv.luvToXyz(field["luv"]!);
+      var rgbFromXyz = Hsluv.xyzToRgb(field["xyz"]!);
+      var hexFromRgb = Hsluv.rgbToHex(field["rgb"]!);
+      var hexFromHsluv = Hsluv.hsluvToHex(field["hsluv"]!);
+      var hexFromHpluv = Hsluv.hpluvToHex(field["hpluv"]!);
 
-      assertTuplesClose("hsluvToLch", field["lch"], lchFromHsluv);
-      assertTuplesClose("hpluvToLch", field["lch"], lchFromHpluv);
-      assertTuplesClose("lchToLuv", field["luv"], luvFromLch);
-      assertTuplesClose("luvToXyz", field["xyz"], xyzFromLuv);
-      assertTuplesClose("xyzToRgb", field["rgb"], rgbFromXyz);
+      assertTuplesClose("hsluvToLch", field["lch"]!, lchFromHsluv);
+      assertTuplesClose("hpluvToLch", field["lch"]!, lchFromHpluv);
+      assertTuplesClose("lchToLuv", field["luv"]!, luvFromLch);
+      assertTuplesClose("luvToXyz", field["xyz"]!, xyzFromLuv);
+      assertTuplesClose("xyzToRgb", field["rgb"]!, rgbFromXyz);
       // toLowerCase because some targets such as lua have hard time parsing hex code with various cases
       expect(fieldName, hexFromRgb.toLowerCase());
       expect(fieldName, hexFromHsluv.toLowerCase());

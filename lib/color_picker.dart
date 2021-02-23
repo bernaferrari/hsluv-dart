@@ -4,16 +4,17 @@ import 'geometry.dart';
 import 'hsluv.dart';
 
 class PickerGeometry {
-  PickerGeometry(
-      {this.lines,
-      this.vertices,
-      this.angles,
-      this.outerCircleRadius,
-      this.innerCircleRadius});
+  PickerGeometry({
+    required this.lines,
+    required this.vertices,
+    required this.angles,
+    required this.outerCircleRadius,
+    required this.innerCircleRadius,
+  });
 
   List<Line> lines;
 
-// Ordered such that 1st vertex is interection between first and
+// Ordered such that 1st vertex is interaction between first and
 // second line, 2nd vertex between second and third line etc.
   List<Point> vertices;
 
@@ -21,10 +22,10 @@ class PickerGeometry {
   List<double> angles;
 
 // Smallest circle with center at origin such that polygon fits inside
-  double outerCircleRadius;
+  double? outerCircleRadius;
 
 // Largest circle with center at origin such that it fits inside polygon
-  double innerCircleRadius;
+  double? innerCircleRadius;
 }
 
 class ColorPicker {
@@ -35,8 +36,8 @@ class ColorPicker {
     var outerCircleRadius = 0.0;
 
 // Find the line closest to origin
-    int closestIndex2;
-    double closestLineDistance;
+    int? closestIndex2;
+    double? closestLineDistance;
 
     for (int i = 0; i < numLines; i += 1) {
       var d = Geometry.distanceLineFromOrigin(lines[i]);
@@ -46,7 +47,7 @@ class ColorPicker {
       }
     }
 
-    var closestLine = lines[closestIndex2];
+    var closestLine = lines[closestIndex2!];
     var perpendicularLine =
         Line(slope: 0 - (1 / closestLine.slope), intercept: 0.0);
     var intersectionPoint =
@@ -79,15 +80,15 @@ class ColorPicker {
       }
     });
 
-    var orderedLines = [];
-    var orderedVertices = [];
-    var orderedAngles = [];
+    final List<Line> orderedLines = [];
+    final List<Point> orderedVertices = [];
+    final List<double> orderedAngles = [];
 
     var nextIndex2;
     var currentIntersection;
     var intersectionPointDistance;
 
-    var currentIndex2 = closestIndex2;
+    int? currentIndex2 = closestIndex2;
     var d = [];
 
     for (int j = 0; j < intersections.length; j += 1) {
@@ -115,11 +116,12 @@ class ColorPicker {
     }
 
     return PickerGeometry(
-        lines: orderedLines,
-        vertices: orderedVertices,
-        angles: orderedAngles,
-        outerCircleRadius: outerCircleRadius,
-        innerCircleRadius: closestLineDistance);
+      lines: orderedLines,
+      vertices: orderedVertices,
+      angles: orderedAngles,
+      outerCircleRadius: outerCircleRadius,
+      innerCircleRadius: closestLineDistance,
+    );
   }
 
   static Point closestPoint(PickerGeometry geometry, Point point) {
@@ -141,7 +143,7 @@ class ColorPicker {
     var index2 = (index1 - 1 + numVertices) % numVertices;
     var closestLine = geometry.lines[index2];
 
-// Provided point is within the polygon
+    // Provided point is within the polygon
     if (Geometry.distanceFromOrigin(point) <
         Geometry.lengthOfRayUntilIntersect(angle, closestLine)) {
       return point;

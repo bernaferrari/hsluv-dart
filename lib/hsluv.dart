@@ -120,7 +120,7 @@ class Hsluv {
 
   static double toLinear(double c) {
     if (c > 0.04045) {
-      return math.pow((c + 0.055) / (1 + 0.055), 2.4);
+      return math.pow((c + 0.055) / (1 + 0.055), 2.4) as double;
     } else {
       return c / 12.92;
     }
