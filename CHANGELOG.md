@@ -1,3 +1,6 @@
+## [1.1.2]
+* Remove not null assert, which is not necessary anymore.
+
 ## [1.1.1]
 * Minor fixes related to null safety.
 

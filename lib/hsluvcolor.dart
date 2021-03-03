@@ -9,10 +9,7 @@ class HSLuvColor {
   /// All the arguments must not be null and be in their respective ranges. See
   /// the fields for each parameter for a description of their ranges.
   const HSLuvColor.fromHSL(this.hue, this.saturation, this.lightness)
-      : assert(hue != null),
-        assert(saturation != null),
-        assert(lightness != null),
-        assert(hue >= 0.0),
+      : assert(hue >= 0.0),
         assert(hue <= 360.0),
         assert(saturation >= 0.0),
         assert(saturation <= 100.0),
