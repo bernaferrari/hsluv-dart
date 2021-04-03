@@ -22,8 +22,8 @@ class SliderColorBloc extends Bloc<SliderColorEvent, SliderColorState> {
 
   @override
   Stream<SliderColorState> mapEventToState(
-      SliderColorEvent event,
-      ) async* {
+    SliderColorEvent event,
+  ) async* {
     if (event is MoveRGB) {
       yield* _mapRGB(event);
     }

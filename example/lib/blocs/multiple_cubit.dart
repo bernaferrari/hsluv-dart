@@ -17,7 +17,7 @@ class MultipleContrastCompareCubit extends Cubit<MultipleColorCompareState> {
       hsluvColors: _colorsCubit.state.hsluvColors,
     );
 
-    _mdcSubscription = _colorsCubit.listen((stateValue) async {
+    _mdcSubscription = _colorsCubit.stream.listen((stateValue) async {
       set(
         rgbColors: stateValue.rgbColors,
         hsluvColors: stateValue.hsluvColors,
@@ -25,7 +25,7 @@ class MultipleContrastCompareCubit extends Cubit<MultipleColorCompareState> {
     });
   }
 
-  StreamSubscription _mdcSubscription;
+  late StreamSubscription _mdcSubscription;
 
   @override
   Future<void> close() {
@@ -40,10 +40,9 @@ class MultipleContrastCompareCubit extends Cubit<MultipleColorCompareState> {
       );
 
   void set({
-    Map<int, Color> rgbColors,
-    Map<int, HSLuvColor> hsluvColors,
-    Map locked,
-    int selectedKey,
+    required Map<int, Color> rgbColors,
+    required Map<int, HSLuvColor> hsluvColors,
+    int? selectedKey,
   }) {
     final colorsCompared = <int, ColorCompareContrast>{};
     final _selectedKey = selectedKey ?? state.selectedKey;
@@ -51,8 +50,8 @@ class MultipleContrastCompareCubit extends Cubit<MultipleColorCompareState> {
     for (var key in rgbColors.keys) {
       if (key == _selectedKey) {
         colorsCompared[key] = ColorCompareContrast.withoutRange(
-          rgbColor: rgbColors[key],
-          hsluvColor: hsluvColors[key],
+          rgbColor: rgbColors[key]!,
+          hsluvColor: hsluvColors[key]!,
           index: key,
         );
         continue;
@@ -60,7 +59,7 @@ class MultipleContrastCompareCubit extends Cubit<MultipleColorCompareState> {
 
       final colorsRange = <RgbHSLuvTupleWithContrast>[];
       for (var i = -10; i < 15; i += 5) {
-        final luv = hsluvColors[key];
+        final luv = hsluvColors[key]!;
 
         // if lightness becomes 0 or 100 the hue value might be lost
         // because app is always converting HSLuv to RGB and vice-versa.
@@ -71,17 +70,17 @@ class MultipleContrastCompareCubit extends Cubit<MultipleColorCompareState> {
           RgbHSLuvTupleWithContrast(
             rgbColor: updatedLuv.toColor(),
             hsluvColor: updatedLuv,
-            againstColor: rgbColors[_selectedKey],
+            againstColor: rgbColors[_selectedKey]!,
           ),
         );
       }
 
       colorsCompared[key] = ColorCompareContrast(
-        rgbColor: rgbColors[key],
-        hsluvColor: hsluvColors[key],
+        rgbColor: rgbColors[key]!,
+        hsluvColor: hsluvColors[key]!,
         index: key,
         colorsRange: colorsRange,
-        againstColor: rgbColors[_selectedKey],
+        againstColor: rgbColors[_selectedKey]!,
       );
     }
 
@@ -115,23 +114,23 @@ class MultipleColorCompareState extends Equatable {
       'MultipleColorCompareState($selectedKey, $colorsCompared)';
 
   @override
-  List<Object> get props =>
+  List<Object?> get props =>
       [selectedKey, colorsCompared, originalRgb, originalHsluv];
 }
 
 class ColorCompareContrast extends Equatable {
   ColorCompareContrast({
-    @required this.rgbColor,
-    @required this.hsluvColor,
-    @required this.index,
-    @required this.colorsRange,
-    @required Color againstColor,
+    required Color this.rgbColor,
+    required this.hsluvColor,
+    required this.index,
+    required this.colorsRange,
+    required Color againstColor,
   }) : contrast = calculateContrast(rgbColor, againstColor);
 
   const ColorCompareContrast.withoutRange({
-    @required this.rgbColor,
-    @required this.hsluvColor,
-    @required this.index,
+    required this.rgbColor,
+    required this.hsluvColor,
+    required this.index,
     this.colorsRange = const [],
     this.contrast = 0,
   });
@@ -146,18 +145,20 @@ class ColorCompareContrast extends Equatable {
   String toString() => 'ColorCompareContrast($index: $rgbColor)';
 
   @override
-  List<Object> get props => [rgbColor, index, contrast, colorsRange];
+  List<Object?> get props => [rgbColor, index, contrast, colorsRange];
 }
 
 class RgbHSLuvTupleWithContrast extends Equatable {
-  RgbHSLuvTupleWithContrast(
-      {this.rgbColor, this.hsluvColor, Color againstColor})
-      : contrast = calculateContrast(rgbColor, againstColor);
+  RgbHSLuvTupleWithContrast({
+    required this.rgbColor,
+    required this.hsluvColor,
+    required Color againstColor,
+  }) : contrast = calculateContrast(rgbColor, againstColor);
 
   final Color rgbColor;
   final HSLuvColor hsluvColor;
   final double contrast;
 
   @override
-  List<Object> get props => [rgbColor, hsluvColor, contrast];
+  List<Object?> get props => [rgbColor, hsluvColor, contrast];
 }

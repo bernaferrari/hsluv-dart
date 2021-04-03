@@ -6,7 +6,7 @@ import '../util/hsinter_tiny.dart';
 import 'vertical_picker_main.dart';
 
 class HSVSelector extends StatelessWidget {
-  const HSVSelector({this.color, this.moreColors = false});
+  const HSVSelector({required this.color, this.moreColors = false});
 
   // initial color
   final Color color;

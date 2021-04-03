@@ -9,14 +9,14 @@ import '../util/constants.dart';
 class TextFormColored extends StatelessWidget {
   const TextFormColored({this.controller, this.radius});
 
-  final double radius;
-  final TextEditingController controller;
+  final double? radius;
+  final TextEditingController? controller;
 
   @override
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.only(
-      topLeft: Radius.circular(radius),
-      topRight: Radius.circular(radius),
+      topLeft: Radius.circular(radius!),
+      topRight: Radius.circular(radius!),
     );
 
     return TextFormField(
@@ -49,7 +49,7 @@ class TextFormColored extends StatelessWidget {
           child: Icon(FeatherIcons.hash, size: 16),
         ),
       ),
-      style: Theme.of(context).textTheme.headline6.copyWith(
+      style: Theme.of(context).textTheme.headline6!.copyWith(
             color: Theme.of(context).colorScheme.onBackground,
           ),
     );

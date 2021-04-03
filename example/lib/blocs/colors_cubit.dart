@@ -10,9 +10,9 @@ import 'blocs.dart';
 
 class ColorsState extends Equatable {
   const ColorsState({
-    @required this.rgbColors,
-    @required this.hsluvColors,
-    @required this.selected,
+    required this.rgbColors,
+    required this.hsluvColors,
+    required this.selected,
   });
 
   final Map<int, Color> rgbColors;
@@ -30,10 +30,10 @@ class ColorsState extends Equatable {
       ];
 
   ColorsState copyWith({
-    Map<int, Color> rgbColors,
-    Map<int, HSLuvColor> hsluvColors,
-    int selected,
-    int blindnessSelected,
+    Map<int, Color>? rgbColors,
+    Map<int, HSLuvColor>? hsluvColors,
+    int? selected,
+    int? blindnessSelected,
   }) {
     return ColorsState(
       rgbColors: rgbColors ?? this.rgbColors,
@@ -45,9 +45,9 @@ class ColorsState extends Equatable {
 
 class ColorsCubit extends Cubit<ColorsState> {
   ColorsCubit(SliderColorBloc _sliderColorBloc, ColorsState initialState)
-      : assert(_sliderColorBloc != null),
-        super(initialState) {
-    _sliderColorBlocSubscription = _sliderColorBloc.listen((stateValue) async {
+      : super(initialState) {
+    _sliderColorBlocSubscription =
+        _sliderColorBloc.stream.listen((stateValue) async {
       if (stateValue is SliderColorLoaded) {
         updateColor(
           rgbColor: stateValue.rgbColor,
@@ -57,7 +57,7 @@ class ColorsCubit extends Cubit<ColorsState> {
     });
   }
 
-  StreamSubscription _sliderColorBlocSubscription;
+  late StreamSubscription _sliderColorBlocSubscription;
 
   @override
   Future<void> close() {
@@ -81,9 +81,9 @@ class ColorsCubit extends Cubit<ColorsState> {
   }
 
   void updateColor({
-    int selected,
-    Color rgbColor,
-    HSLuvColor hsLuvColor,
+    int? selected,
+    Color? rgbColor,
+    HSLuvColor? hsLuvColor,
   }) {
     assert(rgbColor != null || hsLuvColor != null);
 
@@ -99,7 +99,7 @@ class ColorsCubit extends Cubit<ColorsState> {
       allLuv[_selected] = HSLuvColor.fromColor(rgbColor);
       allRgb[_selected] = rgbColor;
     } else {
-      allLuv[_selected] = hsLuvColor;
+      allLuv[_selected] = hsLuvColor!;
       allRgb[_selected] = hsLuvColor.toColor();
     }
 
@@ -112,7 +112,7 @@ class ColorsCubit extends Cubit<ColorsState> {
     );
   }
 
-  void updateRgbColor({int selected, @required Color rgbColor}) {
+  void updateRgbColor({int? selected, required Color rgbColor}) {
     final _selected = selected ?? state.selected;
 
     final allRgb = Map<int, Color>.from(state.rgbColors);
@@ -130,7 +130,7 @@ class ColorsCubit extends Cubit<ColorsState> {
   void updateSelected(int selection) =>
       emit(state.copyWith(selected: selection));
 
-  void updateAllColors({@required List<Color> colors}) {
+  void updateAllColors({required List<Color> colors}) {
     final colorsMap = <int, Color>{};
     for (int i = 0; i < colors.length; i++) {
       colorsMap[i] = colors[i];
@@ -144,13 +144,11 @@ class ColorsCubit extends Cubit<ColorsState> {
     );
   }
 
-  static Map<int, HSLuvColor> _convertToHSLuv(
-    Map<int, Color> updatableMap,
-  ) {
+  static Map<int, HSLuvColor> _convertToHSLuv(Map<int, Color> updatableMap) {
     final luvMap = <int, HSLuvColor>{};
 
     for (var key in updatableMap.keys) {
-      luvMap[key] = HSLuvColor.fromColor(updatableMap[key]);
+      luvMap[key] = HSLuvColor.fromColor(updatableMap[key]!);
     }
 
     return luvMap;

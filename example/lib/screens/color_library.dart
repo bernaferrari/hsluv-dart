@@ -10,7 +10,7 @@ import '../util/selected.dart';
 import '../widgets/update_color_dialog.dart';
 
 class ColorLibrary extends StatefulWidget {
-  const ColorLibrary({this.color});
+  const ColorLibrary({required this.color});
 
   final Color color;
 
@@ -122,7 +122,7 @@ class _ColorLibraryState extends State<ColorLibrary> {
 //                                }),
                                     style: Theme.of(context)
                                         .textTheme
-                                        .caption
+                                        .caption!
                                         .copyWith(
                                           fontFamily: "B612Mono",
                                           color: contrastingColor(colorsList[i])

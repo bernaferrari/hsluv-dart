@@ -22,7 +22,7 @@ import 'multi_row_color_picker.dart';
 import 'single_row_contrast_color_picker.dart';
 
 class ColorsCompareScreen extends StatelessWidget {
-  const ColorsCompareScreen({Key key}) : super(key: key);
+  const ColorsCompareScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class ColorsCompareScreen extends StatelessWidget {
         return const Scaffold(body: LoadingIndicator());
       }
 
-      final selectedColor = state.colorsCompared[state.selectedKey];
+      final selectedColor = state.colorsCompared[state.selectedKey]!;
 
       ColorScheme colorScheme;
       if (selectedColor.rgbColor.computeLuminance() > kLumContrast) {
@@ -73,7 +73,7 @@ class ColorsCompareScreen extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Material(
-                  color: state.colorsCompared[currentKey].rgbColor,
+                  color: state.colorsCompared[currentKey]!.rgbColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -151,7 +151,7 @@ class ColorsCompareScreen extends StatelessWidget {
 class _ComparisonPart extends StatelessWidget {
   const _ComparisonPart(this.otherColor, this.contrast);
 
-  final Color otherColor;
+  final Color? otherColor;
   final double contrast;
 
   @override
@@ -229,10 +229,10 @@ class _ComparisonPart extends StatelessWidget {
 
 class CompactPicker extends StatelessWidget {
   const CompactPicker({
-    @required this.colorsCompared,
-    @required this.selectedKey,
-    @required this.currentKey,
-    Key key,
+    required this.colorsCompared,
+    required this.selectedKey,
+    required this.currentKey,
+    Key? key,
   }) : super(key: key);
 
   final Map<int, ColorCompareContrast> colorsCompared;
@@ -242,7 +242,7 @@ class CompactPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print(
-        "currentKey $currentKey | selected $selectedKey ${colorsCompared[currentKey].contrast}");
+        "currentKey $currentKey | selected $selectedKey ${colorsCompared[currentKey]!.contrast}");
 
     return AnimatedSwitcher(
       duration: Duration(milliseconds: 500),
@@ -252,13 +252,13 @@ class CompactPicker extends StatelessWidget {
       },
       child: Container(
         padding: const EdgeInsets.only(top: 12, bottom: 16),
-        color: colorsCompared[currentKey].rgbColor,
+        color: colorsCompared[currentKey]!.rgbColor,
         child: Column(
           children: <Widget>[
             RichText(
               text: TextSpan(
                 style: TextStyle(
-                  color: colorsCompared[selectedKey].rgbColor,
+                  color: colorsCompared[selectedKey]!.rgbColor,
                   fontWeight: FontWeight.w200,
                   fontSize: 18,
                 ),
@@ -275,21 +275,21 @@ class CompactPicker extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             _TopSection(
-              rgbColor: colorsCompared[currentKey].rgbColor,
-              hsluvColor: colorsCompared[currentKey].hsluvColor,
-              colorFromSelected: colorsCompared[selectedKey].rgbColor,
-              contrast: colorsCompared[currentKey].contrast,
+              rgbColor: colorsCompared[currentKey]!.rgbColor,
+              hsluvColor: colorsCompared[currentKey]!.hsluvColor,
+              colorFromSelected: colorsCompared[selectedKey]!.rgbColor,
+              contrast: colorsCompared[currentKey]!.contrast,
               isSelected: currentKey == selectedKey,
               currentKey: currentKey,
             ),
             SingleRowContrastColorPicker(
-              colorsRange: colorsCompared[currentKey].colorsRange,
+              colorsRange: colorsCompared[currentKey]!.colorsRange,
               currentKey: currentKey,
             ),
             const SizedBox(height: 16),
             _ComparisonPart(
-              colorsCompared[selectedKey].rgbColor,
-              colorsCompared[currentKey].contrast,
+              colorsCompared[selectedKey]!.rgbColor,
+              colorsCompared[currentKey]!.contrast,
             ),
           ],
         ),
@@ -300,10 +300,10 @@ class CompactPicker extends StatelessWidget {
 
 class ExpandedPicker extends StatelessWidget {
   const ExpandedPicker({
-    @required this.colorsMap,
-    @required this.selectedKey,
-    @required this.currentKey,
-    Key key,
+    required this.colorsMap,
+    required this.selectedKey,
+    required this.currentKey,
+    Key? key,
   }) : super(key: key);
 
   final Map<int, ColorCompareContrast> colorsMap;
@@ -328,10 +328,10 @@ class ExpandedPicker extends StatelessWidget {
             ),
             SizedBox(width: 16),
             _TopSection(
-              rgbColor: colorsMap[currentKey].rgbColor,
-              hsluvColor: colorsMap[currentKey].hsluvColor,
-              colorFromSelected: colorsMap[selectedKey].rgbColor,
-              contrast: colorsMap[selectedKey].contrast,
+              rgbColor: colorsMap[currentKey]!.rgbColor,
+              hsluvColor: colorsMap[currentKey]!.hsluvColor,
+              colorFromSelected: colorsMap[selectedKey]!.rgbColor,
+              contrast: colorsMap[selectedKey]!.contrast,
               isSelected: selectedKey == currentKey,
               currentKey: currentKey,
             ),
@@ -342,8 +342,8 @@ class ExpandedPicker extends StatelessWidget {
           selected: selectedKey,
           moreColors: false,
           colorsTuple: RgbHSLuvTuple(
-            colorsMap[selectedKey].rgbColor,
-            colorsMap[selectedKey].hsluvColor,
+            colorsMap[selectedKey]!.rgbColor,
+            colorsMap[selectedKey]!.hsluvColor,
           ),
         ),
       ],
@@ -353,12 +353,12 @@ class ExpandedPicker extends StatelessWidget {
 
 class _TopSection extends StatelessWidget {
   const _TopSection({
-    @required this.rgbColor,
-    @required this.hsluvColor,
-    @required this.colorFromSelected,
-    @required this.contrast,
-    @required this.isSelected,
-    @required this.currentKey,
+    required this.rgbColor,
+    required this.hsluvColor,
+    required this.colorFromSelected,
+    required this.contrast,
+    required this.isSelected,
+    required this.currentKey,
   });
 
   final Color colorFromSelected;
@@ -395,11 +395,11 @@ class _TopSection extends StatelessWidget {
 
 class _ContrastWithLetters extends StatelessWidget {
   const _ContrastWithLetters({
-    @required this.colorFromSelected,
-    @required this.contrast,
+    required this.colorFromSelected,
+    required this.contrast,
   });
 
-  final Color colorFromSelected;
+  final Color? colorFromSelected;
   final double contrast;
 
   @override
@@ -440,11 +440,11 @@ class _ContrastWithLetters extends StatelessWidget {
 
 class _TopSectionButtons extends StatelessWidget {
   const _TopSectionButtons({
-    @required this.rgbColor,
-    @required this.hsluvColor,
-    @required this.colorFromSelected,
-    @required this.isSelected,
-    @required this.currentType,
+    required this.rgbColor,
+    required this.hsluvColor,
+    required this.colorFromSelected,
+    required this.isSelected,
+    required this.currentType,
   });
 
   final Color rgbColor;

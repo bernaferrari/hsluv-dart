@@ -11,20 +11,20 @@ extension on int {
 
 class SingleSlider extends StatelessWidget {
   const SingleSlider(
-      this.title,
-      this.value,
-      this.strValue,
-      this.colorList, {
-        this.scale,
-        this.onChanged,
-      });
+    this.title,
+    this.value,
+    this.strValue,
+    this.colorList, {
+    this.scale,
+    this.onChanged,
+  });
 
   final String title;
   final double value;
   final String strValue;
-  final int scale;
-  final List<Color> colorList;
-  final ValueChanged<double> onChanged;
+  final int? scale;
+  final List<Color>? colorList;
+  final ValueChanged<double>? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +49,7 @@ class SingleSlider extends StatelessWidget {
           child: IconButton(
             icon: Icon(FeatherIcons.minus, size: 20),
             onPressed: () {
-              onChanged(math.max(value - 1 / scale, 0));
+              onChanged!(math.max(value - 1 / scale!, 0));
             },
           ),
         ),
@@ -60,7 +60,7 @@ class SingleSlider extends StatelessWidget {
           child: IconButton(
             icon: Icon(FeatherIcons.plus, size: 20),
             onPressed: () {
-              onChanged(math.min(value + 1 / scale, 1));
+              onChanged!(math.min(value + 1 / scale!, 1));
             },
           ),
         ),
@@ -74,36 +74,29 @@ class _GradientRoundedRectSliderTrackShape extends SliderTrackShape
   /// Create a slider track that draws two rectangles with rounded outer edges.
   const _GradientRoundedRectSliderTrackShape(this.colors);
 
-  final List<Color> colors;
+  final List<Color>? colors;
 
   @override
   void paint(
-      PaintingContext context,
-      Offset offset, {
-        @required RenderBox parentBox,
-        @required SliderThemeData sliderTheme,
-        @required Animation<double> enableAnimation,
-        @required TextDirection textDirection,
-        @required Offset thumbCenter,
-        bool isDiscrete = false,
-        bool isEnabled = false,
-      }) {
-    assert(context != null);
-    assert(offset != null);
-    assert(parentBox != null);
-    assert(sliderTheme != null);
+    PaintingContext context,
+    Offset offset, {
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required Animation<double> enableAnimation,
+    required TextDirection textDirection,
+    required Offset thumbCenter,
+    bool isDiscrete = false,
+    bool isEnabled = false,
+  }) {
     assert(sliderTheme.disabledActiveTrackColor != null);
     assert(sliderTheme.disabledInactiveTrackColor != null);
     assert(sliderTheme.activeTrackColor != null);
     assert(sliderTheme.inactiveTrackColor != null);
     assert(sliderTheme.thumbShape != null);
-    assert(enableAnimation != null);
-    assert(textDirection != null);
-    assert(thumbCenter != null);
     // If the slider track height is less than or equal to 0, then it makes no
     // difference whether the track is painted or not, therefore the painting
     // can be a no-op.
-    if (sliderTheme.trackHeight <= 0) {
+    if (sliderTheme.trackHeight! <= 0) {
       return;
     }
 
@@ -111,7 +104,7 @@ class _GradientRoundedRectSliderTrackShape extends SliderTrackShape
     // trailing: inactive.
     final gradient = LinearGradient(
       tileMode: TileMode.clamp,
-      colors: colors,
+      colors: colors!,
     );
 
     final trackRect = getPreferredRect(
@@ -164,7 +157,7 @@ class _RoundSliderThumbShape2 extends SliderComponentShape {
     this.strValue,
   });
 
-  final String strValue;
+  final String? strValue;
 
   /// The preferred radius of the round thumb shape when the slider is enabled.
   ///
@@ -175,7 +168,7 @@ class _RoundSliderThumbShape2 extends SliderComponentShape {
   ///
   /// If no disabledRadius is provided, then it is equal to the
   /// [enabledThumbRadius]
-  final double disabledThumbRadius;
+  final double? disabledThumbRadius;
 
   double get _disabledThumbRadius => disabledThumbRadius ?? enabledThumbRadius;
 
@@ -187,23 +180,19 @@ class _RoundSliderThumbShape2 extends SliderComponentShape {
 
   @override
   void paint(
-      PaintingContext context,
-      Offset center, {
-        Animation<double> activationAnimation,
-        @required Animation<double> enableAnimation,
-        bool isDiscrete,
-        TextPainter labelPainter,
-        RenderBox parentBox,
-        @required SliderThemeData sliderTheme,
-        TextDirection textDirection,
-        double value,
-        double textScaleFactor,
-        Size sizeWithOverflow,
-      }) {
-    assert(context != null);
-    assert(center != null);
-    assert(enableAnimation != null);
-    assert(sliderTheme != null);
+    PaintingContext context,
+    Offset center, {
+    Animation<double>? activationAnimation,
+    required Animation<double> enableAnimation,
+    bool? isDiscrete,
+    TextPainter? labelPainter,
+    RenderBox? parentBox,
+    required SliderThemeData sliderTheme,
+    TextDirection? textDirection,
+    double? value,
+    double? textScaleFactor,
+    Size? sizeWithOverflow,
+  }) {
     assert(sliderTheme.disabledThumbColor != null);
     assert(sliderTheme.thumbColor != null);
 
@@ -219,7 +208,7 @@ class _RoundSliderThumbShape2 extends SliderComponentShape {
     canvas.drawCircle(
       center,
       radiusTween.evaluate(enableAnimation),
-      Paint()..color = colorTween.evaluate(enableAnimation),
+      Paint()..color = colorTween.evaluate(enableAnimation)!,
     );
 
     final textStyle =

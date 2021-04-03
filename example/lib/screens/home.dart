@@ -15,7 +15,7 @@ import 'multiple_sliders.dart';
 import 'single_color_blindness.dart';
 
 class Home extends StatefulWidget {
-  const Home({this.initialColor});
+  const Home({required this.initialColor});
 
   final Color initialColor;
 
@@ -35,13 +35,12 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ColorsCubit, ColorsState>(builder: (_, state) {
-      final rgbColor = state.rgbColors[state.selected];
-      final hsluvColor = state.hsluvColors[state.selected];
+      final rgbColor = state.rgbColors[state.selected]!;
+      final hsluvColor = state.hsluvColors[state.selected]!;
 
-      final contrastedColor =
-          (state.hsluvColors[state.selected].lightness > kLightnessThreshold)
-              ? Colors.black
-              : Colors.white;
+      final contrastedColor = (hsluvColor.lightness > kLightnessThreshold)
+          ? Colors.black
+          : Colors.white;
 
       final surfaceColor = blendColorWithBackground(rgbColor);
 
@@ -83,7 +82,9 @@ class _HomeState extends State<Home> {
                       children: [
                         const MultipleSliders(),
                         HSVerticalPicker(
-                            color: rgbColor, hsLuvColor: hsluvColor),
+                          color: rgbColor,
+                          hsLuvColor: hsluvColor,
+                        ),
                         const SingleColorBlindness(),
                         const About(),
                         ColorLibrary(color: rgbColor),
@@ -180,9 +181,9 @@ class ThemeBar extends StatelessWidget {
                     child: RawMaterialButton(
                       onPressed: () => context
                           .read<ColorsCubit>()
-                          .updateRgbColor(rgbColor: list[i], selected: i),
+                          .updateRgbColor(rgbColor: list[i]!, selected: i),
                       onLongPress: () {
-                        showSlidersDialog(context, list[i], i);
+                        showSlidersDialog(context, list[i]!, i);
                       },
                       fillColor: list[i],
                       shape: CircleBorder(
@@ -198,7 +199,7 @@ class ThemeBar extends StatelessWidget {
                           ? Icon(
                               FeatherIcons.check,
                               size: 16,
-                              color: contrastingColor(list[i]),
+                              color: contrastingColor(list[i]!),
                             )
                           : null,
                       elevation: 0.0,

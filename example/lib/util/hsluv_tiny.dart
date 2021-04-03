@@ -14,8 +14,12 @@ extension on List<double> {
   }
 }
 
-List<HSLuvColor> hsluvTones(HSLuvColor hsluv,
-    [int size, double start = 5.0, double stop = 100.0]) {
+List<HSLuvColor> hsluvTones(
+  HSLuvColor hsluv,
+  int size, [
+  double start = 5.0,
+  double stop = 100.0,
+]) {
   final step = (stop - start) / (size - 1);
 
   return [
@@ -25,8 +29,12 @@ List<HSLuvColor> hsluvTones(HSLuvColor hsluv,
   ];
 }
 
-List<HSLuvColor> hsluvLightness(HSLuvColor hsluv,
-    [int size, double start = 5.0, double stop = 95.0]) {
+List<HSLuvColor> hsluvLightness(
+  HSLuvColor hsluv,
+  int size, [
+  double start = 5.0,
+  double stop = 95.0,
+]) {
   final step = (stop - start) / (size - 1);
 
   return [

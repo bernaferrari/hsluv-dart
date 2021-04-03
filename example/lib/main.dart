@@ -35,15 +35,15 @@ class BoxedApp extends StatefulWidget {
 }
 
 class _BoxedAppState extends State<BoxedApp> {
-  SliderColorBloc _sliderColorBloc;
-  ColorsCubit _colorsCubit;
+  late SliderColorBloc _sliderColorBloc;
+  late ColorsCubit _colorsCubit;
 
   @override
   void initState() {
     super.initState();
 
     _sliderColorBloc = SliderColorBloc()
-      ..add(MoveColor(Colors.orange[200], true));
+      ..add(MoveColor(Colors.orange[200]!, true));
     _colorsCubit = ColorsCubit(
       _sliderColorBloc,
       ColorsCubit.initialState(getShuffledColors()),
@@ -75,7 +75,7 @@ class _BoxedAppState extends State<BoxedApp> {
         title: 'HSLuv Sample',
         routes: {
           "/": (context) {
-            return Home(initialColor: Colors.orange[200]);
+            return Home(initialColor: Colors.orange[200]!);
           },
           "compare": (context) {
             return BlocProvider<MultipleContrastCompareCubit>(

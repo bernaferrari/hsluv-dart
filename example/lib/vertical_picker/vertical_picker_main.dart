@@ -29,8 +29,8 @@ const lightStr = "Lightness";
 
 class HSVerticalPicker extends StatefulWidget {
   const HSVerticalPicker({
-    @required this.color,
-    @required this.hsLuvColor,
+    required this.color,
+    required this.hsLuvColor,
   });
 
   final Color color;
@@ -41,21 +41,25 @@ class HSVerticalPicker extends StatefulWidget {
 }
 
 class _HSVerticalPickerState extends State<HSVerticalPicker> {
-  int currentSegment;
+  late int currentSegment;
 
   @override
   void initState() {
-    currentSegment = PageStorage.of(context).readState(context,
+    currentSegment = PageStorage.of(context)?.readState(context,
             identifier: const ValueKey("verticalSelected")) ??
         0;
 
     super.initState();
   }
 
-  void onValueChanged(int newValue) {
+  void onValueChanged(int? newValue) {
+    if (newValue == null) {
+      return;
+    }
+
     setState(() {
       currentSegment = newValue;
-      PageStorage.of(context).writeState(
+      PageStorage.of(context)?.writeState(
         context,
         currentSegment,
         identifier: const ValueKey("verticalSelected"),
@@ -161,15 +165,15 @@ class _HSVerticalPickerState extends State<HSVerticalPicker> {
 
 class HSGenericScreen extends StatefulWidget {
   const HSGenericScreen({
-    this.color,
-    this.kind,
-    this.fetchHue,
-    this.fetchSat,
-    this.fetchLight,
-    this.hueTitle,
-    this.satTitle,
-    this.lightTitle,
-    this.toneSize,
+    required this.color,
+    required this.kind,
+    required this.fetchHue,
+    required this.fetchSat,
+    required this.fetchLight,
+    required this.hueTitle,
+    required this.satTitle,
+    required this.lightTitle,
+    required this.toneSize,
   });
 
   final HSInterColor color;
@@ -197,7 +201,7 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
   @override
   void initState() {
     super.initState();
-    expanded = PageStorage.of(context).readState(context,
+    expanded = PageStorage.of(context)?.readState(context,
             identifier: const ValueKey<String>("VerticalSelector")) ??
         0;
   }
@@ -209,7 +213,7 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
   void modifyAndSaveExpanded(int updatedValue) {
     setState(() {
       expanded = updatedValue;
-      PageStorage.of(context).writeState(context, expanded,
+      PageStorage.of(context)?.writeState(context, expanded,
           identifier: const ValueKey<String>("VerticalSelector"));
     });
   }

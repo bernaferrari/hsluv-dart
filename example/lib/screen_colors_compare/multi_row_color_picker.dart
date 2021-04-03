@@ -18,8 +18,8 @@ import '../util/when.dart';
 class MultiRowColorPicker extends StatelessWidget {
   const MultiRowColorPicker({
     this.moreColors = false,
-    this.selected,
-    this.colorsTuple,
+    required this.selected,
+    required this.colorsTuple,
   });
 
   // maximum number of items
@@ -55,12 +55,12 @@ class MultiRowColorPicker extends StatelessWidget {
 
 class _MultiRowColorPicker extends StatelessWidget {
   const _MultiRowColorPicker({
-    this.fetchHue,
-    this.fetchSat,
-    this.fetchLight,
-    this.toneSize,
-    this.selected,
-    this.colorsTuple,
+    required this.fetchHue,
+    required this.fetchSat,
+    required this.fetchLight,
+    required this.toneSize,
+    required this.selected,
+    required this.colorsTuple,
   });
 
   final int selected;
@@ -200,11 +200,11 @@ class _MultiRowColorPicker extends StatelessWidget {
 
 class _HorizontalColorListExpanded extends StatelessWidget {
   const _HorizontalColorListExpanded({
-    @required this.category,
-    @required this.listSize,
-    @required this.colorsList,
-    @required this.isInfinite,
-    @required this.onColorPressed,
+    required this.category,
+    required this.listSize,
+    required this.colorsList,
+    required this.isInfinite,
+    required this.onColorPressed,
   });
 
   final List<RgbHSLuvTuple> colorsList;
@@ -258,8 +258,8 @@ class _HorizontalColorListExpanded extends StatelessWidget {
 
 class _ContrastItemExpanded extends StatelessWidget {
   const _ContrastItemExpanded({
-    this.rgbHsluvTuple,
-    this.onPressed,
+    required this.rgbHsluvTuple,
+    required this.onPressed,
     this.category = "",
   });
 
@@ -292,7 +292,7 @@ class _ContrastItemExpanded extends StatelessWidget {
       onPressed: onPressed,
       child: Text(
         writtenValue,
-        style: Theme.of(context).textTheme.caption.copyWith(color: textColor),
+        style: Theme.of(context).textTheme.caption!.copyWith(color: textColor),
       ),
     );
   }

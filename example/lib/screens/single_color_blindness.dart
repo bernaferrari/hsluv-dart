@@ -19,7 +19,7 @@ class SingleColorBlindness extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ColorsCubit, ColorsState>(
       builder: (_, state) {
-        final color = state.rgbColors[state.selected];
+        final color = state.rgbColors[state.selected]!;
         final values = retrieveColorBlind(color);
 
         return Scaffold(
@@ -68,7 +68,7 @@ class SingleColorBlindness extends StatelessWidget {
                             final numOfItems = (builder.maxWidth / 280).floor();
                             return Wrap(
                               children: <Widget>[
-                                for (var value in values[key]) ...[
+                                for (var value in values[key]!) ...[
                                   SizedBox(
                                     width: builder.maxWidth / numOfItems,
                                     height: 80,
@@ -170,7 +170,7 @@ class _ColorBlindCard extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             blindColor.name[0],
-            style: Theme.of(context).textTheme.headline5.copyWith(
+            style: Theme.of(context).textTheme.headline5!.copyWith(
                   fontWeight: FontWeight.w700,
                   color: defaultColor,
                   fontSize: 48,
@@ -184,7 +184,7 @@ class _ColorBlindCard extends StatelessWidget {
               children: <Widget>[
                 Text(
                   blindColor.name,
-                  style: Theme.of(context).textTheme.headline6.copyWith(
+                  style: Theme.of(context).textTheme.headline6!.copyWith(
                         fontSize: 18,
                         color: contrastedColor,
                       ),
@@ -196,7 +196,7 @@ class _ColorBlindCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context)
                       .textTheme
-                      .caption
+                      .caption!
                       .copyWith(color: contrastedColor.withOpacity(0.87)),
                 ),
               ],

@@ -24,13 +24,13 @@ class MultipleSliders extends StatelessWidget {
           });
 
       final Widget hsl = HSLuvSlider(
-          color: (state as SliderColorLoaded).hsluvColor,
+          color: state.hsluvColor,
           onChanged: (h, s, l) {
             BlocProvider.of<SliderColorBloc>(context).add(MoveHSLuv(h, s, l));
           });
 
       final Widget hsv = HSVSlider(
-          color: (state as SliderColorLoaded).hsvColor,
+          color: state.hsvColor,
           onChanged: (h, s, v) {
             BlocProvider.of<SliderColorBloc>(context).add(MoveHSV(h, s, v));
           });
@@ -46,8 +46,7 @@ class MultipleSliders extends StatelessWidget {
               wrapInCard(context, hsl),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: ColorSearchButton(
-                    color: (state as SliderColorLoaded).rgbColor),
+                child: ColorSearchButton(color: state.rgbColor),
               ),
             ],
           ),

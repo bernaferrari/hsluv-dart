@@ -8,7 +8,8 @@ import 'package:hsluv/hsluvcolor.dart';
 import 'single_slider.dart';
 
 class HSLuvSlider extends StatefulWidget {
-  const HSLuvSlider({Key key, this.color, this.onChanged}) : super(key: key);
+  const HSLuvSlider({Key? key, required this.color, required this.onChanged})
+      : super(key: key);
 
   final Function(double, double, double) onChanged;
   final HSLuvColor color;
@@ -22,9 +23,9 @@ class _HSLuvSliderState extends State<HSLuvSlider> {
   double valueS = 0.0;
   double valueL = 0.0;
 
-  List<Color> colorH;
-  List<Color> colorS;
-  List<Color> colorL;
+  List<Color>? colorH;
+  List<Color>? colorS;
+  List<Color>? colorL;
 
   void updateColorLists() {
     final vh = valueH;
@@ -77,20 +78,20 @@ class _HSLuvSliderState extends State<HSLuvSlider> {
         }),
         SingleSlider("Saturation", valueS / 100, "${valueS.round()}", colorS,
             scale: 100, onChanged: (value) {
-              setState(() {
-                valueS = value * 100;
-                updateColorLists();
-                widget.onChanged(valueH, valueS, valueL);
-              });
-            }),
+          setState(() {
+            valueS = value * 100;
+            updateColorLists();
+            widget.onChanged(valueH, valueS, valueL);
+          });
+        }),
         SingleSlider("Lightness", valueL / 100, "${valueL.round()}", colorL,
             scale: 100, onChanged: (value) {
-              setState(() {
-                valueL = value * 100;
-                updateColorLists();
-                widget.onChanged(valueH, valueS, valueL);
-              });
-            }),
+          setState(() {
+            valueL = value * 100;
+            updateColorLists();
+            widget.onChanged(valueH, valueS, valueL);
+          });
+        }),
       ],
     );
   }

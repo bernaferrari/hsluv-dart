@@ -5,7 +5,11 @@ import 'package:flutter/rendering.dart';
 import 'single_slider.dart';
 
 class RGBSlider extends StatefulWidget {
-  const RGBSlider({Key key, this.color, this.onChanged}) : super(key: key);
+  const RGBSlider({
+    Key? key,
+    required this.color,
+    required this.onChanged,
+  }) : super(key: key);
 
   final Function(int, int, int) onChanged;
   final Color color;
@@ -23,9 +27,9 @@ class _RGBSliderState extends State<RGBSlider> {
   int valueBlue = 0;
   int valueGreen = 0;
 
-  List<Color> colorRed;
-  List<Color> colorGreen;
-  List<Color> colorBlue;
+  List<Color>? colorRed;
+  List<Color>? colorGreen;
+  List<Color>? colorBlue;
 
   void updateColorLists() {
     final vg = valueGreen.convertToHexString();
@@ -58,30 +62,30 @@ class _RGBSliderState extends State<RGBSlider> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        SingleSlider("Red", valueRed / 255, "$valueRed", colorRed,
-            scale: 255, onChanged: (value) {
-              setState(() {
-                valueRed = (value * 255).round();
-                updateColorLists();
-                widget.onChanged(valueRed, valueGreen, valueBlue);
-              });
-            }),
+        SingleSlider("Red", valueRed / 255, "$valueRed", colorRed, scale: 255,
+            onChanged: (value) {
+          setState(() {
+            valueRed = (value * 255).round();
+            updateColorLists();
+            widget.onChanged(valueRed, valueGreen, valueBlue);
+          });
+        }),
         SingleSlider("Green", valueGreen / 255, "$valueGreen", colorGreen,
             scale: 255, onChanged: (value) {
-              setState(() {
-                valueGreen = (value * 255).round();
-                updateColorLists();
-                widget.onChanged(valueRed, valueGreen, valueBlue);
-              });
-            }),
+          setState(() {
+            valueGreen = (value * 255).round();
+            updateColorLists();
+            widget.onChanged(valueRed, valueGreen, valueBlue);
+          });
+        }),
         SingleSlider("Blue", valueBlue / 255, "$valueBlue", colorBlue,
             scale: 255, onChanged: (value) {
-              setState(() {
-                valueBlue = (value * 255).round();
-                updateColorLists();
-                widget.onChanged(valueRed, valueGreen, valueBlue);
-              });
-            }),
+          setState(() {
+            valueBlue = (value * 255).round();
+            updateColorLists();
+            widget.onChanged(valueRed, valueGreen, valueBlue);
+          });
+        }),
       ],
     );
   }

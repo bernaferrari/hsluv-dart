@@ -7,7 +7,7 @@ import '../util/hsinter_tiny.dart';
 import 'vertical_picker_main.dart';
 
 class HSLuvSelector extends StatelessWidget {
-  const HSLuvSelector({this.color, this.moreColors = false});
+  const HSLuvSelector({required this.color, this.moreColors = false});
 
   // initial color
   final HSLuvColor color;

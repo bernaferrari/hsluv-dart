@@ -23,8 +23,12 @@ List<Color> hsvAlternatives(Color color, [int n = 6]) {
   return [for (; n > 0; n--) hsv.withHue((div * n) % 360.0).toColor()];
 }
 
-List<Color> hsvTones(Color color,
-    [int size, double start = 0.05, double stop = 1.0]) {
+List<Color> hsvTones(
+  Color color,
+  int size, [
+  double start = 0.05,
+  double stop = 1.0,
+]) {
   final HSVColor hsv = HSVColor.fromColor(color);
   final step = (stop - start) / (size - 1);
 
@@ -35,8 +39,12 @@ List<Color> hsvTones(Color color,
   ];
 }
 
-List<Color> hsvValues(Color color,
-    [int size, double start = 0.05, double stop = 0.95]) {
+List<Color> hsvValues(
+  Color color,
+  int size, [
+  double start = 0.05,
+  double stop = 0.95,
+]) {
   final HSVColor hsv = HSVColor.fromColor(color);
   final step = (stop - start) / (size - 1);
 

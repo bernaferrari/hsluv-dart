@@ -8,16 +8,16 @@ import 'inter_color_with_contrast.dart';
 
 class ContrastItem extends StatelessWidget {
   const ContrastItem({
-    this.color,
+    required this.color,
+    required this.contrast,
+    required this.kind,
     this.onPressed,
-    this.contrast,
     this.compactText = false,
     this.category = "",
-    this.kind,
   });
 
   final InterColorWithContrast color;
-  final Function onPressed;
+  final Function? onPressed;
   final bool compactText;
   final double contrast;
   final String category;
@@ -42,7 +42,7 @@ class ContrastItem extends StatelessWidget {
     if (compactText) {
       cornerText = Text(
         writtenValue,
-        style: Theme.of(context).textTheme.caption.copyWith(color: textColor),
+        style: Theme.of(context).textTheme.caption!.copyWith(color: textColor),
       );
     } else {
       cornerText = Column(
@@ -51,21 +51,21 @@ class ContrastItem extends StatelessWidget {
           Text(
             writtenValue,
             style:
-                Theme.of(context).textTheme.caption.copyWith(color: textColor),
+                Theme.of(context).textTheme.caption!.copyWith(color: textColor),
           ),
           Text(
             contrast.toStringAsPrecision(3),
             style: Theme.of(context)
                 .textTheme
                 .caption
-                .copyWith(fontSize: 10, color: textColor),
+                ?.copyWith(fontSize: 10, color: textColor),
           ),
           Text(
             getContrastLetters(contrast),
             style: Theme.of(context)
                 .textTheme
                 .caption
-                .copyWith(fontSize: 8, color: textColor),
+                ?.copyWith(fontSize: 8, color: textColor),
           )
         ],
       );
@@ -78,7 +78,7 @@ class ContrastItem extends StatelessWidget {
         padding: EdgeInsets.zero,
         color: color.color,
         shape: const RoundedRectangleBorder(),
-        onPressed: onPressed,
+        onPressed: onPressed as void Function()?,
         child: cornerText,
       ),
     );

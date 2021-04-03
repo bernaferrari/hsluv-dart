@@ -4,7 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 class NearestColor extends StatelessWidget {
-  const NearestColor({this.color});
+  const NearestColor({required this.color});
 
   final Color color;
 
@@ -21,9 +21,9 @@ class NearestColor extends StatelessWidget {
             return const SizedBox.shrink();
           }
           return Text(
-            (snapshot.data as NamedColor).name,
+            (snapshot.data as NamedColor).name!,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.caption.copyWith(),
+            style: Theme.of(context).textTheme.caption!.copyWith(),
           );
         },
       ),
@@ -76,7 +76,7 @@ class _AnimatedTextState extends State<AnimatedText> {
       child: Text(
         widget.text,
         textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.caption.copyWith(),
+        style: Theme.of(context).textTheme.caption!.copyWith(),
       ),
     );
   }
@@ -85,8 +85,8 @@ class _AnimatedTextState extends State<AnimatedText> {
 class NamedColor {
   const NamedColor({this.name, this.color});
 
-  final String name;
-  final Color color;
+  final String? name;
+  final Color? color;
 
   @override
   String toString() => "$runtimeType $name |$color";
@@ -95,17 +95,16 @@ class NamedColor {
 /// Converted from https://github.com/dtao/nearest-color
 /// Gets the nearest color, from the given list of [NamedColor] objects
 NamedColor nearestColor(Color needle, List<NamedColor> colors) {
-  double distanceSq;
-  double minDistanceSq = double.infinity;
-  Color rgb;
-  NamedColor value;
+  num distanceSq;
+  num minDistanceSq = double.infinity;
+  late NamedColor value;
 
   for (int i = 0; i < colors.length; ++i) {
-    rgb = colors[i].color;
+    final Color rgb = colors[i].color!;
 
     distanceSq = math.pow(needle.red - rgb.red, 2.0) +
         math.pow(needle.green - rgb.green, 2.0) +
-        math.pow(needle.blue - rgb.blue, 2.0);
+        (math.pow(needle.blue - rgb.blue, 2.0));
 
     if (distanceSq < minDistanceSq) {
       minDistanceSq = distanceSq;

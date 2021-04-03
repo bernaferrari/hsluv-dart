@@ -57,7 +57,7 @@ class _ContactInfo extends StatelessWidget {
             textAlign: TextAlign.center,
             style: Theme.of(context)
                 .textTheme
-                .headline5
+                .headline5!
                 .copyWith(fontWeight: FontWeight.w600)),
         const SizedBox(height: 8),
         Text("Designed & developed by Bernardo Ferrari.",
@@ -212,7 +212,7 @@ class ShuffleSection extends StatelessWidget {
 }
 
 class MoreColors extends StatelessWidget {
-  const MoreColors({this.activeColor});
+  const MoreColors({required this.activeColor});
 
   final Color activeColor;
 
@@ -279,7 +279,7 @@ class TranslucentCard extends StatelessWidget {
     this.margin = const EdgeInsets.only(left: 16, right: 16, top: 8),
   });
 
-  final Widget child;
+  final Widget? child;
   final EdgeInsetsGeometry margin;
 
   @override

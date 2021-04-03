@@ -8,18 +8,18 @@ import 'picker_item.dart';
 
 class ExpandableColorBar extends StatelessWidget {
   const ExpandableColorBar({
-    this.kind,
-    this.title,
-    this.expanded,
-    this.sectionIndex,
-    this.listSize,
-    this.colorsList,
-    this.onTitlePressed,
-    this.onColorPressed,
+    required this.kind,
+    required this.title,
+    required this.expanded,
+    required this.sectionIndex,
+    required this.listSize,
+    required this.colorsList,
+    required this.onTitlePressed,
+    required this.onColorPressed,
     this.isInfinite = false,
   });
 
-  final Function onTitlePressed;
+  final VoidCallback onTitlePressed;
   final Function(Color) onColorPressed;
   final List<ColorWithInter> colorsList;
   final String title;
@@ -83,10 +83,10 @@ class ExpandableColorBar extends StatelessWidget {
 /// For example, "H" => "Hue", "S" => "Saturation" and so on...
 class _ExpandableTitle extends StatelessWidget {
   const _ExpandableTitle({
-    this.title,
-    this.expanded,
-    this.index,
-    this.onTitlePressed,
+    required this.title,
+    required this.expanded,
+    required this.index,
+    required this.onTitlePressed,
   });
 
   final VoidCallback onTitlePressed;

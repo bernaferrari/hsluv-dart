@@ -10,15 +10,15 @@ import 'vertical_picker_main.dart';
 
 class ColorCompareWidgetDetails extends StatelessWidget {
   const ColorCompareWidgetDetails({
-    this.color,
-    this.onPressed,
+    required this.color,
+    required this.kind,
     this.compactText = true,
     this.category = "",
-    this.kind,
+    this.onPressed,
   });
 
   final ColorWithInter color;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool compactText;
   final String category;
   final HSInterType kind;
@@ -40,7 +40,7 @@ class ColorCompareWidgetDetails extends StatelessWidget {
 
     final Widget cornerText = Text(
       writtenValue,
-      style: Theme.of(context).textTheme.caption.copyWith(color: textColor),
+      style: Theme.of(context).textTheme.caption!.copyWith(color: textColor),
     );
 
     final Widget centeredText =
@@ -55,7 +55,7 @@ class ColorCompareWidgetDetails extends StatelessWidget {
           padding: EdgeInsets.zero,
           shape: const RoundedRectangleBorder(),
         ),
-        onPressed: onPressed ?? () => colorSelected(context, color.color),
+        onPressed: onPressed ?? (() => colorSelected(context, color.color)),
         onLongPress: () => showSlidersDialog(context, color.color),
         child: compactText ? centeredText : cornerText,
       ),
@@ -78,11 +78,11 @@ class ColorCompareWidgetDetails extends StatelessWidget {
 
   Widget richTextColorToHSV(BuildContext context, HSInterColor hsi,
       Color textColor, String category) {
-    final TextStyle theme = Theme.of(context).textTheme.caption;
+    final TextStyle theme = Theme.of(context).textTheme.caption!;
 
     final shortestSide = MediaQuery.of(context).size.width;
 
-    final String letterLorV = when({
+    final String? letterLorV = when({
       () => kind == HSInterType.HSLuv: () => "L",
       () => kind == HSInterType.HSV: () => "V",
     });
