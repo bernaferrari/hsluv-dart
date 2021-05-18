@@ -35,25 +35,19 @@ class BoxedApp extends StatefulWidget {
 }
 
 class _BoxedAppState extends State<BoxedApp> {
-  late SliderColorBloc _sliderColorBloc;
-  late ColorsCubit _colorsCubit;
+  late final SliderColorBloc _sliderColorBloc = SliderColorBloc()
+    ..add(MoveColor(Colors.orange[200]!, true));
 
-  @override
-  void initState() {
-    super.initState();
-
-    _sliderColorBloc = SliderColorBloc()
-      ..add(MoveColor(Colors.orange[200]!, true));
-    _colorsCubit = ColorsCubit(
-      _sliderColorBloc,
-      ColorsCubit.initialState(getShuffledColors()),
-    );
-  }
+  late final ColorsCubit _colorsCubit = ColorsCubit(
+    _sliderColorBloc,
+    ColorsCubit.initialState(getShuffledColors()),
+  );
 
   @override
   void dispose() {
     super.dispose();
     _sliderColorBloc.close();
+    _colorsCubit.close();
   }
 
   @override

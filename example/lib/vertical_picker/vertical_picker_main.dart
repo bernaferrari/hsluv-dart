@@ -41,16 +41,9 @@ class HSVerticalPicker extends StatefulWidget {
 }
 
 class _HSVerticalPickerState extends State<HSVerticalPicker> {
-  late int currentSegment;
-
-  @override
-  void initState() {
-    currentSegment = PageStorage.of(context)?.readState(context,
-            identifier: const ValueKey("verticalSelected")) ??
-        0;
-
-    super.initState();
-  }
+  late int currentSegment = PageStorage.of(context)?.readState(context,
+          identifier: const ValueKey("verticalSelected")) ??
+      0;
 
   void onValueChanged(int? newValue) {
     if (newValue == null) {
@@ -59,11 +52,8 @@ class _HSVerticalPickerState extends State<HSVerticalPicker> {
 
     setState(() {
       currentSegment = newValue;
-      PageStorage.of(context)?.writeState(
-        context,
-        currentSegment,
-        identifier: const ValueKey("verticalSelected"),
-      );
+      PageStorage.of(context)?.writeState(context, currentSegment,
+          identifier: const ValueKey("verticalSelected"));
     });
   }
 
@@ -196,15 +186,9 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
   double addSaturation = 0.0;
   bool satSelected = false;
   bool fiveSelected = false;
-  int expanded = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    expanded = PageStorage.of(context)?.readState(context,
-            identifier: const ValueKey<String>("VerticalSelector")) ??
-        0;
-  }
+  late int expanded = PageStorage.of(context)?.readState(context,
+          identifier: const ValueKey("VerticalSelector")) ??
+      0;
 
   double interval(double value, double min, double max) {
     return math.min(math.max(value, min), max);
@@ -214,14 +198,14 @@ class _HSGenericScreenState extends State<HSGenericScreen> {
     setState(() {
       expanded = updatedValue;
       PageStorage.of(context)?.writeState(context, expanded,
-          identifier: const ValueKey<String>("VerticalSelector"));
+          identifier: const ValueKey("VerticalSelector"));
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final HSInterColor color = widget.color;
-    final Color rgbColor = widget.color.toColor();
+    // final Color rgbColor = widget.color.toColor();
 
     // in the ideal the world they could be calculated in the Bloc &/or in parallel.
     final List<ColorWithInter> hue = widget.fetchHue();

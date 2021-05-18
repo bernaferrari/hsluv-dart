@@ -120,7 +120,7 @@ class MultipleColorCompareState extends Equatable {
 
 class ColorCompareContrast extends Equatable {
   ColorCompareContrast({
-    required Color this.rgbColor,
+    required this.rgbColor,
     required this.hsluvColor,
     required this.index,
     required this.colorsRange,
