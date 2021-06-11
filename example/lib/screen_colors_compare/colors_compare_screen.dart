@@ -245,7 +245,7 @@ class CompactPicker extends StatelessWidget {
         "currentKey $currentKey | selected $selectedKey ${colorsCompared[currentKey]!.contrast}");
 
     return AnimatedSwitcher(
-      duration: Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500),
       switchInCurve: Curves.easeInOut,
       transitionBuilder: (child, animation) {
         return SizeTransition(child: child, sizeFactor: animation);
@@ -314,7 +314,7 @@ class ExpandedPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -326,7 +326,7 @@ class ExpandedPicker extends StatelessWidget {
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             _TopSection(
               rgbColor: colorsMap[currentKey]!.rgbColor,
               hsluvColor: colorsMap[currentKey]!.hsluvColor,
@@ -337,7 +337,7 @@ class ExpandedPicker extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         MultiRowColorPicker(
           selected: selectedKey,
           moreColors: false,
@@ -416,7 +416,7 @@ class _ContrastWithLetters extends StatelessWidget {
           text: TextSpan(style: style, children: [
             TextSpan(
               text: contrast.toStringAsPrecision(3),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),
@@ -475,7 +475,7 @@ class _TopSectionButtons extends StatelessWidget {
               side: BorderSide(color: outlinedButtonSideColor),
               primary: contrastColor,
             ),
-            icon: Icon(
+            icon: const Icon(
               FeatherIcons.search,
               size: 16,
             ),

@@ -13,7 +13,7 @@ import '../contrast/shuffle_color.dart';
 import '../util/constants.dart';
 
 class About extends StatelessWidget {
-  const About();
+  const About({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -81,20 +81,20 @@ class _ContactInfo extends StatelessWidget {
           children: <Widget>[
             const SizedBox(width: 32),
             IconButton(
-              icon: Icon(FeatherIcons.github),
+              icon: const Icon(FeatherIcons.github),
               tooltip: "GitHub",
               onPressed: () async {
                 _launchURL("https://github.com/bernaferrari");
               },
             ),
             IconButton(
-                icon: Icon(FeatherIcons.twitter),
+                icon: const Icon(FeatherIcons.twitter),
                 tooltip: "Twitter",
                 onPressed: () async {
                   _launchURL("https://twitter.com/bernaferrari");
                 }),
             IconButton(
-              icon: Icon(FeatherIcons.tag),
+              icon: const Icon(FeatherIcons.tag),
               tooltip: "Reddit",
               onPressed: () async {
                 _launchURL("https://www.reddit.com/user/bernaferrari");
@@ -104,7 +104,7 @@ class _ContactInfo extends StatelessWidget {
               },
             ),
             IconButton(
-              icon: Icon(FeatherIcons.linkedin),
+              icon: const Icon(FeatherIcons.linkedin),
               tooltip: "LinkedIn",
               onPressed: () async {
                 _launchURL(
@@ -112,7 +112,7 @@ class _ContactInfo extends StatelessWidget {
               },
             ),
             IconButton(
-              icon: Icon(FeatherIcons.mail),
+              icon: const Icon(FeatherIcons.mail),
               tooltip: "Email",
               onPressed: () async {
                 const url =
@@ -142,7 +142,7 @@ class _ContactInfo extends StatelessWidget {
 }
 
 class ColorCompare extends StatelessWidget {
-  const ColorCompare();
+  const ColorCompare({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +156,7 @@ class ColorCompare extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Icon(FeatherIcons.trendingUp),
+                  const Icon(FeatherIcons.trendingUp),
                   const SizedBox(width: 16),
                   Text(
                     "Compare Colors",
@@ -166,7 +166,7 @@ class ColorCompare extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(FeatherIcons.chevronRight),
+            const Icon(FeatherIcons.chevronRight),
             const SizedBox(width: 16),
           ],
         ),
@@ -176,7 +176,7 @@ class ColorCompare extends StatelessWidget {
 }
 
 class ShuffleSection extends StatelessWidget {
-  const ShuffleSection();
+  const ShuffleSection({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -192,7 +192,7 @@ class ShuffleSection extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Icon(FeatherIcons.shuffle),
+                  const Icon(FeatherIcons.shuffle),
                   const SizedBox(width: 16),
                   Text(
                     "Shuffle colors",
@@ -202,7 +202,7 @@ class ShuffleSection extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(FeatherIcons.chevronRight),
+            const Icon(FeatherIcons.chevronRight),
             const SizedBox(width: 16),
           ],
         ),
@@ -212,19 +212,19 @@ class ShuffleSection extends StatelessWidget {
 }
 
 class MoreColors extends StatelessWidget {
-  const MoreColors({required this.activeColor});
+  const MoreColors({required this.activeColor, Key? key}) : super(key: key);
 
   final Color activeColor;
 
   @override
   Widget build(BuildContext context) {
-    return WatchBoxBuilder(
-      box: Hive.box<dynamic>("settings"),
-      builder: (context, box) {
+    return ValueListenableBuilder<Box<dynamic>>(
+      valueListenable: Hive.box<dynamic>("settings").listenable(),
+      builder: (context, box, _) {
         return SwitchListTile(
           contentPadding:
               const EdgeInsets.only(top: 8, bottom: 8, right: 16, left: 16),
-          value: box.get("moreItems", defaultValue: false),
+          value: box.get("moreItems", defaultValue: false)!,
           activeColor: activeColor,
           subtitle: Text(
             "Duplicate the number of colors in HSLuv/HSV pickers.",
@@ -244,7 +244,7 @@ class MoreColors extends StatelessWidget {
 }
 
 class GDPR extends StatelessWidget {
-  const GDPR();
+  const GDPR({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -254,7 +254,7 @@ class GDPR extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Icon(FeatherIcons.shield),
+            const Icon(FeatherIcons.shield),
             const SizedBox(width: 16),
             Text("Privacy Policy",
                 textAlign: TextAlign.center,
@@ -277,7 +277,8 @@ class TranslucentCard extends StatelessWidget {
   const TranslucentCard({
     this.child,
     this.margin = const EdgeInsets.only(left: 16, right: 16, top: 8),
-  });
+    Key? key,
+  }) : super(key: key);
 
   final Widget? child;
   final EdgeInsetsGeometry margin;

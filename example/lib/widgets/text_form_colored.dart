@@ -7,7 +7,8 @@ import '../blocs/blocs.dart';
 import '../util/constants.dart';
 
 class TextFormColored extends StatelessWidget {
-  const TextFormColored({this.controller, this.radius});
+  const TextFormColored({this.controller, this.radius, Key? key})
+      : super(key: key);
 
   final double? radius;
   final TextEditingController? controller;
@@ -31,11 +32,11 @@ class TextFormColored extends StatelessWidget {
       ],
       decoration: InputDecoration(
         enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white38, width: 2),
+          borderSide: const BorderSide(color: Colors.white38, width: 2),
           borderRadius: borderRadius,
         ),
         focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.black26, width: 2),
+          borderSide: const BorderSide(color: Colors.black26, width: 2),
           borderRadius: borderRadius,
         ),
         filled: true,
@@ -44,8 +45,8 @@ class TextFormColored extends StatelessWidget {
             ? Colors.black12
             : Colors.white24,
         isDense: true,
-        prefix: Padding(
-          padding: const EdgeInsets.only(right: 8.0),
+        prefix: const Padding(
+          padding: EdgeInsets.only(right: 8.0),
           child: Icon(FeatherIcons.hash, size: 16),
         ),
       ),

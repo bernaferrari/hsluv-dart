@@ -13,7 +13,7 @@ import '../widgets/update_color_dialog.dart';
 import 'color_library.dart';
 
 class SingleColorBlindness extends StatelessWidget {
-  const SingleColorBlindness();
+  const SingleColorBlindness({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

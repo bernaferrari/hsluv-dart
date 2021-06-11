@@ -1,30 +1,9 @@
-include: package:effective_dart/analysis_options.yaml
-
-# Specify analysis options.
-#
-# Until there are meta linter rules, each desired lint must be explicitly enabled.
-# See: https://github.com/dart-lang/linter/issues/288
-#
-# For a list of lints, see: http://dart-lang.github.io/linter/lints/
-# See the configuration guide for more
-# https://github.com/dart-lang/sdk/tree/master/pkg/analyzer#configuring-the-analyzer
-
-
-analyzer:
-  strong-mode:
-    implicit-dynamic: false
-  errors:
-    # treat missing required parameters as a warning (not a hint)
-    missing_required_param: warning
-    # treat missing returns as a warning (not a hint)
-    missing_return: warning
-    # allow having TODOs in the code
-    todo: ignore
+include: package:flutter_lints/flutter.yaml
 
 linter:
   rules:
-    public_member_api_docs: false
-    prefer_mixin: false
-    omit_local_variable_types: false
-    constant_identifier_names: false
-    lines_longer_than_80_chars: false
+    avoid_print: false  # Uncomment to disable the `avoid_print` rule
+  # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+
+# Additional information about this file can be found at
+# https://dart.dev/guides/language/analysis-options

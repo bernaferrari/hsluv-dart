@@ -17,7 +17,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await openBox();
   Bloc.observer = SimpleBlocObserver();
-  runApp(BoxedApp());
+  runApp(const BoxedApp());
 }
 
 Future openBox() async {
@@ -30,6 +30,8 @@ Future openBox() async {
 }
 
 class BoxedApp extends StatefulWidget {
+  const BoxedApp({Key? key}) : super(key: key);
+
   @override
   _BoxedAppState createState() => _BoxedAppState();
 }
@@ -74,7 +76,7 @@ class _BoxedAppState extends State<BoxedApp> {
           "compare": (context) {
             return BlocProvider<MultipleContrastCompareCubit>(
               create: (context) => MultipleContrastCompareCubit(_colorsCubit),
-              child: ColorsCompareScreen(),
+              child: const ColorsCompareScreen(),
             );
           }
         },

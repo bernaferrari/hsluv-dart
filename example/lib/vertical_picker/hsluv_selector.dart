@@ -7,7 +7,8 @@ import '../util/hsinter_tiny.dart';
 import 'vertical_picker_main.dart';
 
 class HSLuvSelector extends StatelessWidget {
-  const HSLuvSelector({required this.color, this.moreColors = false});
+  const HSLuvSelector({required this.color, this.moreColors = false, Key? key})
+      : super(key: key);
 
   // initial color
   final HSLuvColor color;
@@ -16,7 +17,7 @@ class HSLuvSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const kind = HSInterType.HSLuv;
+    const kind = HSInterType.hsluv;
 
     // maximum number of items
     final int itemsOnScreen =

@@ -7,7 +7,7 @@ import '../widgets/color_sliders.dart';
 import '../widgets/loading_indicator.dart';
 
 class MultipleSliders extends StatelessWidget {
-  const MultipleSliders();
+  const MultipleSliders({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

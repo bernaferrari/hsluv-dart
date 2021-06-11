@@ -4,7 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 class NearestColor extends StatelessWidget {
-  const NearestColor({required this.color});
+  const NearestColor({required this.color, Key? key}) : super(key: key);
 
   final Color color;
 
@@ -46,7 +46,7 @@ class NearestColor extends StatelessWidget {
 }
 
 class AnimatedText extends StatefulWidget {
-  const AnimatedText(this.text);
+  const AnimatedText(this.text, Key? key) : super(key: key);
 
   final String text;
 

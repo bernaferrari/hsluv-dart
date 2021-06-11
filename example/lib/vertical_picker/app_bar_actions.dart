@@ -6,7 +6,7 @@ import '../util/constants.dart';
 import '../widgets/update_color_dialog.dart';
 
 class ColorSearchButton extends StatelessWidget {
-  const ColorSearchButton({required this.color});
+  const ColorSearchButton({required this.color, Key? key}) : super(key: key);
 
   final Color color;
 
@@ -48,11 +48,9 @@ class ColorSearchButton extends StatelessWidget {
 }
 
 class OutlinedIconButton extends StatelessWidget {
-  const OutlinedIconButton({
-    required this.child,
-    this.borderColor,
-    this.onPressed,
-  });
+  const OutlinedIconButton(
+      {required this.child, this.borderColor, this.onPressed, Key? key})
+      : super(key: key);
 
   final Widget child;
   final VoidCallback? onPressed;
@@ -66,7 +64,7 @@ class OutlinedIconButton extends StatelessWidget {
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
           padding: EdgeInsets.zero,
-          shape: CircleBorder(),
+          shape: const CircleBorder(),
           side: BorderSide(
             color: borderColor ??
                 Theme.of(context).colorScheme.onSurface.withOpacity(0.7),

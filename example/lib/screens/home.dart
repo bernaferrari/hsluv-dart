@@ -15,7 +15,7 @@ import 'multiple_sliders.dart';
 import 'single_color_blindness.dart';
 
 class Home extends StatefulWidget {
-  const Home({required this.initialColor});
+  const Home({required this.initialColor, Key? key}) : super(key: key);
 
   final Color initialColor;
 
@@ -104,7 +104,7 @@ class _HomeState extends State<Home> {
                     ),
                     child: Column(
                       children: <Widget>[
-                        ThemeBar(),
+                        const ThemeBar(),
                         TabBar(
                           labelColor: contrastedColor,
                           indicatorColor: contrastedColor,
@@ -126,9 +126,9 @@ class _HomeState extends State<Home> {
                               ),
                             ),
                             const Tab(icon: Icon(FeatherIcons.barChart2)),
-                            Tab(icon: Icon(Icons.invert_colors)),
-                            Tab(icon: Icon(FeatherIcons.info)),
-                            Tab(icon: Icon(FeatherIcons.bookOpen)),
+                            const Tab(icon: Icon(Icons.invert_colors)),
+                            const Tab(icon: Icon(FeatherIcons.info)),
+                            const Tab(icon: Icon(FeatherIcons.bookOpen)),
                           ],
                         ),
                       ],
@@ -159,6 +159,8 @@ class _HomeState extends State<Home> {
 }
 
 class ThemeBar extends StatelessWidget {
+  const ThemeBar({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Padding(

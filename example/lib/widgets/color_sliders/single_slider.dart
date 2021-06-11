@@ -5,10 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 
-extension on int {
-  String convertToHexString() => toRadixString(16).padLeft(2, '0');
-}
-
 class SingleSlider extends StatelessWidget {
   const SingleSlider(
     this.title,
@@ -17,7 +13,8 @@ class SingleSlider extends StatelessWidget {
     this.colorList, {
     this.scale,
     this.onChanged,
-  });
+    Key? key,
+  }) : super(key: key);
 
   final String title;
   final double value;
@@ -47,7 +44,7 @@ class SingleSlider extends StatelessWidget {
           width: 36,
           height: 36,
           child: IconButton(
-            icon: Icon(FeatherIcons.minus, size: 20),
+            icon: const Icon(FeatherIcons.minus, size: 20),
             onPressed: () {
               onChanged!(math.max(value - 1 / scale!, 0));
             },
@@ -58,7 +55,7 @@ class SingleSlider extends StatelessWidget {
           width: 36,
           height: 36,
           child: IconButton(
-            icon: Icon(FeatherIcons.plus, size: 20),
+            icon: const Icon(FeatherIcons.plus, size: 20),
             onPressed: () {
               onChanged!(math.min(value + 1 / scale!, 1));
             },
@@ -211,7 +208,7 @@ class _RoundSliderThumbShape2 extends SliderComponentShape {
       Paint()..color = colorTween.evaluate(enableAnimation)!,
     );
 
-    final textStyle =
+    const textStyle =
         TextStyle(color: Colors.black, fontSize: 14, fontFamily: "B612Mono");
     final textSpan = TextSpan(
       text: strValue,

@@ -10,7 +10,7 @@ import '../util/selected.dart';
 import '../widgets/update_color_dialog.dart';
 
 class ColorLibrary extends StatefulWidget {
-  const ColorLibrary({required this.color});
+  const ColorLibrary({required this.color, Key? key}) : super(key: key);
 
   final Color color;
 
@@ -34,7 +34,7 @@ class _ColorLibraryState extends State<ColorLibrary> {
     return Scaffold(
       backgroundColor: widget.color,
       appBar: AppBar(
-        title: Text("Color Library"),
+        title: const Text("Color Library"),
         backgroundColor: widget.color,
         elevation: 0,
       ),

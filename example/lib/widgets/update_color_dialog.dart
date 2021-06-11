@@ -34,7 +34,7 @@ Future<void> showSlidersDialog(BuildContext context, Color color,
 }
 
 class UpdateColorDialog extends StatelessWidget {
-  const UpdateColorDialog(this.color);
+  const UpdateColorDialog(this.color, {Key? key}) : super(key: key);
 
   final Color color;
 

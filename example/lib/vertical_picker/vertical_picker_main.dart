@@ -3,13 +3,11 @@ import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hsluv/hsluvcolor.dart';
 
 import '../color_with_inter.dart';
 import '../hsinter.dart';
-import '../screens/about.dart';
 import '../util/color_util.dart';
 import '../util/constants.dart';
 import '../util/selected.dart';
@@ -31,7 +29,8 @@ class HSVerticalPicker extends StatefulWidget {
   const HSVerticalPicker({
     required this.color,
     required this.hsLuvColor,
-  });
+    Key? key,
+  }) : super(key: key);
 
   final Color color;
   final HSLuvColor hsLuvColor;
@@ -75,33 +74,33 @@ class _HSVerticalPickerState extends State<HSVerticalPicker> {
         backgroundColor: widget.color,
         actions: <Widget>[
           Center(child: ColorSearchButton(color: widget.color)),
-          SizedBox(width: 8),
-          OutlinedIconButton(
-            child: Icon(FeatherIcons.moreHorizontal, size: 16),
-            onPressed: () {
-              showDialog<dynamic>(
-                  context: context,
-                  builder: (_) {
-                    return AlertDialog(
-                      contentPadding: const EdgeInsets.all(24),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      backgroundColor: widget.color,
-                      content: Card(
-                        clipBehavior: Clip.antiAlias,
-                        margin: EdgeInsets.zero,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .background
-                            .withOpacity(kVeryTransparent),
-                        elevation: 0,
-                        child: MoreColors(activeColor: Colors.green),
-                      ),
-                    );
-                  });
-            },
-          ),
+          const SizedBox(width: 8),
+          // OutlinedIconButton(
+          //   child: const Icon(FeatherIcons.moreHorizontal, size: 16),
+          //   onPressed: () {
+          //     showDialog<dynamic>(
+          //         context: context,
+          //         builder: (_) {
+          //           return AlertDialog(
+          //             contentPadding: const EdgeInsets.all(24),
+          //             shape: RoundedRectangleBorder(
+          //               borderRadius: BorderRadius.circular(16),
+          //             ),
+          //             backgroundColor: widget.color,
+          //             content: Card(
+          //               clipBehavior: Clip.antiAlias,
+          //               margin: EdgeInsets.zero,
+          //               color: Theme.of(context)
+          //                   .colorScheme
+          //                   .background
+          //                   .withOpacity(kVeryTransparent),
+          //               elevation: 0,
+          //               child: const MoreColors(activeColor: Colors.green),
+          //             ),
+          //           );
+          //         });
+          //   },
+          // ),
           const SizedBox(width: 8),
         ],
       ),
@@ -164,7 +163,8 @@ class HSGenericScreen extends StatefulWidget {
     required this.satTitle,
     required this.lightTitle,
     required this.toneSize,
-  });
+    Key? key,
+  }) : super(key: key);
 
   final HSInterColor color;
   final HSInterType kind;

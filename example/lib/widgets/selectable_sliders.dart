@@ -3,7 +3,12 @@ import 'package:flutter/material.dart';
 
 class SliderWithSelector extends StatefulWidget {
   const SliderWithSelector(
-      this.sliders, this.color, this.selectableColor, this.context);
+    this.sliders,
+    this.color,
+    this.selectableColor,
+    this.context, {
+    Key? key,
+  }) : super(key: key);
 
   final Color color;
   final Color selectableColor;

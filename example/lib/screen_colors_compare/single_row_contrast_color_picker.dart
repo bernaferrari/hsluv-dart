@@ -9,7 +9,8 @@ class SingleRowContrastColorPicker extends StatelessWidget {
   const SingleRowContrastColorPicker({
     required this.colorsRange,
     required this.currentKey,
-  });
+    Key? key,
+  }) : super(key: key);
 
   final int currentKey;
   final List<RgbHSLuvTupleWithContrast> colorsRange;

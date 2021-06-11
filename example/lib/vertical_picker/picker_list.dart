@@ -17,7 +17,8 @@ class ExpandableColorBar extends StatelessWidget {
     required this.onTitlePressed,
     required this.onColorPressed,
     this.isInfinite = false,
-  });
+    Key? key,
+  }) : super(key: key);
 
   final VoidCallback onTitlePressed;
   final Function(Color) onColorPressed;

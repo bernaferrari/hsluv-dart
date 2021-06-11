@@ -6,10 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hsluv/hsluvcolor.dart';
 
-enum HSInterType {
-  HSLuv,
-  HSV,
-}
+enum HSInterType { hsluv, hsv }
 
 /// HSInterColor means Hue Saturation Interchangeable Color.
 /// It is made to wrap both HSV and HSLuv with the same interface.
@@ -33,19 +30,19 @@ class HSInterColor extends Equatable {
     late final double maxV;
 
     switch (kind) {
-      case HSInterType.HSLuv:
+      case HSInterType.hsluv:
         maxV = 100.0;
         break;
-      case HSInterType.HSV:
+      case HSInterType.hsv:
         maxV = 1.0;
         break;
     }
 
-    if (kind == HSInterType.HSLuv) {
+    if (kind == HSInterType.hsluv) {
       final luv = HSLuvColor.fromColor(color);
       return HSInterColor.fromHSInter(
           luv.hue, luv.saturation, luv.lightness, kind, maxV);
-    } else if (kind == HSInterType.HSV) {
+    } else if (kind == HSInterType.hsv) {
       final hsv = HSVColor.fromColor(color);
       return HSInterColor.fromHSInter(
           hsv.hue, hsv.saturation, hsv.value, kind, maxV);
@@ -63,7 +60,7 @@ class HSInterColor extends Equatable {
       hsLuvColor.hue,
       hsLuvColor.saturation,
       hsLuvColor.lightness,
-      HSInterType.HSLuv,
+      HSInterType.hsluv,
       maxV,
     );
   }
@@ -80,9 +77,9 @@ class HSInterColor extends Equatable {
   /// output [saturation] in [0-100] interval.
   int outputSaturation() {
     switch (kind) {
-      case HSInterType.HSLuv:
+      case HSInterType.hsluv:
         return saturation.toInt();
-      case HSInterType.HSV:
+      case HSInterType.hsv:
         return (saturation * 100).toInt();
     }
   }
@@ -90,9 +87,9 @@ class HSInterColor extends Equatable {
   /// output [lightness] in [0-100] interval.
   int outputLightness() {
     switch (kind) {
-      case HSInterType.HSLuv:
+      case HSInterType.hsluv:
         return lightness.toInt();
-      case HSInterType.HSV:
+      case HSInterType.hsv:
         return (lightness * 100).toInt();
     }
   }
@@ -121,9 +118,9 @@ class HSInterColor extends Equatable {
   /// Calls the [toColor] method from either HSLuvColor or HSVColor.
   Color toColor() {
     switch (kind) {
-      case HSInterType.HSLuv:
+      case HSInterType.hsluv:
         return HSLuvColor.fromHSL(hue, saturation, lightness).toColor();
-      case HSInterType.HSV:
+      case HSInterType.hsv:
         return HSVColor.fromAHSV(1.0, hue, saturation, lightness).toColor();
     }
   }
@@ -134,14 +131,14 @@ class HSInterColor extends Equatable {
   /// Returns this color as a String in the H:250 S:100 L:60 format.
   @override
   String toString() {
-    final String valueLetter = kind == HSInterType.HSLuv ? "L" : "V";
+    final String valueLetter = kind == HSInterType.hsluv ? "L" : "V";
 
     // this is never reached, but is needed for dart analyzer.
     return "H:${hue.toInt()} S:${outputSaturation()} $valueLetter:${outputLightness()}";
   }
 
   String toPartialStr(int index) {
-    final String valueLetter = kind == HSInterType.HSLuv ? "L" : "V";
+    final String valueLetter = kind == HSInterType.hsluv ? "L" : "V";
 
     switch (index) {
       case 0:

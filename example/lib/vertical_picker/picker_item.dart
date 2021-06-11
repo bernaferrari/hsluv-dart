@@ -15,7 +15,8 @@ class ColorCompareWidgetDetails extends StatelessWidget {
     this.compactText = true,
     this.category = "",
     this.onPressed,
-  });
+    Key? key,
+  }) : super(key: key);
 
   final ColorWithInter color;
   final VoidCallback? onPressed;
@@ -83,8 +84,8 @@ class ColorCompareWidgetDetails extends StatelessWidget {
     final shortestSide = MediaQuery.of(context).size.width;
 
     final String? letterLorV = when({
-      () => kind == HSInterType.HSLuv: () => "L",
-      () => kind == HSInterType.HSV: () => "V",
+      () => kind == HSInterType.hsluv: () => "L",
+      () => kind == HSInterType.hsv: () => "V",
     });
 
     return RichText(

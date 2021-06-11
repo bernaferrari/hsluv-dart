@@ -14,7 +14,8 @@ class ContrastItem extends StatelessWidget {
     this.onPressed,
     this.compactText = false,
     this.category = "",
-  });
+    Key? key,
+  }) : super(key: key);
 
   final InterColorWithContrast color;
   final Function? onPressed;
