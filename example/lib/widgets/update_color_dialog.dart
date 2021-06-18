@@ -109,7 +109,11 @@ class UpdateColorDialog extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                TextFormColored(controller: controller, radius: radius),
+                TextFormColored(
+                  controller: controller,
+                  radius: radius,
+                  onSubmitted: (_) => Navigator.of(context).pop(color),
+                ),
                 Card(
                   elevation: 0,
                   shape: const RoundedRectangleBorder(

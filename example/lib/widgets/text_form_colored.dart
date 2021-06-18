@@ -7,11 +7,18 @@ import '../blocs/blocs.dart';
 import '../util/constants.dart';
 
 class TextFormColored extends StatelessWidget {
-  const TextFormColored({this.controller, this.radius, Key? key})
-      : super(key: key);
+  const TextFormColored({
+    this.controller,
+    this.radius,
+    required this.onSubmitted,
+    this.autofocus = true,
+    Key? key,
+  }) : super(key: key);
 
   final double? radius;
+  final bool autofocus;
   final TextEditingController? controller;
+  final ValueChanged<String> onSubmitted;
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +28,9 @@ class TextFormColored extends StatelessWidget {
     );
 
     return TextFormField(
-      autofocus: true,
+      autofocus: autofocus,
       controller: controller,
+      onFieldSubmitted: onSubmitted,
       onChanged: (str) {
         BlocProvider.of<SliderColorBloc>(context).add(
             MoveColor(Color(int.parse("0xFF${str.padRight(6, "F")}")), false));
