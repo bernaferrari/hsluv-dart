@@ -1,11 +1,11 @@
-<p align="center"><img src="https://github.com/bernaferrari/hsluv-dart/raw/master/example/assets/ic_launcher-playstore.png" alt="HSLuv Sample" height="200px"></p>
+<p align="center"><img src="https://github.com/bernaferrari/hsluv-dart/raw/main/example/assets/ic_launcher-playstore.png" alt="HSLuv Sample" height="200px"></p>
 
 HSLuv Sample for Flutter
 ===================================
 
 | Sliders | Main Screen | Color Blindness | About |
 |:-:|:-:|:-:|:-:|
-| ![First](https://github.com/bernaferrari/hsluv-dart/raw/master/example/assets/sliders.jpg?raw=true) | ![Sec](https://github.com/bernaferrari/hsluv-dart/raw/master/example/assets/main.jpg?raw=true) | ![Third](https://github.com/bernaferrari/hsluv-dart/raw/master/example/assets/color-blindness.jpg?raw=true) | ![Fourth](https://github.com/bernaferrari/hsluv-dart/raw/master/example/assets/about.jpg?raw=true) |
+| ![First](https://github.com/bernaferrari/hsluv-dart/raw/main/example/assets/sliders.jpg?raw=true) | ![Sec](https://github.com/bernaferrari/hsluv-dart/raw/main/example/assets/main.jpg?raw=true) | ![Third](https://github.com/bernaferrari/hsluv-dart/raw/main/example/assets/color-blindness.jpg?raw=true) | ![Fourth](https://github.com/bernaferrari/hsluv-dart/raw/main/example/assets/about.jpg?raw=true) |
 
 Most color pickers give you 16 million colors and ask you to choose one. I designed and developed this app to help developers and designers find the best color for them with the smallest amount of effort.
 
@@ -14,7 +14,7 @@ It is hard to develop alone. If you have any good or bad feedback, want to be al
 
 <a href="https://bernaferrari.github.io/hsluv-dart/"><img src="../assets/try_here.png" height="50"/></a>
 
-[Download the Android APK](https://github.com/bernaferrari/hsluv-dart/raw/master/example/assets/hsluv_sample.apk)
+[Download the Android APK](https://github.com/bernaferrari/hsluv-dart/raw/main/example/assets/hsluv_sample.apk)
 
 This app contains the following screens:
 * Three sliders. RGB, HSV and HSLuv. You can see how they interact with each other.
@@ -57,10 +57,10 @@ To retrieve the colors, I opened the `colorclaim.1.1.sketchpalette` file in Visu
 
 | Compare | Info | Color Library |
 |:-:|:-:|:-:|
-| ![First](https://github.com/bernaferrari/hsluv-dart/raw/master/example/assets/compare.jpg?raw=true) | ![Sec](https://github.com/bernaferrari/hsluv-dart/raw/master/example/assets/info.jpg?raw=true) | ![Third](https://github.com/bernaferrari/hsluv-dart/raw/master/example/assets/library.jpg?raw=true) |
+| ![First](https://github.com/bernaferrari/hsluv-dart/raw/main/example/assets/compare.jpg?raw=true) | ![Sec](https://github.com/bernaferrari/hsluv-dart/raw/main/example/assets/info.jpg?raw=true) | ![Third](https://github.com/bernaferrari/hsluv-dart/raw/main/example/assets/library.jpg?raw=true) |
 
 ## HSV vs HSLuv
-<p align="center"><img src="https://github.com/bernaferrari/hsluv-dart/raw/master/example/assets/hsluv_vs_hsv.jpg" alt="HSV vs HSLuv" height="350px"></p>
+<p align="center"><img src="https://github.com/bernaferrari/hsluv-dart/raw/main/example/assets/hsluv_vs_hsv.jpg" alt="HSV vs HSLuv" height="350px"></p>
 You can see in that image the difference between Hue values in HSV (or HSL, which has the same Hue values) and HSLuv. HSLuv only changes the apparent lightness when lightness changes.
 You can change both Hue and Saturation values that, when compared to another color, the resulting contrast value will be the same. This is one of the foundations for the "Contrast Compare" screen.
 You only need to update the lightness value and nothing else to modify the contrast ratio. Therefore, you only need one picker or slider, not three, if you are aiming at the contrast.
@@ -70,7 +70,7 @@ While developing this app, there was a need to interop HSLuvColor with HSVColor 
  HSInterColor was born. You pass a kind parameter, which can be HSLuv or HSV and it automatically wraps them, so you can have unified `toString`, `toColor` and others. It is also extensible and modifying it to wrap other color structures should be easy.
  
 ## Design Process
-<p align="center"><img src="https://github.com/bernaferrari/hsluv-dart/raw/master/example/assets/design_process.jpg" alt="Design Process" height="350px"></p>
+<p align="center"><img src="https://github.com/bernaferrari/hsluv-dart/raw/main/example/assets/design_process.jpg" alt="Design Process" height="350px"></p>
 
 Many strategies were used to design this app. One of them was to draw in iPad using [Paper by Wetransfer](https://apps.apple.com/us/app/paper-by-wetransfer/id506003812) until a satisfiable design appeared.
 Another one was to sometimes test the app in iPad instead of phone. The large rectangular screen would make some designs immediately obsolete. And vice-versa. There was a previous iteration of the Color Compare screen that only compared two colors, but with a lot of details (like 3 selectors for each - H, S and V).

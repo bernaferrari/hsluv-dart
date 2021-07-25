@@ -103,7 +103,8 @@ class UpdateColorDialog extends StatelessWidget {
           child: AlertDialog(
             contentPadding: const EdgeInsets.all(24),
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(radius)),
+              borderRadius: BorderRadius.circular(radius),
+            ),
             backgroundColor: color,
             content: Column(
               mainAxisAlignment: MainAxisAlignment.center,

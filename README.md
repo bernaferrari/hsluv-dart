@@ -2,12 +2,12 @@
 
 # HSLuv for Dart & Flutter
 
-Dart port of [HSLuv](https://www.hsluv.org) (revision 4) with a [Flutter sample](example). This was a direct conversion of the [reference implementation](https://github.com/hsluv/hsluv/tree/master/haxe).
+Dart port of [HSLuv](https://www.hsluv.org) (revision 4) with a [Flutter sample](example). This was a direct conversion of the [reference implementation](https://github.com/hsluv/hsluv/tree/main/haxe).
 The sample is available as a web app.
 
-<a href="https://bernaferrari.github.io/hsluv-dart/"><img src="https://github.com/bernaferrari/hsluv-dart/raw/master/assets/try_here.png" height="50"/></a>
+<a href="https://bernaferrari.github.io/hsluv-dart/"><img src="https://github.com/bernaferrari/hsluv-dart/raw/main/assets/try_here.png" height="50"/></a>
 
-[<p align="center"><img src="https://github.com/bernaferrari/hsluv-dart/raw/master/assets/sample_app.jpg?raw=true" width="400"/></p>](example)
+[<p align="center"><img src="https://github.com/bernaferrari/hsluv-dart/raw/main/assets/sample_app.jpg?raw=true" width="400"/></p>](example)
 
 > HSLuv is a human-friendly alternative to HSL.
 
@@ -52,7 +52,7 @@ void main() {
 }
 ```
 
-[<p align="center"><img src="https://github.com/bernaferrari/hsluv-dart/raw/master/assets/hsv_vs_hsluv.gif?raw=true" width="300"/></p>](example)
+[<p align="center"><img src="https://github.com/bernaferrari/hsluv-dart/raw/main/assets/hsv_vs_hsluv.gif?raw=true" width="300"/></p>](example)
 
 [Sample app](example) showing HSV (top) vs HSLuv (bottom). See how the perceived lightness changes as the hue slider moves.
 
