@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../contrast/shuffle_color.dart';
@@ -15,7 +14,7 @@ class ColorLibrary extends StatefulWidget {
   final Color color;
 
   @override
-  _ColorLibraryState createState() => _ColorLibraryState();
+  State<ColorLibrary> createState() => _ColorLibraryState();
 }
 
 class _ColorLibraryState extends State<ColorLibrary> {
@@ -122,7 +121,7 @@ class _ColorLibraryState extends State<ColorLibrary> {
 //                                }),
                                     style: Theme.of(context)
                                         .textTheme
-                                        .caption!
+                                        .bodySmall!
                                         .copyWith(
                                           fontFamily: "B612Mono",
                                           color: contrastingColor(colorsList[i])

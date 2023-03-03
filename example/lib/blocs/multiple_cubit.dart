@@ -10,14 +10,14 @@ import '../util/color_util.dart';
 import 'colors_cubit.dart';
 
 class MultipleContrastCompareCubit extends Cubit<MultipleColorCompareState> {
-  MultipleContrastCompareCubit(ColorsCubit _colorsCubit)
+  MultipleContrastCompareCubit(ColorsCubit colorsCubit)
       : super(const MultipleColorCompareState()) {
     set(
-      rgbColors: _colorsCubit.state.rgbColors,
-      hsluvColors: _colorsCubit.state.hsluvColors,
+      rgbColors: colorsCubit.state.rgbColors,
+      hsluvColors: colorsCubit.state.hsluvColors,
     );
 
-    _mdcSubscription = _colorsCubit.stream.listen((stateValue) async {
+    _mdcSubscription = colorsCubit.stream.listen((stateValue) async {
       set(
         rgbColors: stateValue.rgbColors,
         hsluvColors: stateValue.hsluvColors,
@@ -45,10 +45,10 @@ class MultipleContrastCompareCubit extends Cubit<MultipleColorCompareState> {
     int? selectedKey,
   }) {
     final colorsCompared = <int, ColorCompareContrast>{};
-    final _selectedKey = selectedKey ?? state.selectedKey;
+    final selectedKey0 = selectedKey ?? state.selectedKey;
 
     for (var key in rgbColors.keys) {
-      if (key == _selectedKey) {
+      if (key == selectedKey0) {
         colorsCompared[key] = ColorCompareContrast.withoutRange(
           rgbColor: rgbColors[key]!,
           hsluvColor: hsluvColors[key]!,
@@ -70,7 +70,7 @@ class MultipleContrastCompareCubit extends Cubit<MultipleColorCompareState> {
           RgbHSLuvTupleWithContrast(
             rgbColor: updatedLuv.toColor(),
             hsluvColor: updatedLuv,
-            againstColor: rgbColors[_selectedKey]!,
+            againstColor: rgbColors[selectedKey0]!,
           ),
         );
       }
@@ -80,7 +80,7 @@ class MultipleContrastCompareCubit extends Cubit<MultipleColorCompareState> {
         hsluvColor: hsluvColors[key]!,
         index: key,
         colorsRange: colorsRange,
-        againstColor: rgbColors[_selectedKey]!,
+        againstColor: rgbColors[selectedKey0]!,
       );
     }
 
@@ -89,7 +89,7 @@ class MultipleContrastCompareCubit extends Cubit<MultipleColorCompareState> {
         colorsCompared: colorsCompared,
         originalRgb: rgbColors,
         originalHsluv: hsluvColors,
-        selectedKey: _selectedKey,
+        selectedKey: selectedKey0,
       ),
     );
   }

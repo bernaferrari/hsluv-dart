@@ -15,12 +15,10 @@ import 'multiple_sliders.dart';
 import 'single_color_blindness.dart';
 
 class Home extends StatefulWidget {
-  const Home({required this.initialColor, Key? key}) : super(key: key);
-
-  final Color initialColor;
+  const Home({Key? key}) : super(key: key);
 
   @override
-  _HomeState createState() => _HomeState();
+  State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
@@ -197,6 +195,8 @@ class ThemeBar extends StatelessWidget {
                               .withOpacity(0.7),
                         ),
                       ),
+                      elevation: 0.0,
+                      padding: EdgeInsets.zero,
                       child: state.selected == i
                           ? Icon(
                               FeatherIcons.check,
@@ -204,8 +204,6 @@ class ThemeBar extends StatelessWidget {
                               color: contrastingColor(list[i]!),
                             )
                           : null,
-                      elevation: 0.0,
-                      padding: EdgeInsets.zero,
                     ),
                   ),
                   const SizedBox(width: 8),

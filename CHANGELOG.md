@@ -1,3 +1,6 @@
+## [1.1.3]
+* Update constraints to Flutter 2.19.
+
 ## [1.1.2]
 * Remove not null assert, which is not necessary anymore.
 

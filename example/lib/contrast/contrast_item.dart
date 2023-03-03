@@ -43,7 +43,7 @@ class ContrastItem extends StatelessWidget {
     if (compactText) {
       cornerText = Text(
         writtenValue,
-        style: Theme.of(context).textTheme.caption!.copyWith(color: textColor),
+        style: Theme.of(context).textTheme.bodySmall!.copyWith(color: textColor),
       );
     } else {
       cornerText = Column(
@@ -52,20 +52,20 @@ class ContrastItem extends StatelessWidget {
           Text(
             writtenValue,
             style:
-                Theme.of(context).textTheme.caption!.copyWith(color: textColor),
+                Theme.of(context).textTheme.bodySmall!.copyWith(color: textColor),
           ),
           Text(
             contrast.toStringAsPrecision(3),
             style: Theme.of(context)
                 .textTheme
-                .caption
+                .bodySmall
                 ?.copyWith(fontSize: 10, color: textColor),
           ),
           Text(
             getContrastLetters(contrast),
             style: Theme.of(context)
                 .textTheme
-                .caption
+                .bodySmall
                 ?.copyWith(fontSize: 8, color: textColor),
           )
         ],

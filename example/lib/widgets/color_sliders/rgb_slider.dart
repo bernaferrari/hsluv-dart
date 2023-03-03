@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 import 'single_slider.dart';
 
@@ -15,7 +14,7 @@ class RGBSlider extends StatefulWidget {
   final Color color;
 
   @override
-  _RGBSliderState createState() => _RGBSliderState();
+  State<RGBSlider> createState() => _RGBSliderState();
 }
 
 extension on int {

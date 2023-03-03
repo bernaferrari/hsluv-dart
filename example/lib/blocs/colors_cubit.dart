@@ -44,10 +44,10 @@ class ColorsState extends Equatable {
 }
 
 class ColorsCubit extends Cubit<ColorsState> {
-  ColorsCubit(SliderColorBloc _sliderColorBloc, ColorsState initialState)
+  ColorsCubit(SliderColorBloc sliderColorBloc, ColorsState initialState)
       : super(initialState) {
     _sliderColorBlocSubscription =
-        _sliderColorBloc.stream.listen((stateValue) async {
+        sliderColorBloc.stream.listen((stateValue) async {
       if (stateValue is SliderColorLoaded) {
         updateColor(
           rgbColor: stateValue.rgbColor,
@@ -87,42 +87,42 @@ class ColorsCubit extends Cubit<ColorsState> {
   }) {
     assert(rgbColor != null || hsLuvColor != null);
 
-    final _selected = selected ?? state.selected;
+    final selected0 = selected ?? state.selected;
 
     final allLuv = Map<int, HSLuvColor>.from(state.hsluvColors);
     final allRgb = Map<int, Color>.from(state.rgbColors);
 
     if (rgbColor != null && hsLuvColor != null) {
-      allLuv[_selected] = hsLuvColor;
-      allRgb[_selected] = rgbColor;
+      allLuv[selected0] = hsLuvColor;
+      allRgb[selected0] = rgbColor;
     } else if (rgbColor != null) {
-      allLuv[_selected] = HSLuvColor.fromColor(rgbColor);
-      allRgb[_selected] = rgbColor;
+      allLuv[selected0] = HSLuvColor.fromColor(rgbColor);
+      allRgb[selected0] = rgbColor;
     } else {
-      allLuv[_selected] = hsLuvColor!;
-      allRgb[_selected] = hsLuvColor.toColor();
+      allLuv[selected0] = hsLuvColor!;
+      allRgb[selected0] = hsLuvColor.toColor();
     }
 
     emit(
       state.copyWith(
         rgbColors: allRgb,
         hsluvColors: allLuv,
-        selected: _selected,
+        selected: selected0,
       ),
     );
   }
 
   void updateRgbColor({int? selected, required Color rgbColor}) {
-    final _selected = selected ?? state.selected;
+    final selected0 = selected ?? state.selected;
 
     final allRgb = Map<int, Color>.from(state.rgbColors);
-    allRgb[_selected] = rgbColor;
+    allRgb[selected0] = rgbColor;
 
     emit(
       state.copyWith(
         rgbColors: allRgb,
         hsluvColors: _convertToHSLuv(allRgb),
-        selected: _selected,
+        selected: selected0,
       ),
     );
   }

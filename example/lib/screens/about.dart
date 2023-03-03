@@ -1,10 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -57,23 +53,23 @@ class _ContactInfo extends StatelessWidget {
             textAlign: TextAlign.center,
             style: Theme.of(context)
                 .textTheme
-                .headline5!
+                .headlineSmall!
                 .copyWith(fontWeight: FontWeight.w600)),
         const SizedBox(height: 8),
         Text("Designed & developed by Bernardo Ferrari.",
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.subtitle2),
+            style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: 8),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Text("If you have ideas or suggestions, please get in touch!",
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.caption),
+              style: Theme.of(context).textTheme.bodySmall),
         ),
         const SizedBox(height: 8),
         Text("This app is open source.",
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.caption),
+            style: Theme.of(context).textTheme.bodySmall),
         const SizedBox(height: 8),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -117,8 +113,8 @@ class _ContactInfo extends StatelessWidget {
               onPressed: () async {
                 const url =
                     'mailto:bernaferrari2+studio@gmail.com?subject=Color%20Studio%20feedback';
-                if (await canLaunch(url)) {
-                  await launch(url);
+                if (await canLaunchUrl(Uri.https(url))) {
+                  await launchUrl(Uri.https(url));
                 } else {
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   const snackBar = SnackBar(
@@ -137,7 +133,7 @@ class _ContactInfo extends StatelessWidget {
   }
 
   Future<void> _launchURL(String url) async {
-    await launch(url);
+    await launchUrl(Uri.https(url));
   }
 }
 
@@ -161,7 +157,7 @@ class ColorCompare extends StatelessWidget {
                   Text(
                     "Compare Colors",
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headline6,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ],
               ),
@@ -197,7 +193,7 @@ class ShuffleSection extends StatelessWidget {
                   Text(
                     "Shuffle colors",
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headline6,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ],
               ),
@@ -228,11 +224,11 @@ class MoreColors extends StatelessWidget {
           activeColor: activeColor,
           subtitle: Text(
             "Duplicate the number of colors in HSLuv/HSV pickers.",
-            style: Theme.of(context).textTheme.caption,
+            style: Theme.of(context).textTheme.bodySmall,
           ),
           title: Text(
             "More Colors",
-            style: Theme.of(context).textTheme.headline6,
+            style: Theme.of(context).textTheme.titleLarge,
           ),
           onChanged: (value) {
             box.put('moreItems', value);
@@ -258,7 +254,7 @@ class GDPR extends StatelessWidget {
             const SizedBox(width: 16),
             Text("Privacy Policy",
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headline6),
+                style: Theme.of(context).textTheme.titleLarge),
           ],
         ),
         const Padding(

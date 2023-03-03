@@ -1,7 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../blocs/blocs.dart';
@@ -57,7 +54,7 @@ class SingleColorBlindness extends StatelessWidget {
                     for (var key in values.keys) ...[
                       Text(
                         key,
-                        style: Theme.of(context).textTheme.headline6,
+                        style: Theme.of(context).textTheme.titleLarge,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
@@ -170,7 +167,7 @@ class _ColorBlindCard extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             blindColor.name[0],
-            style: Theme.of(context).textTheme.headline5!.copyWith(
+            style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                   fontWeight: FontWeight.w700,
                   color: defaultColor,
                   fontSize: 48,
@@ -184,7 +181,7 @@ class _ColorBlindCard extends StatelessWidget {
               children: <Widget>[
                 Text(
                   blindColor.name,
-                  style: Theme.of(context).textTheme.headline6!.copyWith(
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
                         fontSize: 18,
                         color: contrastedColor,
                       ),
@@ -196,7 +193,7 @@ class _ColorBlindCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context)
                       .textTheme
-                      .caption!
+                      .bodySmall!
                       .copyWith(color: contrastedColor.withOpacity(0.87)),
                 ),
               ],

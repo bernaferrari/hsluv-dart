@@ -123,7 +123,7 @@ class HSLuvColor {
   }
 
   @override
-  int get hashCode => hashValues(hue, saturation, lightness);
+  int get hashCode => Object.hash(hue, saturation, lightness);
 
   @override
   String toString() => 'H:$hue S:$saturation L:$lightness';

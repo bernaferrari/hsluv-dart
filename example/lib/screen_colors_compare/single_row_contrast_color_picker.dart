@@ -67,9 +67,8 @@ class _ContrastItemCompacted extends StatelessWidget {
 
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        elevation: 0,
+        elevation: 0, backgroundColor: rgbHsluvTuple.rgbColor,
         padding: EdgeInsets.zero,
-        primary: rgbHsluvTuple.rgbColor,
         shape: const RoundedRectangleBorder(),
       ),
       onPressed: onPressed,
@@ -79,20 +78,20 @@ class _ContrastItemCompacted extends StatelessWidget {
           Text(
             rgbHsluvTuple.hsluvColor.lightness.round().toString(),
             style:
-                Theme.of(context).textTheme.caption!.copyWith(color: textColor),
+                Theme.of(context).textTheme.bodySmall!.copyWith(color: textColor),
           ),
           Text(
             contrast.toStringAsPrecision(3),
             style: Theme.of(context)
                 .textTheme
-                .caption!
+                .bodySmall!
                 .copyWith(fontSize: 10, color: textColor),
           ),
           Text(
             getContrastLetters(contrast),
             style: Theme.of(context)
                 .textTheme
-                .caption!
+                .bodySmall!
                 .copyWith(fontSize: 8, color: textColor),
           )
         ],

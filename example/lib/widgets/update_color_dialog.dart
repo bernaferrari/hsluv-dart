@@ -1,4 +1,3 @@
-// user defined function
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,7 +12,7 @@ import 'text_form_colored.dart';
 
 Future<void> showSlidersDialog(BuildContext context, Color color,
     [int? index]) async {
-  final dynamic result = await showDialog<dynamic>(
+  final Color? result = await showDialog<dynamic>(
       context: context,
       builder: (_) {
         return BlocProvider(
@@ -23,9 +22,9 @@ Future<void> showSlidersDialog(BuildContext context, Color color,
       });
 
   if (result != null) {
-    if (index == null && result is Color) {
+    if (index == null) {
       BlocProvider.of<SliderColorBloc>(context).add(MoveColor(result, true));
-    } else if (result is Color) {
+    } else {
       context
           .read<ColorsCubit>()
           .updateRgbColor(rgbColor: result, selected: index);

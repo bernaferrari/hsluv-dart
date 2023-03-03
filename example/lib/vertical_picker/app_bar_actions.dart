@@ -35,7 +35,7 @@ class ColorSearchButton extends StatelessWidget {
             color.toHexStr(),
             style: Theme.of(context)
                 .textTheme
-                .bodyText2!
+                .bodyMedium!
                 .copyWith(color: onSurface),
           ),
           onPressed: () {
@@ -63,16 +63,15 @@ class OutlinedIconButton extends StatelessWidget {
       height: 36,
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-          padding: EdgeInsets.zero,
+          foregroundColor: Theme.of(context).colorScheme.onSurface, padding: EdgeInsets.zero,
           shape: const CircleBorder(),
           side: BorderSide(
             color: borderColor ??
                 Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
           ),
-          primary: Theme.of(context).colorScheme.onSurface,
         ),
-        child: child,
         onPressed: onPressed,
+        child: child,
       ),
     );
   }

@@ -1,8 +1,5 @@
-import 'package:bloc/bloc.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -16,7 +13,7 @@ import 'util/constants.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await openBox();
-  Bloc.observer = SimpleBlocObserver();
+  BlocOverrides.runZoned(() {}, blocObserver: SimpleBlocObserver());
   runApp(const BoxedApp());
 }
 
@@ -33,7 +30,7 @@ class BoxedApp extends StatefulWidget {
   const BoxedApp({Key? key}) : super(key: key);
 
   @override
-  _BoxedAppState createState() => _BoxedAppState();
+  State<BoxedApp> createState() => _BoxedAppState();
 }
 
 class _BoxedAppState extends State<BoxedApp> {
@@ -60,19 +57,13 @@ class _BoxedAppState extends State<BoxedApp> {
 
     return MultiBlocProvider(
       providers: [
-        BlocProvider<SliderColorBloc>(
-          create: (context) => _sliderColorBloc,
-        ),
-        BlocProvider<ColorsCubit>(
-          create: (context) => _colorsCubit,
-        ),
+        BlocProvider<SliderColorBloc>(create: (context) => _sliderColorBloc),
+        BlocProvider<ColorsCubit>(create: (context) => _colorsCubit),
       ],
       child: MaterialApp(
         title: 'HSLuv Sample',
         routes: {
-          "/": (context) {
-            return Home(initialColor: Colors.orange[200]!);
-          },
+          "/": (context) => const Home(),
           "compare": (context) {
             return BlocProvider<MultipleContrastCompareCubit>(
               create: (context) => MultipleContrastCompareCubit(_colorsCubit),

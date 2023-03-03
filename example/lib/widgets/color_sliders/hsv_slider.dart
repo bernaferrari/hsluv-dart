@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 import 'single_slider.dart';
 
@@ -15,7 +14,7 @@ class HSVSlider extends StatefulWidget {
   final HSVColor color;
 
   @override
-  _HSVSliderState createState() => _HSVSliderState();
+  State<HSVSlider> createState() => _HSVSliderState();
 }
 
 class _HSVSliderState extends State<HSVSlider> {
