@@ -1,6 +1,6 @@
 ![Logo of HSLuv for Dart & Flutter](assets/logo.png)
 
-# HSLuv for Dart & Flutter
+# HSLuv (and HPLuv) for Dart & Flutter
 
 Dart port of [HSLuv](https://www.hsluv.org) (revision 4) with a [Flutter sample](example). This was a direct conversion of the [reference implementation](https://github.com/hsluv/hsluv/tree/main/haxe).
 The sample is available as a web app.
@@ -19,6 +19,14 @@ When Hue or Saturation attributes change, there might be minimal changes in cont
 
 This is specially useful when [building acessible color systems](https://stripe.com/blog/accessible-color-systems).
 For more information, check: [Designing Color Spaces](https://programmingdesignsystems.com/color/perceptually-uniform-color-spaces/index.html) / [Wikipedia article](https://en.wikipedia.org/wiki/HSLuv)
+
+## HPLuv
+
+[<p align="center"><img src="https://github.com/user-attachments/assets/f551a11f-1b57-46d6-af23-e100d22d6f5e?raw=true" width="310"/></p>](hpluv)
+
+H**P**Luv is a similar color space where the perceptual saturation/chroma of a color always stays the same under hue changes. HPL is illustrated by the smaller circle within the [hsluv](https://www.hsluv.org) homepage color picker, which consists of the maximum saturation HPL values available for the given lightness level. HPL is restricted to **P**astel colors, as many hues cannot reach saturation levels that equal the other hues (eg, in the image, at lightness = 60.2, the most saturated cyan is only about half as saturated as the most saturated possible orange, so the maximum saturation of HPL colors there is constrained to that of cyan).
+
+You can make a `Color` in HPLuv with `toColor(Hsluv.hpluvToRgb([hue, saturation, lightness))` where `hue: [0...360]`, `saturation: [0..100]`, `lightness: [0..100]`.
 
 ## Usage
 
