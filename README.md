@@ -1,24 +1,29 @@
 ![Logo of HSLuv for Dart & Flutter](assets/logo.png)
 
-# HSLuv for Dart & Flutter
+# HSLuv (and HPLuv) for Dart & Flutter
 
-Dart port of [HSLuv](https://www.hsluv.org) (revision 4) with a [Flutter sample](example). This was a direct conversion of the [reference implementation](https://github.com/hsluv/hsluv/tree/main/haxe).
-The sample is available as a web app.
+Dart port of [HSLuv](https://www.hsluv.org) (revision 4), based on the [reference implementation](https://github.com/hsluv/hsluv/tree/main/haxe).
 
-<a href="https://bernaferrari.github.io/hsluv-dart/"><img src="https://github.com/bernaferrari/hsluv-dart/raw/main/assets/try_here.png" height="50"/></a>
-
-[<p align="center"><img src="https://github.com/bernaferrari/hsluv-dart/raw/main/assets/sample_app.jpg?raw=true" width="400"/></p>](example)
+The bundled Flutter example has been deprecated. Explore HSLuv in [Chroma Folio](https://github.com/bernaferrari/chroma-folio) or [try it in your browser](https://bernaferrari.github.io/chroma-folio/).
 
 > HSLuv is a human-friendly alternative to HSL.
 
 It is like HSL, but color only gets perceptually lighter or darker when the Lightness attribute changes.
 In HSL, if you go from a green hue to a red one, there will be big differences in the perceived lightness. In HSLuv, almost none.
 
-If you want to see for yourself, check the [sample app](example) and open the Color Compare screen. Contrast "only" changes when Lightness changes.
+Open Spectrum in Chroma Folio to compare how perceived lightness changes across hues in HSL and HSLuv.
 When Hue or Saturation attributes change, there might be minimal changes in contrast (in the 0.01 range), but nothing perceivable and certainly better than HSV/HSL.
 
 This is specially useful when [building acessible color systems](https://stripe.com/blog/accessible-color-systems).
 For more information, check: [Designing Color Spaces](https://programmingdesignsystems.com/color/perceptually-uniform-color-spaces/index.html) / [Wikipedia article](https://en.wikipedia.org/wiki/HSLuv)
+
+## HPLuv
+
+[<p align="center"><img src="https://github.com/user-attachments/assets/f551a11f-1b57-46d6-af23-e100d22d6f5e?raw=true" width="310"/></p>](hpluv)
+
+H**P**Luv is a similar color space where the perceptual saturation/chroma of a color always stays the same under hue changes. HPL is illustrated by the smaller circle within the [hsluv](https://www.hsluv.org) homepage color picker, which consists of the maximum saturation HPL values available for the given lightness level. HPL is restricted to **P**astel colors, as many hues cannot reach saturation levels that equal the other hues (eg, in the image, at lightness = 60.2, the most saturated cyan is only about half as saturated as the most saturated possible orange, so the maximum saturation of HPL colors there is constrained to that of cyan).
+
+You can make a `Color` in HPLuv with `toColor(Hsluv.hpluvToRgb([hue, saturation, lightness))` where `hue: [0...360]`, `saturation: [0..100]`, `lightness: [0..100]`.
 
 ## Usage
 
@@ -52,9 +57,9 @@ void main() {
 }
 ```
 
-[<p align="center"><img src="https://github.com/bernaferrari/hsluv-dart/raw/main/assets/hsv_vs_hsluv.gif?raw=true" width="300"/></p>](example)
+<p align="center"><img src="assets/hsv_vs_hsluv.gif" width="300" alt="Hue comparison in HSV and HSLuv"></p>
 
-[Sample app](example) showing HSV (top) vs HSLuv (bottom). See how the perceived lightness changes as the hue slider moves.
+HSV is on top and HSLuv is below. Watch the perceived lightness as the hue changes.
 
 ### Color values ranges
 
@@ -72,7 +77,6 @@ void main() {
 - XYZ values are ranging in [0...1]
 
 **Important**: Flutter's HSLColor has lightness and saturation ranging from 0 to 1.0. HSLuv uses 0 to 100.
-There is a class, called HSInterColor in the [sample](example) that tries to mitigate this.
 
 ### API functions
 
