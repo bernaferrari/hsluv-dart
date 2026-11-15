@@ -3,8 +3,8 @@ import 'package:hsluv/hsluv.dart';
 
 import 'snapshot.dart';
 
-const MAXDIFF = 0.0000000001;
-const MAXRELDIFF = 0.000000001;
+const maxDiff = 0.0000000001;
+const maxRelDiff = 0.000000001;
 
 class TestClass {
   /// modified from
@@ -12,22 +12,22 @@ class TestClass {
   static bool assertAlmostEqualRelativeAndAbs(double a, double b) {
     // Check if the numbers are really close -- needed
     // when comparing numbers near zero.
-    double diff = (a - b).abs();
-    if (diff <= MAXDIFF) {
+    final double diff = (a - b).abs();
+    if (diff <= maxDiff) {
       return true;
     }
 
-    a = a.abs();
-    b = b.abs();
-    double largest = (b > a) ? b : a;
+    final absA = a.abs();
+    final absB = b.abs();
+    final double largest = (absB > absA) ? absB : absA;
 
-    return diff <= largest * MAXRELDIFF;
+    return diff <= largest * maxRelDiff;
   }
 
-  static assertTuplesClose(
+  static void assertTuplesClose(
       String label, List<double> expected, List<double> actual) {
     bool mismatch = false;
-    List<double> deltas = [];
+    final List<double> deltas = [];
 
     for (int i = 0; i < expected.length; i += 1) {
       deltas.add((expected[i] - actual[i]).abs());
@@ -37,18 +37,20 @@ class TestClass {
     }
 
     if (mismatch) {
-      print("MISMATCH " + label);
-      print(" expected: ${expected[0]} ${expected[1]} ${expected[2]}");
-      print("  actual: ${actual[0]} ${actual[1]} ${actual[2]}");
-      print("  deltas: ${deltas[0]} ${deltas[1]} ${expected[2]}");
+      fail(
+        'MISMATCH $label\n'
+        ' expected: ${expected[0]} ${expected[1]} ${expected[2]}\n'
+        '   actual: ${actual[0]} ${actual[1]} ${actual[2]}\n'
+        '   deltas: ${deltas[0]} ${deltas[1]} ${deltas[2]}',
+      );
     }
 
     expect(mismatch, false);
   }
 
   static void testConsistency() {
-    var samples = Snapshot.generateHexSamples();
-    for (String hex in samples) {
+    final samples = Snapshot.generateHexSamples();
+    for (final String hex in samples) {
       expect(hex, Hsluv.hsluvToHex(Hsluv.hexToHsluv(hex)));
       expect(hex, Hsluv.hpluvToHex(Hsluv.hexToHpluv(hex)));
     }
@@ -59,11 +61,11 @@ class TestClass {
     for (double r = 0.0; r < 1.0; r += 0.01) {
       for (double g = 0.0; g < 1.0; g += 0.01) {
         for (double b = 0.0; b < 1.0; b += 0.01) {
-          var sample = [r, g, b];
-          var hsluv = Hsluv.rgbToHsluv(sample);
-          var hpluv = Hsluv.rgbToHpluv(sample);
-          var rgbHsluv = Hsluv.hsluvToRgb(hsluv);
-          var rgbHpluv = Hsluv.hpluvToRgb(hpluv);
+          final sample = [r, g, b];
+          final hsluv = Hsluv.rgbToHsluv(sample);
+          final hpluv = Hsluv.rgbToHpluv(sample);
+          final rgbHsluv = Hsluv.hsluvToRgb(hsluv);
+          final rgbHpluv = Hsluv.hpluvToRgb(hpluv);
           assertTuplesClose('RGB -> HSLuv -> RGB', sample, rgbHsluv);
           assertTuplesClose('RGB -> HPLuv -> RGB', sample, rgbHpluv);
         }
@@ -72,42 +74,42 @@ class TestClass {
   }
 
   static void testHsluv() {
-    var snapshot = Snapshot.generateSnapshot();
-    for (var fieldName in snapshot.keys) {
-      var field = snapshot[fieldName]!;
+    final snapshot = Snapshot.generateSnapshot();
+    for (final fieldName in snapshot.keys) {
+      final field = snapshot[fieldName]!;
 
-      var rgbFromHex = Hsluv.hexToRgb(fieldName);
-      var xyzFromRgb = Hsluv.rgbToXyz(field["rgb"]!);
-      var luvFromXyz = Hsluv.xyzToLuv(field["xyz"]!);
-      var lchFromLuv = Hsluv.luvToLch(field["luv"]!);
-      var hsluvFromLch = Hsluv.lchToHsluv(field["lch"]!);
-      var hpluvFromLch = Hsluv.lchToHpluv(field["lch"]!);
-      var hsluvFromHex = Hsluv.hexToHsluv(fieldName);
-      var hpluvFromHex = Hsluv.hexToHpluv(fieldName);
+      final rgbFromHex = Hsluv.hexToRgb(fieldName);
+      final xyzFromRgb = Hsluv.rgbToXyz(field["rgb"]!);
+      final luvFromXyz = Hsluv.xyzToLuv(field["xyz"]!);
+      final lchFromLuv = Hsluv.luvToLch(field["luv"]!);
+      final hsluvFromLch = Hsluv.lchToHsluv(field["lch"]!);
+      final hpluvFromLch = Hsluv.lchToHpluv(field["lch"]!);
+      final hsluvFromHex = Hsluv.hexToHsluv(fieldName);
+      final hpluvFromHex = Hsluv.hexToHpluv(fieldName);
 
-      assertTuplesClose(fieldName + "→" + "hexToRgb", field["rgb"]!, rgbFromHex);
-      assertTuplesClose(fieldName + "→" + "rgbToXyz", field["xyz"]!, xyzFromRgb);
-      assertTuplesClose(fieldName + "→" + "xyzToLuv", field["luv"]!, luvFromXyz);
-      assertTuplesClose(fieldName + "→" + "luvToLch", field["lch"]!, lchFromLuv);
+      assertTuplesClose('$fieldName→hexToRgb', field["rgb"]!, rgbFromHex);
+      assertTuplesClose('$fieldName→rgbToXyz', field["xyz"]!, xyzFromRgb);
+      assertTuplesClose('$fieldName→xyzToLuv', field["luv"]!, luvFromXyz);
+      assertTuplesClose('$fieldName→luvToLch', field["lch"]!, lchFromLuv);
       assertTuplesClose(
-          fieldName + "→" + "lchToHsluv", field["hsluv"]!, hsluvFromLch);
+          '$fieldName→lchToHsluv', field["hsluv"]!, hsluvFromLch);
       assertTuplesClose(
-          fieldName + "→" + "lchToHpluv", field["hpluv"]!, hpluvFromLch);
+          '$fieldName→lchToHpluv', field["hpluv"]!, hpluvFromLch);
       assertTuplesClose(
-          fieldName + "→" + "hexToHsluv", field["hsluv"]!, hsluvFromHex);
+          '$fieldName→hexToHsluv', field["hsluv"]!, hsluvFromHex);
       assertTuplesClose(
-          fieldName + "→" + "hexToHpluv", field["hpluv"]!, hpluvFromHex);
+          '$fieldName→hexToHpluv', field["hpluv"]!, hpluvFromHex);
 
       // backward functions
 
-      var lchFromHsluv = Hsluv.hsluvToLch(field["hsluv"]!);
-      var lchFromHpluv = Hsluv.hpluvToLch(field["hpluv"]!);
-      var luvFromLch = Hsluv.lchToLuv(field["lch"]!);
-      var xyzFromLuv = Hsluv.luvToXyz(field["luv"]!);
-      var rgbFromXyz = Hsluv.xyzToRgb(field["xyz"]!);
-      var hexFromRgb = Hsluv.rgbToHex(field["rgb"]!);
-      var hexFromHsluv = Hsluv.hsluvToHex(field["hsluv"]!);
-      var hexFromHpluv = Hsluv.hpluvToHex(field["hpluv"]!);
+      final lchFromHsluv = Hsluv.hsluvToLch(field["hsluv"]!);
+      final lchFromHpluv = Hsluv.hpluvToLch(field["hpluv"]!);
+      final luvFromLch = Hsluv.lchToLuv(field["lch"]!);
+      final xyzFromLuv = Hsluv.luvToXyz(field["luv"]!);
+      final rgbFromXyz = Hsluv.xyzToRgb(field["xyz"]!);
+      final hexFromRgb = Hsluv.rgbToHex(field["rgb"]!);
+      final hexFromHsluv = Hsluv.hsluvToHex(field["hsluv"]!);
+      final hexFromHpluv = Hsluv.hpluvToHex(field["hpluv"]!);
 
       assertTuplesClose("hsluvToLch", field["lch"]!, lchFromHsluv);
       assertTuplesClose("hpluvToLch", field["lch"]!, lchFromHpluv);

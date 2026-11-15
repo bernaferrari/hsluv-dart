@@ -18,21 +18,30 @@ class HSLuvColor {
 
   /// Creates an [HSLuvColor] from an RGB [Color].
   ///
-  /// This constructor does not necessarily round-trip with [toColor] because
-  /// of floating-point imprecision.
-  factory HSLuvColor.fromColor(Color color) {
-    final double red = color.red / 0xFF;
-    final double green = color.green / 0xFF;
-    final double blue = color.blue / 0xFF;
+  /// When [round] is true (default), components are rounded to the nearest
+  /// integer. Pass `round: false` or use [HSLuvColor.fromRawColor] to preserve
+  /// full floating-point precision.
+  factory HSLuvColor.fromColor(Color color, {bool round = true}) {
+    final double red = color.r.clamp(0.0, 1.0);
+    final double green = color.g.clamp(0.0, 1.0);
+    final double blue = color.b.clamp(0.0, 1.0);
 
     final List<double> luv = Hsluv.rgbToHsluv([red, green, blue]);
 
-    final double hue = luv[0].roundToDouble();
-    final double saturation = luv[1].roundToDouble();
-    final double lightness = luv[2].roundToDouble();
+    final double hue =
+        (round ? luv[0].roundToDouble() : luv[0]).clamp(0.0, 360.0);
+    final double saturation =
+        (round ? luv[1].roundToDouble() : luv[1]).clamp(0.0, 100.0);
+    final double lightness =
+        (round ? luv[2].roundToDouble() : luv[2]).clamp(0.0, 100.0);
 
     return HSLuvColor.fromHSL(hue, saturation, lightness);
   }
+
+  /// Creates an [HSLuvColor] from an RGB [Color] preserving floating-point
+  /// precision.
+  factory HSLuvColor.fromRawColor(Color color) =>
+      HSLuvColor.fromColor(color, round: false);
 
   /// Hue, from 0.0 to 360.0. Describes which color of the spectrum is
   /// represented. A value of 0.0 represents red, as does 360.0. Values in
@@ -57,7 +66,7 @@ class HSLuvColor {
   }
 
   /// Returns a copy of this color with saturation being added via the [add] parameter.
-  /// It also accepts a [min] and [max] parameters, where default = 0, 100.
+  /// It also accepts [min] and [max] parameters, where default = 0, 100.
   HSLuvColor addSaturation(double add, {double min = 0, double max = 100}) {
     return HSLuvColor.fromHSL(
       hue,
@@ -66,8 +75,8 @@ class HSLuvColor {
     );
   }
 
-  /// Returns a copy of this color with saturation being added via the [add] parameter.
-  /// It also accepts a [min] and [max] parameters, where default = 0, 100.
+  /// Returns a copy of this color with lightness being added via the [add] parameter.
+  /// It also accepts [min] and [max] parameters, where default = 0, 100.
   HSLuvColor addLightness(double add, {double min = 0, double max = 100}) {
     return HSLuvColor.fromHSL(
       hue,
@@ -78,7 +87,7 @@ class HSLuvColor {
 
   /// Returns a copy of this color with hue, saturation and lightness being added.
   /// If Saturation or Lightness values is > 100, it will be limited to 100.
-  /// If Saturation or Lightness values is < 0, it will be set to 100.
+  /// If Saturation or Lightness values is < 0, it will be set to 0.
   HSLuvColor addHSLuv(double h, double s, double l) {
     return HSLuvColor.fromHSL(
       (hue + h) % 360,
@@ -87,39 +96,58 @@ class HSLuvColor {
     );
   }
 
+  /// Returns a copy of this color with the specified fields replaced.
+  HSLuvColor copyWith({
+    double? hue,
+    double? saturation,
+    double? lightness,
+  }) {
+    return HSLuvColor.fromHSL(
+      (hue ?? this.hue).clamp(0.0, 360.0),
+      (saturation ?? this.saturation).clamp(0.0, 100.0),
+      (lightness ?? this.lightness).clamp(0.0, 100.0),
+    );
+  }
+
   /// Returns a copy of this color with the [hue] parameter replaced with the
   /// given value.
   HSLuvColor withHue(double hue) {
-    return HSLuvColor.fromHSL(hue, saturation, lightness);
+    return HSLuvColor.fromHSL(hue.clamp(0.0, 360.0), saturation, lightness);
   }
 
   /// Returns a copy of this color with the [saturation] parameter replaced with
   /// the given value.
   HSLuvColor withSaturation(double saturation) {
-    return HSLuvColor.fromHSL(hue, math.min(saturation, 100), lightness);
+    return HSLuvColor.fromHSL(hue, saturation.clamp(0.0, 100.0), lightness);
   }
 
   /// Returns a copy of this color with the [lightness] parameter replaced with
   /// the given value.
   HSLuvColor withLightness(double lightness) {
-    return HSLuvColor.fromHSL(hue, saturation, math.min(lightness, 100));
+    return HSLuvColor.fromHSL(hue, saturation, lightness.clamp(0.0, 100.0));
   }
 
-  /// Returns this HSL color in RGB.
+  /// Returns this HSLuv color as an sRGB [Color].
   Color toColor() {
     final rgb = Hsluv.hsluvToRgb([hue, saturation, lightness]);
-    return Color.fromARGB(255, (rgb[0] * 255).toInt(), (rgb[1] * 255).toInt(),
-        (rgb[2] * 255).toInt());
+    return Color.fromARGB(
+      255,
+      (rgb[0] * 255).round().clamp(0, 255),
+      (rgb[1] * 255).round().clamp(0, 255),
+      (rgb[2] * 255).round().clamp(0, 255),
+    );
   }
 
+  /// Returns a `#RRGGBB` hex string for this color.
+  String toHex() => Hsluv.hsluvToHex([hue, saturation, lightness]);
+
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    if (other is! HSLuvColor) return false;
-    final HSLuvColor typedOther = other;
-    return typedOther.hue == hue &&
-        typedOther.saturation == saturation &&
-        typedOther.lightness == lightness;
+    return other is HSLuvColor &&
+        other.hue == hue &&
+        other.saturation == saturation &&
+        other.lightness == lightness;
   }
 
   @override
