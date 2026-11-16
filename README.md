@@ -1,4 +1,6 @@
-![Logo of HSLuv for Dart & Flutter](https://raw.githubusercontent.com/bernaferrari/hsluv-dart/main/assets/logo.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/bernaferrari/hsluv-dart/main/assets/logo.png" width="680" alt="HSLuv for Dart and Flutter">
+</p>
 
 # HSLuv (and HPLuv) for Dart & Flutter
 
@@ -23,9 +25,11 @@ For more information, check: [Designing Color Spaces](https://programmingdesigns
 
 ## HPLuv
 
-[<p align="center"><img src="https://github.com/user-attachments/assets/f551a11f-1b57-46d6-af23-e100d22d6f5e?raw=true" width="310"/></p>](hpluv)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/bernaferrari/hsluv-dart/main/assets/hpluv_vs_hsluv_solid.webp" width="680" alt="3D solid comparison of HSLuv CIELUV polyhedron vs HPLuv inscribed pastel spindle">
+</p>
 
-H**P**Luv is a similar color space where the perceptual saturation/chroma of a color always stays the same under hue changes. HPL is illustrated by the smaller circle within the [hsluv](https://www.hsluv.org) homepage color picker, which consists of the maximum saturation HPL values available for the given lightness level. HPL is restricted to **P**astel colors, as many hues cannot reach saturation levels that equal the other hues (eg, in the image, at lightness = 60.2, the most saturated cyan is only about half as saturated as the most saturated possible orange, so the maximum saturation of HPL colors there is constrained to that of cyan).
+H**P**Luv is a similar color space where the perceptual saturation/chroma (`C*`) stays uniform across every hue. While HSLuv normalizes `(H, S, L)` into a cylinder by stretching each hue out to the irregular sRGB polyhedron boundary in CIELUV chroma (`C*`), HPLuv carves the largest symmetric pastel spindle inside every lightness slice (bounded by the shortest cyan edge, roughly half as saturated as orange around lightness = 60).
 
 You can make a `Color` in HPLuv with `hpluvToRGBColor([hue, saturation, lightness])` where `hue: [0...360]`, `saturation: [0..100]`, `lightness: [0..100]`.
 
@@ -62,9 +66,11 @@ void main() {
 }
 ```
 
-<p align="center"><img src="https://raw.githubusercontent.com/bernaferrari/hsluv-dart/main/assets/hsv_vs_hsluv.gif" width="300" alt="Hue comparison in HSV and HSLuv"></p>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/bernaferrari/hsluv-dart/main/assets/hsl_vs_hsluv.webp" width="680" alt="Hue and perceived lightness comparison in HSL vs HSLuv">
+</p>
 
-HSV is on top and HSLuv is below. Watch the perceived lightness as the hue changes.
+HSL is on top and HSLuv is below (both fixed at `S: 88%`, `L: 62%`). Watch the perceived lightness curve (`L*`) as the hue changes.
 
 ### Color values ranges
 
