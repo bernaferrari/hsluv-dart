@@ -3,3 +3,10 @@ include: package:flutter_lints/flutter.yaml
 analyzer:
   exclude:
     - build/**
+
+linter:
+  rules:
+    - use_declaring_parameters
+    - unnecessary_primary_constructor_body
+    - unnecessary_type_name_in_constructor
+    - unnecessary_const_in_enum_constructor

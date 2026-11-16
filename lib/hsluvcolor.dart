@@ -3,12 +3,24 @@ import 'dart:ui';
 
 import 'package:hsluv/hsluv.dart';
 
-class HSLuvColor {
-  /// Creates a color.
-  ///
-  /// All the arguments must not be null and be in their respective ranges. See
-  /// the fields for each parameter for a description of their ranges.
-  const HSLuvColor.fromHSL(this.hue, this.saturation, this.lightness)
+class const HSLuvColor.fromHSL(
+  /// Hue, from 0.0 to 360.0. Describes which color of the spectrum is
+  /// represented. A value of 0.0 represents red, as does 360.0. Values in
+  /// between go through all the hues representable in RGB. You can think of
+  /// this as selecting which color filter is placed over a light.
+  final double hue,
+
+  /// Saturation, from 0.0 to 100.0. This describes how colorful the color is.
+  /// 0.0 implies a shade of grey (i.e. no pigment), and 100.0 implies a color as
+  /// vibrant as that hue gets. You can think of this as the purity of the
+  /// color filter over the light.
+  final double saturation,
+
+  /// Lightness, from 0.0 to 100.0. The lightness of a color describes how bright
+  /// a color is. A value of 0.0 indicates black, and 100.0 indicates white.
+  final double lightness,
+) {
+  this
     : assert(hue >= 0.0),
       assert(hue <= 360.0),
       assert(saturation >= 0.0),
@@ -21,7 +33,7 @@ class HSLuvColor {
   /// When [round] is true (default), components are rounded to the nearest
   /// integer. Pass `round: false` or use [HSLuvColor.fromRawColor] to preserve
   /// full floating-point precision.
-  factory HSLuvColor.fromColor(Color color, {bool round = true}) {
+  factory fromColor(Color color, {bool round = true}) {
     final double red = color.r.clamp(0.0, 1.0);
     final double green = color.g.clamp(0.0, 1.0);
     final double blue = color.b.clamp(0.0, 1.0);
@@ -46,24 +58,8 @@ class HSLuvColor {
 
   /// Creates an [HSLuvColor] from an RGB [Color] preserving floating-point
   /// precision.
-  factory HSLuvColor.fromRawColor(Color color) =>
+  factory fromRawColor(Color color) =>
       HSLuvColor.fromColor(color, round: false);
-
-  /// Hue, from 0.0 to 360.0. Describes which color of the spectrum is
-  /// represented. A value of 0.0 represents red, as does 360.0. Values in
-  /// between go through all the hues representable in RGB. You can think of
-  /// this as selecting which color filter is placed over a light.
-  final double hue;
-
-  /// Saturation, from 0.0 to 100.0. This describes how colorful the color is.
-  /// 0.0 implies a shade of grey (i.e. no pigment), and 100.0 implies a color as
-  /// vibrant as that hue gets. You can think of this as the purity of the
-  /// color filter over the light.
-  final double saturation;
-
-  /// Lightness, from 0.0 to 100.0. The lightness of a color describes how bright
-  /// a color is. A value of 0.0 indicates black, and 100.0 indicates white.
-  final double lightness;
 
   /// Returns a copy of this color with hue being added via the [add] parameter.
   /// It also accepts a [cycle] parameter, so it circles back when larger than it (default = 360).

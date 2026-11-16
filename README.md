@@ -11,7 +11,11 @@ The bundled Flutter example has been deprecated. Explore HSLuv in [Chroma Folio]
 It is like HSL, but color only gets perceptually lighter or darker when the Lightness attribute changes.
 In HSL, if you go from a green hue to a red one, there will be big differences in the perceived lightness. In HSLuv, almost none.
 
-Open Spectrum in Chroma Folio to compare how perceived lightness changes across hues in HSL and HSLuv.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/bernaferrari/hsluv-dart/main/assets/hsluv_vs_hsl_solid.webp" width="680" alt="3D solid comparison of HSLuv vs HSL animating down and up across lightness">
+</p>
+
+Open Solid or Spectrum in Chroma Folio to compare how perceived lightness changes across hues in HSL and HSLuv.
 When Hue or Saturation attributes change, there might be minimal changes in contrast (in the 0.01 range), but nothing perceivable and certainly better than HSV/HSL.
 
 This is specially useful when [building acessible color systems](https://stripe.com/blog/accessible-color-systems).

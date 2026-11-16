@@ -2,46 +2,26 @@ import 'dart:math' as math;
 
 import 'hsluv.dart';
 
-class PickerGeometry {
-  PickerGeometry({
-    required this.lines,
-    required this.vertices,
-    required this.angles,
-    required this.outerCircleRadius,
-    required this.innerCircleRadius,
-  });
-
-  List<Line> lines;
-
+class PickerGeometry({
+  required var List<Line> lines,
   // Ordered such that 1st vertex is intersection between first and
   // second line, 2nd vertex between second and third line etc.
-  List<Point> vertices;
-
+  required var List<Point> vertices,
   // Angles from origin to corresponding vertex
-  List<double> angles;
-
+  required var List<double> angles,
   // Smallest circle with center at origin such that polygon fits inside
-  double outerCircleRadius;
-
+  required var double outerCircleRadius,
   // Largest circle with center at origin such that it fits inside polygon
-  double innerCircleRadius;
-}
+  required var double innerCircleRadius,
+});
 
-class _LineIntersection {
-  const _LineIntersection({
-    required this.line1,
-    required this.line2,
-    required this.intersectionPoint,
-    required this.intersectionPointAngle,
-    required this.relativeAngle,
-  });
-
-  final int line1;
-  final int line2;
-  final Point intersectionPoint;
-  final double intersectionPointAngle;
-  final double relativeAngle;
-}
+class const _LineIntersection({
+  required final int line1,
+  required final int line2,
+  required final Point intersectionPoint,
+  required final double intersectionPointAngle,
+  required final double relativeAngle,
+});
 
 class ColorPicker {
   static PickerGeometry getPickerGeometry(double lightness) {

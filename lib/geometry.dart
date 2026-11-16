@@ -2,19 +2,9 @@ import 'dart:math' as math;
 
 // converted from https://github.com/hsluv/hsluv
 
-class Point {
-  Point(this.x, this.y);
+class Point(var double x, var double y);
 
-  double x;
-  double y;
-}
-
-class Line {
-  Line({required this.slope, required this.intercept});
-
-  double slope;
-  double intercept;
-}
+class Line({required var double slope, required var double intercept});
 
 // All angles in radians
 // https://github.com/dart-lang/sdk/issues/2626
