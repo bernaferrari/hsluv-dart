@@ -1,3 +1,10 @@
+## [1.3.0]
+
+* Add `HsluvConverter` for allocation-free, reusable scalar conversions and route `Hsluv` static helpers through it so math lives in one place without intermediate `List`/`Line` allocations.
+* Clamp floating-point boundary overshoot on `hsluvToRgb`, `hpluvToRgb`, `rgbToHsluv`, `rgbToHpluv` (`H` and `L`, keeping `S` unclamped for out-of-gamut sRGB round-trips), and `rgbToHex` channels (`0..255`).
+* Validate `#RRGGBB` format in `Hsluv.hexToRgb` and throw `FormatException` on malformed hex strings.
+* Verify conversions against the canonical 4,096-entry upstream `snapshot-rev4.json` fixture, expand Dartdoc to zero warnings, and refresh README visualizations.
+
 ## [1.2.0]
 
 * Require Flutter 3.50+ / Dart 3.14+ (uses `dart:ui` floating-point `Color` channels, compatible with standalone `material_ui` and bundled Flutter apps).

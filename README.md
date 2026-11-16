@@ -41,7 +41,7 @@ In the `pubspec.yaml` of your flutter project, add the following dependency:
 
 ```yaml
 dependencies:
-  hsluv: ^1.2.0
+  hsluv: ^1.3.0
 ```
 
 In your project you can use it in two different ways, either low level (directly accessing values as a `List<double>`) or high level (similar to `HSLColor`).
