@@ -77,7 +77,8 @@ class TestClass {
   }
 
   static void testHsluv() {
-    final snapshot = Snapshot.generateSnapshot();
+    final snapshot = Snapshot.loadCanonicalRev4Snapshot();
+    expect(snapshot.length, 4096);
     for (final fieldName in snapshot.keys) {
       final field = snapshot[fieldName]!;
 

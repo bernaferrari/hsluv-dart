@@ -74,18 +74,18 @@ HSL is on top and HSLuv is below (both fixed at `S: 88%`, `L: 62%`). Watch the p
 
 ### Color values ranges
 
-- RGB values are ranging in [0...1]
+- RGB values are ranging in `[0...1]`
 - HSLuv and HPLuv values have different ranging for their components
-  - H : [0...360]
-  - S and L : [0...100]
+  - H : `[0...360]`
+  - S and L : `[0...100]`
 - LUV has different ranging for their components
-  - L\* : [0...100]
-  - u* and v* : [-100...100]
+  - L\* : `[0...100]`
+  - u\* and v\* : `[-100...100]`
 - LCh has different ranging for their components
-  - L\* : [0...100]
-  - C* : [0...?] Upper bound varies depending on L* and H\*
-  - H\* : [0...360]
-- XYZ values are ranging in [0...1]
+  - L\* : `[0...100]`
+  - C\* : `[0...?]` Upper bound varies depending on L\* and H\*
+  - H\* : `[0...360]`
+- XYZ values are ranging in `[0...1]`
 
 **Important**: Flutter's HSLColor has lightness and saturation ranging from 0 to 1.0. HSLuv uses 0 to 100.
 
@@ -93,13 +93,13 @@ HSL is on top and HSLuv is below (both fixed at `S: 88%`, `L: 62%`). Watch the p
 
 #### Note
 
-The passing/returning values, when not `String` are `List<double>` containing each component of the given color space/system in the name's order :
+The passing/returning values, when not `String` are `List<double>` containing each component of the given color space/system in the name's order (for allocation-free tight loops, instantiate `HsluvConverter` and mutate its scalar fields directly):
 
-- RGB : [red, blue, green]
-- XYZ : [X, Y, Z]
-- LCH : [L, C, H]
-- LUV : [L, u, v]
-- HSLuv/HPLuv : [H, S, L]
+- RGB : `[red, green, blue]`
+- XYZ : `[X, Y, Z]`
+- LCH : `[L, C, H]`
+- LUV : `[L, u, v]`
+- HSLuv/HPLuv : `[H, S, L]`
 
 #### Function listing
 

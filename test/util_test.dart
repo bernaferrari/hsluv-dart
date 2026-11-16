@@ -86,6 +86,77 @@ void main() {
       closeTo(Contrast.W3C_CONTRAST_TEXT, 0.01),
     );
   });
+
+  test("HsluvConverter matches Hsluv static conversions without drift", () {
+    final converter = HsluvConverter();
+    const samples = [
+      '#000000',
+      '#ffffff',
+      '#ff0000',
+      '#00ff00',
+      '#0000ff',
+      '#ef3e4a',
+    ];
+    for (final hex in samples) {
+      converter
+        ..hex = hex
+        ..hexToHsluv();
+      final hsluv = Hsluv.hexToHsluv(hex);
+      TestClass.assertTuplesClose('$hex→converter.hexToHsluv', hsluv, [
+        converter.hsluvH,
+        converter.hsluvS,
+        converter.hsluvL,
+      ]);
+
+      converter.hsluvToHex();
+      expect(converter.hex, hex);
+
+      converter
+        ..hex = hex
+        ..hexToHpluv();
+      final hpluv = Hsluv.hexToHpluv(hex);
+      TestClass.assertTuplesClose('$hex→converter.hexToHpluv', hpluv, [
+        converter.hpluvH,
+        converter.hpluvS,
+        converter.hpluvL,
+      ]);
+
+      converter.hpluvToHex();
+      expect(converter.hex, hex);
+    }
+  });
+
+  test("clamping and hex validation handle edge cases safely", () {
+    expect(Hsluv.rgbToHex([-0.2, 0.5, 1.3]), '#0080ff');
+    expect(Hsluv.hexToRgb('#ABCDEF'), [171 / 255, 205 / 255, 239 / 255]);
+
+    for (final bad in ['', '#', '#123', '112233', '#gggggg', '#1234567']) {
+      expect(() => Hsluv.hexToRgb(bad), throwsFormatException);
+    }
+
+    // Valid sRGB primaries must produce bounded HSLuv channels even near cube edges.
+    for (final rgb in [
+      [1.0, 0.0, 0.0],
+      [1.0, 1.0, 0.0],
+      [0.0, 1.0, 1.0],
+      [1.0, 0.0, 1.0],
+    ]) {
+      final hsluv = Hsluv.rgbToHsluv(rgb);
+      expect(hsluv[0], inInclusiveRange(0.0, 360.0));
+      expect(hsluv[1], inInclusiveRange(0.0, 100.0));
+      expect(hsluv[2], inInclusiveRange(0.0, 100.0));
+
+      final back = Hsluv.hsluvToRgb(hsluv);
+      for (final ch in back) {
+        expect(ch, inInclusiveRange(0.0, 1.0));
+      }
+    }
+
+    // HPLuv saturation can legitimately exceed 100 for vivid sRGB colors and round-trips.
+    final vividHpluv = Hsluv.hexToHpluv('#ff0000');
+    expect(vividHpluv[1], greaterThan(100.0));
+    expect(Hsluv.hpluvToHex(vividHpluv), '#ff0000');
+  });
 }
 
 extension on HSLuvColor {

@@ -18,12 +18,12 @@ class Geometry {
   }
 
   static double distanceFromOrigin(Point point) {
-    return math.sqrt(math.pow(point.x, 2) + math.pow(point.y, 2));
+    return math.sqrt(point.x * point.x + point.y * point.y);
   }
 
   static double distanceLineFromOrigin(Line line) {
     // https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
-    return line.intercept.abs() / math.sqrt(math.pow(line.slope, 2) + 1);
+    return line.intercept.abs() / math.sqrt(line.slope * line.slope + 1);
   }
 
   static Line perpendicularThroughPoint(Line line, Point point) {

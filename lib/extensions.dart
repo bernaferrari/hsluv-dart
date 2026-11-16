@@ -31,11 +31,14 @@ Color toColor(List<double> rgb) {
   );
 }
 
-/// HSLuv values are ranging in [0;360], [0;100] and [0;100] and RGB in [0;1].
+/// Converts an HSLuv `[H, S, L]` tuple (`H` in `0..360`, `S` and `L` in
+/// `0..100`) to an opaque Flutter [Color].
 Color hsluvToRGBColor(List<double> tuple) {
   return toColor(Hsluv.hsluvToRgb(tuple));
 }
 
+/// Converts an HPLuv `[H, S, L]` tuple (`H` in `0..360`, `S` and `L` in
+/// `0..100`) to an opaque Flutter [Color].
 Color hpluvToRGBColor(List<double> tuple) {
   return toColor(Hsluv.hpluvToRgb(tuple));
 }

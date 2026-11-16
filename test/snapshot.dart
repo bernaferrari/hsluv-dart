@@ -1,4 +1,5 @@
-import 'package:hsluv/hsluv.dart';
+import 'dart:convert';
+import 'dart:io';
 
 class Snapshot {
   static List<String> generateHexSamples() {
@@ -18,27 +19,25 @@ class Snapshot {
     return ret;
   }
 
-  static Map<String, Map<String, List<double>>> generateSnapshot() {
-    final Map<String, Map<String, List<double>>> ret = {};
-    final samples = Snapshot.generateHexSamples();
-
-    for (final String hex in samples) {
-      final rgb = Hsluv.hexToRgb(hex);
-      final xyz = Hsluv.rgbToXyz(rgb);
-      final luv = Hsluv.xyzToLuv(xyz);
-      final lch = Hsluv.luvToLch(luv);
-
-      final Map<String, List<double>> sample = {};
-      sample["rgb"] = rgb;
-      sample["xyz"] = xyz;
-      sample["luv"] = luv;
-      sample["lch"] = lch;
-      sample["hsluv"] = Hsluv.lchToHsluv(lch);
-      sample["hpluv"] = Hsluv.lchToHpluv(lch);
-
-      ret[hex] = sample;
-    }
-
-    return ret;
+  /// Loads the canonical 4,096-entry revision 4 snapshot checked in from
+  /// upstream `hsluv/hsluv`.
+  static Map<String, Map<String, List<double>>> loadCanonicalRev4Snapshot() {
+    final file = File('test/snapshot-rev4.json').existsSync()
+        ? File('test/snapshot-rev4.json')
+        : File('../test/snapshot-rev4.json');
+    final decoded = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
+    return decoded.map(
+      (hex, entry) => MapEntry(
+        hex,
+        (entry as Map<String, dynamic>).map(
+          (space, coords) => MapEntry(
+            space,
+            (coords as List<dynamic>)
+                .map((value) => (value as num).toDouble())
+                .toList(growable: false),
+          ),
+        ),
+      ),
+    );
   }
 }
