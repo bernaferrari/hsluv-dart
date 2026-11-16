@@ -25,7 +25,10 @@ class TestClass {
   }
 
   static void assertTuplesClose(
-      String label, List<double> expected, List<double> actual) {
+    String label,
+    List<double> expected,
+    List<double> actual,
+  ) {
     bool mismatch = false;
     final List<double> deltas = [];
 
@@ -91,14 +94,10 @@ class TestClass {
       assertTuplesClose('$fieldName→rgbToXyz', field["xyz"]!, xyzFromRgb);
       assertTuplesClose('$fieldName→xyzToLuv', field["luv"]!, luvFromXyz);
       assertTuplesClose('$fieldName→luvToLch', field["lch"]!, lchFromLuv);
-      assertTuplesClose(
-          '$fieldName→lchToHsluv', field["hsluv"]!, hsluvFromLch);
-      assertTuplesClose(
-          '$fieldName→lchToHpluv', field["hpluv"]!, hpluvFromLch);
-      assertTuplesClose(
-          '$fieldName→hexToHsluv', field["hsluv"]!, hsluvFromHex);
-      assertTuplesClose(
-          '$fieldName→hexToHpluv', field["hpluv"]!, hpluvFromHex);
+      assertTuplesClose('$fieldName→lchToHsluv', field["hsluv"]!, hsluvFromLch);
+      assertTuplesClose('$fieldName→lchToHpluv', field["hpluv"]!, hpluvFromLch);
+      assertTuplesClose('$fieldName→hexToHsluv', field["hsluv"]!, hsluvFromHex);
+      assertTuplesClose('$fieldName→hexToHpluv', field["hpluv"]!, hpluvFromHex);
 
       // backward functions
 

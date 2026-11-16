@@ -2,6 +2,12 @@ import 'dart:math' as math;
 
 import 'geometry.dart';
 
+export 'color_picker.dart';
+export 'contrast.dart';
+export 'extensions.dart';
+export 'geometry.dart';
+export 'hsluvcolor.dart';
+
 ///    Human-friendly HSL conversion utility class.
 ///    The math for most of this module was taken from:
 /// * http://www.easyrgb.com
@@ -19,13 +25,13 @@ class Hsluv {
   static const m = [
     [3.240969941904521, -1.537383177570093, -0.498610760293],
     [-0.96924363628087, 1.87596750150772, 0.041555057407175],
-    [0.055630079696993, -0.20397695888897, 1.056971514242878]
+    [0.055630079696993, -0.20397695888897, 1.056971514242878],
   ];
 
   static const minv = [
     [0.41239079926595, 0.35758433938387, 0.18048078840183],
     [0.21263900587151, 0.71516867876775, 0.072192315360733],
-    [0.019330818715591, 0.11919477979462, 0.95053215224966]
+    [0.019330818715591, 0.11919477979462, 0.95053215224966],
   ];
 
   static const double refY = 1.0;
@@ -55,14 +61,12 @@ class Hsluv {
 
       for (int t = 0; t < 2; t++) {
         double top1 = (284517 * m1 - 94839 * m3) * sub2;
-        double top2 = (838422 * m3 + 769860 * m2 + 731718 * m1) * L * sub2 -
+        double top2 =
+            (838422 * m3 + 769860 * m2 + 731718 * m1) * L * sub2 -
             769860 * t * L;
         double bottom = (632260 * m3 - 126452 * m2) * sub2 + 126452 * t;
 
-        result.add(Line(
-          slope: top1 / bottom,
-          intercept: top2 / bottom,
-        ));
+        result.add(Line(slope: top1 / bottom, intercept: top2 / bottom));
       }
     }
 
@@ -133,7 +137,7 @@ class Hsluv {
     return [
       fromLinear(dotProduct(m[0], tuple)),
       fromLinear(dotProduct(m[1], tuple)),
-      fromLinear(dotProduct(m[2], tuple))
+      fromLinear(dotProduct(m[2], tuple)),
     ];
   }
 
@@ -144,13 +148,13 @@ class Hsluv {
     List<double> rgbl = [
       toLinear(tuple[0]),
       toLinear(tuple[1]),
-      toLinear(tuple[2])
+      toLinear(tuple[2]),
     ];
 
     return [
       dotProduct(minv[0], rgbl),
       dotProduct(minv[1], rgbl),
-      dotProduct(minv[2], rgbl)
+      dotProduct(minv[2], rgbl),
     ];
   }
 

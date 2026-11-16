@@ -1,4 +1,4 @@
-![Logo of HSLuv for Dart & Flutter](assets/logo.png)
+![Logo of HSLuv for Dart & Flutter](https://raw.githubusercontent.com/bernaferrari/hsluv-dart/main/assets/logo.png)
 
 # HSLuv (and HPLuv) for Dart & Flutter
 
@@ -23,7 +23,7 @@ For more information, check: [Designing Color Spaces](https://programmingdesigns
 
 H**P**Luv is a similar color space where the perceptual saturation/chroma of a color always stays the same under hue changes. HPL is illustrated by the smaller circle within the [hsluv](https://www.hsluv.org) homepage color picker, which consists of the maximum saturation HPL values available for the given lightness level. HPL is restricted to **P**astel colors, as many hues cannot reach saturation levels that equal the other hues (eg, in the image, at lightness = 60.2, the most saturated cyan is only about half as saturated as the most saturated possible orange, so the maximum saturation of HPL colors there is constrained to that of cyan).
 
-You can make a `Color` in HPLuv with `toColor(Hsluv.hpluvToRgb([hue, saturation, lightness))` where `hue: [0...360]`, `saturation: [0..100]`, `lightness: [0..100]`.
+You can make a `Color` in HPLuv with `hpluvToRGBColor([hue, saturation, lightness])` where `hue: [0...360]`, `saturation: [0..100]`, `lightness: [0..100]`.
 
 ## Usage
 
@@ -33,23 +33,24 @@ In the `pubspec.yaml` of your flutter project, add the following dependency:
 
 ```yaml
 dependencies:
-  hsluv: ^VERSION
+  hsluv: ^1.2.0
 ```
 
-In your project you can use it in two different ways, either low level (directly accessing values as a `list<double>`) or high level (similar to [HSLColor](https://api.flutter.dev/flutter/painting/HSLColor-class.html)).
-`HSLuvColor` is easier to use, but has less flexibility than a raw list.
+In your project you can use it in two different ways, either low level (directly accessing values as a `List<double>`) or high level (similar to `HSLColor`).
+`HSLuvColor` is easier to use, and uses `dart:ui`'s `Color` directly (compatible with both standalone `material_ui` and bundled Flutter apps).
 
 ```dart
+import 'dart:ui';
+
 import 'package:hsluv/hsluv.dart';
 
 void main() {
-
   // Low level usage.
-  final List<double> hsluvLow = Hsluv.rgbToHsluv([0.2,0.5,0.7]);
+  final List<double> hsluvLow = Hsluv.rgbToHsluv([0.2, 0.5, 0.7]);
   print(Hsluv.hsluvToHex(hsluvLow));
 
   // High level usage.
-  final hsluvFromColor = HSLuvColor.fromColor(Colors(0xffef3e4a));
+  final hsluvFromColor = const Color(0xFFEF3E4A).toHSLuv();
   print(hsluvFromColor.toString());
 
   final hsluvFromHSL = HSLuvColor.fromHSL(300, 70, 60);
@@ -57,7 +58,7 @@ void main() {
 }
 ```
 
-<p align="center"><img src="assets/hsv_vs_hsluv.gif" width="300" alt="Hue comparison in HSV and HSLuv"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/bernaferrari/hsluv-dart/main/assets/hsv_vs_hsluv.gif" width="300" alt="Hue comparison in HSV and HSLuv"></p>
 
 HSV is on top and HSLuv is below. Watch the perceived lightness as the hue changes.
 

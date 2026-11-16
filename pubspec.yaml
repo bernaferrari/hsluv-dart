@@ -1,10 +1,12 @@
 name: hsluv
 description: Dart port of HSLuv, a human-friendly alternative to HSL based on human experiments.
-homepage: https://github.com/bernaferrari/hsluv-dart
 version: 1.2.0
+homepage: https://github.com/bernaferrari/hsluv-dart
+repository: https://github.com/bernaferrari/hsluv-dart
 
 environment:
-  sdk: ^3.11.0
+  sdk: ^3.14.0
+  flutter: '>=3.50.0'
 
 dependencies:
   flutter:

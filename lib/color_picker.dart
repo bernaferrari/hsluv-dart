@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 
-import 'geometry.dart';
 import 'hsluv.dart';
 
 class PickerGeometry {
@@ -64,28 +63,36 @@ class ColorPicker {
     }
 
     final closestLine = lines[closestIndex2!];
-    final perpendicularLine =
-        Line(slope: 0 - (1 / closestLine.slope), intercept: 0.0);
-    final startIntersection =
-        Geometry.intersectLineLine(closestLine, perpendicularLine);
+    final perpendicularLine = Line(
+      slope: 0 - (1 / closestLine.slope),
+      intercept: 0.0,
+    );
+    final startIntersection = Geometry.intersectLineLine(
+      closestLine,
+      perpendicularLine,
+    );
     final startingAngle = Geometry.angleFromOrigin(startIntersection);
 
     final List<_LineIntersection> intersections = [];
 
     for (int i1 = 0; i1 < numLines - 1; i1 += 1) {
       for (int i2 = i1 + 1; i2 < numLines; i2 += 1) {
-        final intersectionPoint =
-            Geometry.intersectLineLine(lines[i1], lines[i2]);
-        final intersectionPointAngle =
-            Geometry.angleFromOrigin(intersectionPoint);
+        final intersectionPoint = Geometry.intersectLineLine(
+          lines[i1],
+          lines[i2],
+        );
+        final intersectionPointAngle = Geometry.angleFromOrigin(
+          intersectionPoint,
+        );
         intersections.add(
           _LineIntersection(
             line1: i1,
             line2: i2,
             intersectionPoint: intersectionPoint,
             intersectionPointAngle: intersectionPointAngle,
-            relativeAngle:
-                Geometry.normalizeAngle(intersectionPointAngle - startingAngle),
+            relativeAngle: Geometry.normalizeAngle(
+              intersectionPointAngle - startingAngle,
+            ),
           ),
         );
       }
@@ -113,8 +120,9 @@ class ColorPicker {
         orderedVertices.add(currentIntersection.intersectionPoint);
         orderedAngles.add(currentIntersection.intersectionPointAngle);
 
-        final double intersectionPointDistance =
-            Geometry.distanceFromOrigin(currentIntersection.intersectionPoint);
+        final double intersectionPointDistance = Geometry.distanceFromOrigin(
+          currentIntersection.intersectionPoint,
+        );
         if (intersectionPointDistance > outerCircleRadius) {
           outerCircleRadius = intersectionPointDistance;
         }
@@ -138,8 +146,7 @@ class ColorPicker {
     var index1 = 0;
 
     for (int i = 0; i < numVertices; i += 1) {
-      final relativeAngle =
-          Geometry.normalizeAngle(geometry.angles[i] - angle);
+      final relativeAngle = Geometry.normalizeAngle(geometry.angles[i] - angle);
       if (relativeAngle < smallestRelativeAngle) {
         smallestRelativeAngle = relativeAngle;
         index1 = i;
@@ -155,10 +162,14 @@ class ColorPicker {
       return point;
     }
 
-    final Line perpendicularLine =
-        Geometry.perpendicularThroughPoint(closestLine, point);
-    final Point intersectionPoint =
-        Geometry.intersectLineLine(closestLine, perpendicularLine);
+    final Line perpendicularLine = Geometry.perpendicularThroughPoint(
+      closestLine,
+      point,
+    );
+    final Point intersectionPoint = Geometry.intersectLineLine(
+      closestLine,
+      perpendicularLine,
+    );
 
     final Point bound1 = geometry.vertices[index1];
     final Point bound2 = geometry.vertices[index2];

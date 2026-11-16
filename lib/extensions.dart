@@ -1,11 +1,17 @@
 import 'dart:ui';
 
 import 'package:hsluv/hsluv.dart';
-import 'package:hsluv/hsluvcolor.dart';
 
 extension HSLuvColorExtension on Color {
+  /// Converts this [Color] to an [HSLuvColor].
+  ///
+  /// Rounds components by default; pass `round: false` or call [toRawHSLuv] to
+  /// keep full floating-point precision.
   HSLuvColor toHSLuv({bool round = true}) =>
       HSLuvColor.fromColor(this, round: round);
+
+  /// Converts this [Color] to an [HSLuvColor] without rounding channels.
+  HSLuvColor toRawHSLuv() => HSLuvColor.fromRawColor(this);
 }
 
 List<double> toRGBList(Color color) {

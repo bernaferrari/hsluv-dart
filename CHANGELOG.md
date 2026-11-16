@@ -1,3 +1,11 @@
+## [1.2.0]
+
+* Require Flutter 3.50+ / Dart 3.14+ (uses `dart:ui` floating-point `Color` channels, compatible with standalone `material_ui` and bundled Flutter apps).
+* Export `HSLuvColor`, extensions, `ColorPicker`, `Contrast`, and `Geometry` directly from `package:hsluv/hsluv.dart`.
+* Add `HSLuvColor.fromRawColor`, `toRawHSLuv()`, and `round:` option on `HSLuvColor.fromColor` / `toHSLuv()`.
+* Fix `ColorPicker.getPickerGeometry` gamut polygon sampling.
+* Deprecate the bundled Flutter example in favor of [Chroma Folio](https://github.com/bernaferrari/chroma-folio).
+
 ## [1.1.3]
 * Update constraints to Flutter 2.19.
 

@@ -2,10 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hsluv/color_picker.dart';
-import 'package:hsluv/geometry.dart';
 import 'package:hsluv/hsluv.dart';
-import 'package:hsluv/hsluvcolor.dart';
 
 import 'test_class.dart';
 
@@ -52,7 +49,9 @@ void main() {
       expect(geometry.angles.length, geometry.vertices.length);
       expect(geometry.innerCircleRadius, greaterThan(0));
       expect(
-          geometry.outerCircleRadius, greaterThan(geometry.innerCircleRadius));
+        geometry.outerCircleRadius,
+        greaterThan(geometry.innerCircleRadius),
+      );
 
       // Verify polygon matches maxChromaForLH around all 360 degrees
       for (int deg = 0; deg < 360; deg += 5) {
@@ -70,4 +69,25 @@ void main() {
       }
     }
   });
+
+  test("extensions and contrast helpers work cleanly", () {
+    const sample = Color(0xFFEF3E4A);
+    expect(sample.toRawHSLuv(), HSLuvColor.fromRawColor(sample));
+    expect(sample.toHSLuv(), HSLuvColor.fromColor(sample));
+    expect(toRGBList(sample), [239.0, 62.0, 74.0]);
+    expect(hsluvToRGBColor(sample.toRawHSLuv().letToTuple()), sample);
+    expect(hpluvToRGBColor([12, 80, 70]).a, 1.0);
+    expect(Contrast.contrastRatio(100, 0), closeTo(21.0, 0.01));
+    expect(
+      Contrast.contrastRatio(
+        Contrast.lighterMinL(Contrast.W3C_CONTRAST_TEXT),
+        0,
+      ),
+      closeTo(Contrast.W3C_CONTRAST_TEXT, 0.01),
+    );
+  });
+}
+
+extension on HSLuvColor {
+  List<double> letToTuple() => [hue, saturation, lightness];
 }

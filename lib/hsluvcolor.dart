@@ -9,12 +9,12 @@ class HSLuvColor {
   /// All the arguments must not be null and be in their respective ranges. See
   /// the fields for each parameter for a description of their ranges.
   const HSLuvColor.fromHSL(this.hue, this.saturation, this.lightness)
-      : assert(hue >= 0.0),
-        assert(hue <= 360.0),
-        assert(saturation >= 0.0),
-        assert(saturation <= 100.0),
-        assert(lightness >= 0.0),
-        assert(lightness <= 100.0);
+    : assert(hue >= 0.0),
+      assert(hue <= 360.0),
+      assert(saturation >= 0.0),
+      assert(saturation <= 100.0),
+      assert(lightness >= 0.0),
+      assert(lightness <= 100.0);
 
   /// Creates an [HSLuvColor] from an RGB [Color].
   ///
@@ -28,12 +28,18 @@ class HSLuvColor {
 
     final List<double> luv = Hsluv.rgbToHsluv([red, green, blue]);
 
-    final double hue =
-        (round ? luv[0].roundToDouble() : luv[0]).clamp(0.0, 360.0);
-    final double saturation =
-        (round ? luv[1].roundToDouble() : luv[1]).clamp(0.0, 100.0);
-    final double lightness =
-        (round ? luv[2].roundToDouble() : luv[2]).clamp(0.0, 100.0);
+    final double hue = (round ? luv[0].roundToDouble() : luv[0]).clamp(
+      0.0,
+      360.0,
+    );
+    final double saturation = (round ? luv[1].roundToDouble() : luv[1]).clamp(
+      0.0,
+      100.0,
+    );
+    final double lightness = (round ? luv[2].roundToDouble() : luv[2]).clamp(
+      0.0,
+      100.0,
+    );
 
     return HSLuvColor.fromHSL(hue, saturation, lightness);
   }
@@ -97,11 +103,7 @@ class HSLuvColor {
   }
 
   /// Returns a copy of this color with the specified fields replaced.
-  HSLuvColor copyWith({
-    double? hue,
-    double? saturation,
-    double? lightness,
-  }) {
+  HSLuvColor copyWith({double? hue, double? saturation, double? lightness}) {
     return HSLuvColor.fromHSL(
       (hue ?? this.hue).clamp(0.0, 360.0),
       (saturation ?? this.saturation).clamp(0.0, 100.0),
