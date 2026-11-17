@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/bernaferrari/hsluv-dart/main/assets/logo.png" width="680" alt="HSLuv for Dart and Flutter">
+  <img src="https://raw.githubusercontent.com/bernaferrari/hsluv-dart/main/assets/logo.png" width="680" alt="HSLuv for Dart and Flutter: an HSL hue sweep whose gray twin swings from L* 32 to 97, next to an HSLuv sweep whose gray twin holds at L* 60">
 </p>
 
 # HSLuv (and HPLuv) for Dart & Flutter
@@ -14,7 +14,7 @@ It is like HSL, but color only gets perceptually lighter or darker when the Ligh
 In HSL, if you go from a green hue to a red one, there will be big differences in the perceived lightness. In HSLuv, almost none.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/bernaferrari/hsluv-dart/main/assets/hsluv_vs_hsl_solid.webp" width="680" alt="3D solid comparison of HSLuv vs HSL animating down and up across lightness">
+  <img src="https://raw.githubusercontent.com/bernaferrari/hsluv-dart/main/assets/hsluv_vs_hsl_solid.webp" width="680" alt="HSLuv and HSL solids cut at the same lightness; the HSLuv cut has a flat gray twin while the HSL cut swings between dark and light grays">
 </p>
 
 Open Solid or Spectrum in Chroma Folio to compare how perceived lightness changes across hues in HSL and HSLuv.
@@ -26,7 +26,7 @@ For more information, check: [Designing Color Spaces](https://programmingdesigns
 ## HPLuv
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/bernaferrari/hsluv-dart/main/assets/hpluv_vs_hsluv_solid.webp" width="680" alt="3D solid comparison of HSLuv CIELUV polyhedron vs HPLuv inscribed pastel spindle">
+  <img src="https://raw.githubusercontent.com/bernaferrari/hsluv-dart/main/assets/hpluv_vs_hsluv_solid.webp" width="680" alt="HSLuv reaches the irregular sRGB edge with chroma between 47 and 146, while HPLuv stays inside a pastel spindle with one chroma for every hue">
 </p>
 
 H**P**Luv is a similar color space where the perceptual saturation/chroma (`C*`) stays uniform across every hue. While HSLuv normalizes `(H, S, L)` into a cylinder by stretching each hue out to the irregular sRGB polyhedron boundary in CIELUV chroma (`C*`), HPLuv carves the largest symmetric pastel spindle inside every lightness slice (bounded by the shortest cyan edge, roughly half as saturated as orange around lightness = 60).
@@ -67,10 +67,10 @@ void main() {
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/bernaferrari/hsluv-dart/main/assets/hsl_vs_hsluv.webp" width="680" alt="Hue and perceived lightness comparison in HSL vs HSLuv">
+  <img src="https://raw.githubusercontent.com/bernaferrari/hsluv-dart/main/assets/hsl_vs_hsluv.webp" width="680" alt="A hue sweep in HSL and HSLuv with each color, its gray twin, and the perceived lightness curve">
 </p>
 
-HSL is on top and HSLuv is below (both fixed at `S: 88%`, `L: 62%`). Watch the perceived lightness curve (`L*`) as the hue changes.
+HSL is on top and HSLuv is below (both fixed at `S: 88%`, `L: 62%`). The gray strip under each hue bar is the same color with its chroma removed, and the curve plots perceived lightness (`L*`) as the hue changes: HSL jumps around, HSLuv stays flat.
 
 ### Color values ranges
 

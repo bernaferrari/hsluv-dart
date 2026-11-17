@@ -4,7 +4,12 @@
 //   - build/readme_frames/hpluv_vs_hsluv_solid/*.png -> assets/hpluv_vs_hsluv_solid.webp
 //   - build/readme_frames/hsl_vs_hsluv/*.png        -> assets/hsl_vs_hsluv.webp
 //
-// Run via `./tool/generate_assets.sh` (requires `flutter`, `ffmpeg`, and `img2webp`).
+// Run via `./tool/generate_assets.sh` (downloads fonts into build/readme_fonts;
+// requires `flutter`, `curl`, `ffmpeg`, and `img2webp`).
+//
+// Visual language: a dark "luminance lab". Every colour strip is paired with
+// its grayscale twin (the same colours mapped to their L*), and every solid
+// has an L* ruler, so uniform lightness is something you can see, not read.
 
 import 'dart:io';
 import 'dart:math' as math;
@@ -16,11 +21,205 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hsluv/hsluv.dart';
 
-const ui.Color _paper = ui.Color(0xFFF6F4EE);
-const ui.Color _cardBg = ui.Color(0xFFFCFAF5);
-const ui.Color _borderCol = ui.Color(0xFFE0DDD4);
-const ui.Color _ink = ui.Color(0xFF191918);
-const ui.Color _inkMuted = ui.Color(0xFF6B6A66);
+const ui.Color _bg = ui.Color(0xFF101113);
+const ui.Color _hairline = ui.Color(0xFF26282D);
+const ui.Color _fg = ui.Color(0xFFF1F1EF);
+const ui.Color _muted = ui.Color(0xFF8B8E95);
+const ui.Color _faint = ui.Color(0xFF4C4F56);
+
+const double _width = 760.0;
+const double _dpr = 2.0;
+const double _sheetRadius = 22.0;
+const double _pad = 28.0;
+const int _frames = 150;
+const int _ribbonSamples = 180;
+
+// Typography ------------------------------------------------------------------
+
+typedef _Span = (String, ui.TextStyle);
+
+ui.TextStyle _style(
+  String family,
+  double size,
+  double weight,
+  ui.Color color, {
+  double letterSpacing = 0,
+}) {
+  return ui.TextStyle(
+    fontFamily: family,
+    fontSize: size,
+    color: color,
+    letterSpacing: letterSpacing,
+    fontWeight: ui.FontWeight.values[(weight / 100).round() - 1],
+    fontVariations: [ui.FontVariation('wght', weight)],
+    fontFeatures: const [ui.FontFeature.tabularFigures()],
+  );
+}
+
+ui.TextStyle _display(double size, {double weight = 700, ui.Color? color}) =>
+    _style('Display', size, weight, color ?? _fg, letterSpacing: -size * 0.035);
+
+ui.TextStyle _mono(double size, {ui.Color color = _muted, bool bold = false}) =>
+    _style(bold ? 'MonoMedium' : 'Mono', size, bold ? 500 : 400, color);
+
+enum _Anchor { start, center, end }
+
+double _text(
+  ui.Canvas canvas,
+  List<_Span> spans, {
+  required double x,
+  required double baseline,
+  _Anchor anchor = _Anchor.start,
+}) {
+  final builder = ui.ParagraphBuilder(ui.ParagraphStyle());
+  for (final (text, style) in spans) {
+    builder
+      ..pushStyle(style)
+      ..addText(text)
+      ..pop();
+  }
+  final paragraph = builder.build()
+    ..layout(const ui.ParagraphConstraints(width: 2000));
+  final width = paragraph.maxIntrinsicWidth;
+  final dx = switch (anchor) {
+    _Anchor.start => x,
+    _Anchor.center => x - width / 2,
+    _Anchor.end => x - width,
+  };
+  canvas.drawParagraph(
+    paragraph,
+    ui.Offset(dx, baseline - paragraph.alphabeticBaseline),
+  );
+  paragraph.dispose();
+  return width;
+}
+
+String _pad3(double value) => value.round().toString().padLeft(3, '0');
+
+// Colour helpers --------------------------------------------------------------
+
+ui.Color _rgb(List<double> rgb) => ui.Color.from(
+  alpha: 1.0,
+  red: rgb[0].clamp(0.0, 1.0),
+  green: rgb[1].clamp(0.0, 1.0),
+  blue: rgb[2].clamp(0.0, 1.0),
+);
+
+double _lstar(ui.Color color) => Hsluv.rgbToLch([color.r, color.g, color.b])[0];
+
+ui.Color _grayOf(double lstar) => _rgb(Hsluv.lchToRgb([lstar, 0.0, 0.0]));
+
+ui.Color _hsl(double hue, double saturationPct, double lightnessPct) =>
+    HSLColor.fromAHSL(
+      1.0,
+      hue % 360.0,
+      saturationPct / 100.0,
+      lightnessPct / 100.0,
+    ).toColor();
+
+ui.Color _hsluv(double hue, double saturationPct, double lightnessPct) =>
+    _rgb(Hsluv.hsluvToRgb([hue % 360.0, saturationPct, lightnessPct]));
+
+ui.Color _hpluv(double hue, double saturationPct, double lightnessPct) =>
+    _rgb(Hsluv.hpluvToRgb([hue % 360.0, saturationPct, lightnessPct]));
+
+List<ui.Color> _sweep(ui.Color Function(double hue) colorAt) => [
+  for (var i = 0; i <= _ribbonSamples; i++) colorAt(i * 360.0 / _ribbonSamples),
+];
+
+(double, double) _range(Iterable<double> values) =>
+    (values.reduce(math.min), values.reduce(math.max));
+
+String _rangeLabel((double, double) range) {
+  final (low, high) = range;
+  return low.round() == high.round()
+      ? '${low.round()}'
+      : '${low.round()}–${high.round()}';
+}
+
+// Shared chrome ---------------------------------------------------------------
+
+ui.Paint _stroke(ui.Color color, [double width = 1.0]) => ui.Paint()
+  ..style = ui.PaintingStyle.stroke
+  ..strokeWidth = width
+  ..color = color;
+
+void _paintSheet(ui.Canvas canvas, ui.Size size) {
+  final sheet = ui.RRect.fromRectAndRadius(
+    ui.Offset.zero & size,
+    const ui.Radius.circular(_sheetRadius),
+  ).deflate(0.5);
+  canvas.drawRRect(sheet, ui.Paint()..color = _bg);
+  canvas.drawRRect(sheet, _stroke(_hairline));
+}
+
+void _divider(ui.Canvas canvas, ui.Offset a, ui.Offset b) =>
+    canvas.drawLine(a, b, _stroke(_hairline));
+
+/// A colour strip with its grayscale twin underneath: the same samples mapped
+/// to the neutral gray of equal L*. Uniform lightness shows up as a flat twin.
+void _paintTwinRibbon(
+  ui.Canvas canvas,
+  ui.Rect rect,
+  List<ui.Color> colors, {
+  double twinHeight = 12,
+  double radius = 8,
+}) {
+  final stops = [
+    for (var i = 0; i < colors.length; i++) i / (colors.length - 1),
+  ];
+  final grays = [for (final c in colors) _grayOf(_lstar(c))];
+  final colorRect = ui.Rect.fromLTRB(
+    rect.left,
+    rect.top,
+    rect.right,
+    rect.bottom - twinHeight,
+  );
+  final twinRect = ui.Rect.fromLTRB(
+    rect.left,
+    rect.bottom - twinHeight,
+    rect.right,
+    rect.bottom,
+  );
+  final clip = ui.RRect.fromRectAndRadius(rect, ui.Radius.circular(radius));
+  canvas.save();
+  canvas.clipRRect(clip);
+  ui.Shader gradient(List<ui.Color> c) =>
+      ui.Gradient.linear(rect.centerLeft, rect.centerRight, c, stops);
+  canvas.drawRect(colorRect, ui.Paint()..shader = gradient(colors));
+  canvas.drawRect(twinRect, ui.Paint()..shader = gradient(grays));
+  canvas.drawLine(
+    twinRect.topLeft,
+    twinRect.topRight,
+    _stroke(_bg.withValues(alpha: 0.9), 1.5),
+  );
+  canvas.restore();
+}
+
+/// Hue axis ticks below a ribbon: 0° … 360°.
+void _paintHueTicks(ui.Canvas canvas, ui.Rect ribbon, double baseline) {
+  for (var hue = 0; hue <= 360; hue += 60) {
+    final x = ribbon.left + ribbon.width * hue / 360;
+    canvas.drawLine(
+      ui.Offset(x, ribbon.bottom + 3),
+      ui.Offset(x, ribbon.bottom + 7),
+      _stroke(_faint),
+    );
+    _text(
+      canvas,
+      [('$hue°', _mono(9, color: _faint))],
+      x: x,
+      baseline: baseline,
+      anchor: hue == 0
+          ? _Anchor.start
+          : hue == 360
+          ? _Anchor.end
+          : _Anchor.center,
+    );
+  }
+}
+
+// 3D solids -------------------------------------------------------------------
 
 class _Camera {
   new({
@@ -58,6 +257,8 @@ class _Camera {
       towards * _cosPitch + up * _sinPitch,
     );
   }
+
+  double axisY(double lightnessPct) => project(0, 0, lightnessPct).$2;
 }
 
 class _SolidMesh {
@@ -118,12 +319,34 @@ class _Slice {
   final Int32List colors;
 }
 
+Uint16List _quadIndices(Iterable<int> faces, int columns) {
+  final list = faces.toList();
+  final indices = Uint16List(list.length * 6);
+  var cursor = 0;
+  for (final face in list) {
+    final ring = face ~/ columns;
+    final column = face % columns;
+    final next = (column + 1) % columns;
+    final a = ring * columns + column;
+    final b = ring * columns + next;
+    final c = (ring + 1) * columns + next;
+    final d = (ring + 1) * columns + column;
+    indices
+      ..[cursor++] = a
+      ..[cursor++] = b
+      ..[cursor++] = c
+      ..[cursor++] = a
+      ..[cursor++] = c
+      ..[cursor++] = d;
+  }
+  return indices;
+}
+
 void _paintSolid(
   ui.Canvas canvas,
   _Camera camera,
   _SolidMesh mesh,
   _Slice slice, {
-  _SolidMesh? ghostCageMesh,
   List<double>? ghostSliceReach,
   bool drawCageRibs = false,
 }) {
@@ -131,33 +354,6 @@ void _paintSolid(
   const cageRingEvery = 5;
   const cageRibEvery = 6;
   final rowsBelow = (slice.lightness / (100 / _SolidMesh.rows)).ceil();
-
-  if (ghostCageMesh != null) {
-    final backCage = ui.Path();
-    ui.Offset cornerGhost(int row, int column) {
-      final (x, y, _) = camera.project(
-        mesh.hueOf(column),
-        ghostCageMesh.reach[row * columns + column] * camera.radius,
-        _SolidMesh.lightnessOf(row),
-      );
-      return ui.Offset(x, y);
-    }
-
-    for (var row = 5; row <= _SolidMesh.rows - 5; row += cageRingEvery) {
-      backCage.addPolygon([
-        for (var column = 0; column < columns; column++)
-          cornerGhost(row, column),
-      ], true);
-    }
-    canvas.drawPath(
-      backCage,
-      ui.Paint()
-        ..style = ui.PaintingStyle.stroke
-        ..strokeWidth = 0.9
-        ..strokeJoin = ui.StrokeJoin.round
-        ..color = _ink.withValues(alpha: 0.13),
-    );
-  }
 
   if (rowsBelow > 0) {
     final ringCount = rowsBelow + 1;
@@ -197,31 +393,12 @@ void _paintSolid(
     }
     faces.sort((a, b) => faceNearness[a].compareTo(faceNearness[b]));
 
-    final indices = Uint16List(faces.length * 6);
-    var cursor = 0;
-    for (final face in faces) {
-      final ring = face ~/ columns;
-      final column = face % columns;
-      final next = (column + 1) % columns;
-      final a = ring * columns + column;
-      final b = ring * columns + next;
-      final c = (ring + 1) * columns + next;
-      final d = (ring + 1) * columns + column;
-      indices
-        ..[cursor++] = a
-        ..[cursor++] = b
-        ..[cursor++] = c
-        ..[cursor++] = a
-        ..[cursor++] = c
-        ..[cursor++] = d;
-    }
-
     canvas.drawVertices(
       ui.Vertices.raw(
         ui.VertexMode.triangles,
         positions,
         colors: colors,
-        indices: indices,
+        indices: _quadIndices(faces, columns),
       ),
       ui.BlendMode.dst,
       ui.Paint(),
@@ -251,37 +428,22 @@ void _paintSolid(
   }
   edge.close();
 
-  final sliceIndices = Uint16List(rings * columns * 6);
-  var sliceCursor = 0;
-  for (var ring = 0; ring < rings; ring++) {
-    for (var column = 0; column < columns; column++) {
-      final next = (column + 1) % columns;
-      final a = ring * columns + column;
-      final b = ring * columns + next;
-      final c = (ring + 1) * columns + next;
-      final d = (ring + 1) * columns + column;
-      sliceIndices
-        ..[sliceCursor++] = a
-        ..[sliceCursor++] = b
-        ..[sliceCursor++] = c
-        ..[sliceCursor++] = a
-        ..[sliceCursor++] = c
-        ..[sliceCursor++] = d;
-    }
-  }
   canvas.drawVertices(
     ui.Vertices.raw(
       ui.VertexMode.triangles,
       slicePos,
       colors: slice.colors,
-      indices: sliceIndices,
+      indices: _quadIndices(
+        List<int>.generate(rings * columns, (face) => face),
+        columns,
+      ),
     ),
     ui.BlendMode.dst,
     ui.Paint(),
   );
 
   if (ghostSliceReach != null) {
-    final outerEdge = ui.Path();
+    final outer = ui.Path();
     for (var column = 0; column < columns; column++) {
       final (x, y, _) = camera.project(
         mesh.hueOf(column),
@@ -289,938 +451,654 @@ void _paintSolid(
         slice.lightness,
       );
       if (column == 0) {
-        outerEdge.moveTo(x, y);
+        outer.moveTo(x, y);
       } else {
-        outerEdge.lineTo(x, y);
+        outer.lineTo(x, y);
       }
     }
-    outerEdge.close();
-    canvas.drawPath(
-      outerEdge,
-      ui.Paint()
-        ..style = ui.PaintingStyle.stroke
-        ..strokeWidth = 1.25
-        ..strokeJoin = ui.StrokeJoin.round
-        ..color = _ink.withValues(alpha: 0.28),
-    );
+    outer.close();
+    _paintDashed(canvas, outer, _stroke(_fg.withValues(alpha: 0.55)));
   }
 
-  canvas.drawPath(
-    edge,
-    ui.Paint()
-      ..style = ui.PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..strokeJoin = ui.StrokeJoin.round
-      ..color = const ui.Color(0xFFFFFFFF).withValues(alpha: 0.82),
-  );
+  canvas.drawPath(edge, _stroke(_fg.withValues(alpha: 0.9), 1.5));
 
-  if (ghostCageMesh == null) {
-    final cage = ui.Path();
-    ui.Offset corner(int row, int column) {
+  final cage = ui.Path();
+  ui.Offset corner(int row, int column) {
+    final (x, y, _) = camera.project(
+      mesh.hueOf(column),
+      mesh.reach[row * columns + column] * camera.radius,
+      _SolidMesh.lightnessOf(row),
+    );
+    return ui.Offset(x, y);
+  }
+
+  for (var row = rowsBelow; row <= _SolidMesh.rows; row++) {
+    final isTop = row == _SolidMesh.rows;
+    if (row % cageRingEvery != 0 && !isTop) continue;
+    if (_SolidMesh.lightnessOf(row) <= slice.lightness) continue;
+    cage.addPolygon([
+      for (var column = 0; column < columns; column++) corner(row, column),
+    ], true);
+  }
+  if (drawCageRibs) {
+    for (var column = 0; column < columns; column += cageRibEvery) {
       final (x, y, _) = camera.project(
         mesh.hueOf(column),
-        mesh.reach[row * columns + column] * camera.radius,
-        _SolidMesh.lightnessOf(row),
+        slice.reach[column] * camera.radius,
+        slice.lightness,
       );
-      return ui.Offset(x, y);
-    }
-
-    for (var row = rowsBelow; row <= _SolidMesh.rows; row++) {
-      final isTop = row == _SolidMesh.rows;
-      if (row % cageRingEvery != 0 && !isTop) continue;
-      if (_SolidMesh.lightnessOf(row) <= slice.lightness) continue;
       cage.addPolygon([
-        for (var column = 0; column < columns; column++) corner(row, column),
-      ], true);
+        ui.Offset(x, y),
+        for (var row = rowsBelow; row <= _SolidMesh.rows; row++)
+          if (_SolidMesh.lightnessOf(row) > slice.lightness)
+            corner(row, column),
+      ], false);
     }
-    if (drawCageRibs) {
-      for (var column = 0; column < columns; column += cageRibEvery) {
-        final (x, y, _) = camera.project(
-          mesh.hueOf(column),
-          slice.reach[column] * camera.radius,
-          slice.lightness,
-        );
-        cage.addPolygon([
-          ui.Offset(x, y),
-          for (var row = rowsBelow; row <= _SolidMesh.rows; row++)
-            if (_SolidMesh.lightnessOf(row) > slice.lightness)
-              corner(row, column),
-        ], false);
-      }
+  }
+  canvas.drawPath(
+    cage,
+    _stroke(_fg.withValues(alpha: 0.14))..strokeJoin = ui.StrokeJoin.round,
+  );
+}
+
+void _paintDashed(ui.Canvas canvas, ui.Path path, ui.Paint paint) {
+  const dash = 4.0;
+  const gap = 3.0;
+  for (final metric in path.computeMetrics()) {
+    for (var d = 0.0; d < metric.length; d += dash + gap) {
+      canvas.drawPath(metric.extractPath(d, d + dash), paint);
     }
-    canvas.drawPath(
-      cage,
-      ui.Paint()
-        ..style = ui.PaintingStyle.stroke
-        ..strokeWidth = 1.0
-        ..strokeJoin = ui.StrokeJoin.round
-        ..color = _ink.withValues(alpha: 0.16),
-    );
   }
 }
 
-void _drawText(
-  ui.Canvas canvas,
-  String text,
-  ui.Offset offset, {
-  required ui.TextStyle style,
-  ui.TextAlign align = ui.TextAlign.left,
-  double maxWidth = 500,
+/// L* ruler aligned with the solid's vertical axis, marking the current cut.
+void _paintRuler(ui.Canvas canvas, _Camera camera, double x, double lightness) {
+  final top = camera.axisY(100);
+  final bottom = camera.axisY(0);
+  canvas.drawLine(ui.Offset(x, top), ui.Offset(x, bottom), _stroke(_faint));
+  for (var l = 0; l <= 100; l += 10) {
+    final y = camera.axisY(l.toDouble());
+    final major = l % 50 == 0;
+    canvas.drawLine(
+      ui.Offset(x, y),
+      ui.Offset(x - (major ? 7 : 4), y),
+      _stroke(_faint),
+    );
+    if (major) {
+      _text(
+        canvas,
+        [('$l', _mono(9, color: _faint))],
+        x: x - 11,
+        baseline: y + 3,
+        anchor: _Anchor.end,
+      );
+    }
+  }
+  final y = camera.axisY(lightness);
+  final marker = ui.Path()
+    ..moveTo(x + 1, y)
+    ..lineTo(x + 7, y - 4)
+    ..lineTo(x + 7, y + 4)
+    ..close();
+  canvas.drawPath(marker, ui.Paint()..color = _fg);
+  canvas.drawLine(ui.Offset(x - 7, y), ui.Offset(x, y), _stroke(_fg, 1.5));
+}
+
+typedef _SolidPanel = ({
+  String name,
+  String note,
+  _SolidMesh mesh,
+  _Slice slice,
+  List<ui.Color> cut,
+  String readout,
+  List<double>? ghost,
+  bool ribs,
+});
+
+const ui.Size _solidSize = ui.Size(_width, 452);
+
+void _paintSolidComparison(
+  ui.Canvas canvas, {
+  required double yaw,
+  required double lightness,
+  required List<_SolidPanel> panels,
+  required String readoutName,
+  double cameraRadius = 0.56,
+  double pitch = 0.50,
 }) {
-  final builder =
-      ui.ParagraphBuilder(ui.ParagraphStyle(textAlign: align, maxLines: 2))
-        ..pushStyle(style)
-        ..addText(text);
-  final p = builder.build()..layout(ui.ParagraphConstraints(width: maxWidth));
-  final w = switch (align) {
-    ui.TextAlign.center || ui.TextAlign.right => p.maxIntrinsicWidth + 4,
-    _ => maxWidth,
-  };
-  p.layout(ui.ParagraphConstraints(width: w));
-  final dx = switch (align) {
-    ui.TextAlign.center => offset.dx - p.maxIntrinsicWidth / 2,
-    ui.TextAlign.right => offset.dx - p.maxIntrinsicWidth,
-    _ => offset.dx,
-  };
-  canvas.drawParagraph(p, ui.Offset(dx, offset.dy));
+  _paintSheet(canvas, _solidSize);
+  const columnWidth = _width / 2;
+  _divider(
+    canvas,
+    const ui.Offset(columnWidth, 0.5),
+    const ui.Offset(columnWidth, 451.5),
+  );
+
+  for (var i = 0; i < panels.length; i++) {
+    final panel = panels[i];
+    final left = i * columnWidth;
+
+    _text(canvas, [(panel.name, _display(22))], x: left + _pad, baseline: 46);
+    _text(canvas, [(panel.note, _mono(10.5))], x: left + _pad, baseline: 66);
+    _text(
+      canvas,
+      [
+        ('L ', _mono(10.5)),
+        (lightness.round().toString().padLeft(2), _mono(10.5, color: _fg)),
+      ],
+      x: left + columnWidth - _pad,
+      baseline: 46,
+      anchor: _Anchor.end,
+    );
+
+    final camera = _Camera(
+      yaw: yaw,
+      size: const ui.Size(columnWidth - 84, 262),
+      offset: ui.Offset(left + 62, 82),
+      radius: cameraRadius,
+      pitch: pitch,
+    );
+    _paintSolid(
+      canvas,
+      camera,
+      panel.mesh,
+      panel.slice,
+      ghostSliceReach: panel.ghost,
+      drawCageRibs: panel.ribs,
+    );
+    _paintRuler(canvas, camera, left + _pad + 14, lightness);
+
+    final ribbon = ui.Rect.fromLTWH(
+      left + _pad,
+      388,
+      columnWidth - _pad * 2,
+      34,
+    );
+    _text(
+      canvas,
+      [('same colors in grayscale', _mono(10))],
+      x: ribbon.left,
+      baseline: ribbon.top - 10,
+    );
+    _text(
+      canvas,
+      [
+        ('$readoutName ', _mono(10)),
+        (panel.readout, _mono(10, color: _fg, bold: true)),
+      ],
+      x: ribbon.right,
+      baseline: ribbon.top - 10,
+      anchor: _Anchor.end,
+    );
+    _paintTwinRibbon(canvas, ribbon, panel.cut, twinHeight: 12, radius: 7);
+  }
 }
 
-void _drawLightnessPill(
+// Assets ----------------------------------------------------------------------
+
+const ui.Size _heroSize = ui.Size(_width, 272);
+
+void _paintHero(ui.Canvas canvas) {
+  _paintSheet(canvas, _heroSize);
+
+  _text(
+    canvas,
+    [('hsluv  ·  rev. 4  ·  dart & flutter', _mono(10.5))],
+    x: 40,
+    baseline: 56,
+  );
+  _text(canvas, [('HSLuv', _display(72, weight: 800))], x: 36, baseline: 134);
+  _text(
+    canvas,
+    [('Hue moves. Lightness stays.', _display(18, weight: 600))],
+    x: 40,
+    baseline: 174,
+  );
+  _text(
+    canvas,
+    [
+      (
+        'A human-friendly HSL for Dart & Flutter.',
+        _display(14.5, weight: 500, color: _muted),
+      ),
+    ],
+    x: 40,
+    baseline: 198,
+  );
+  _text(
+    canvas,
+    [
+      (r'$ ', _mono(11, color: _faint)),
+      ('dart pub add hsluv', _mono(11, color: _fg)),
+    ],
+    x: 40,
+    baseline: 234,
+  );
+
+  const ribbonLeft = 382.0;
+  const ribbonWidth = 340.0;
+  final hsl = _sweep((h) => _hsl(h, 100, 50));
+  final hsluv = _sweep((h) => _hsluv(h, 100, 60));
+  final rows = [
+    ('HSL', 's 100  l 50', hsl, 60.0),
+    ('HSLuv', 's 100  l 60', hsluv, 146.0),
+  ];
+  for (final (name, params, colors, top) in rows) {
+    final ribbon = ui.Rect.fromLTWH(ribbonLeft, top, ribbonWidth, 48);
+    _text(
+      canvas,
+      [('$name  ', _mono(10.5, color: _fg, bold: true)), (params, _mono(10.5))],
+      x: ribbon.left,
+      baseline: ribbon.top - 10,
+    );
+    _text(
+      canvas,
+      [
+        ('L* ', _mono(10.5)),
+        (_rangeLabel(_range(colors.map(_lstar))), _mono(10.5, color: _fg)),
+      ],
+      x: ribbon.right,
+      baseline: ribbon.top - 10,
+      anchor: _Anchor.end,
+    );
+    _paintTwinRibbon(canvas, ribbon, colors, twinHeight: 16);
+  }
+  _paintHueTicks(
+    canvas,
+    const ui.Rect.fromLTWH(ribbonLeft, 146, ribbonWidth, 48),
+    218,
+  );
+}
+
+void _paintHslVsHsluvSolid(
   ui.Canvas canvas,
-  double width,
-  double height,
-  double l,
-) {
-  const pillW = 152.0;
-  const pillH = 26.0;
-  final pillRect = ui.RRect.fromRectAndRadius(
-    ui.Rect.fromLTWH((width - pillW) / 2, height - 38, pillW, pillH),
-    const ui.Radius.circular(999),
-  );
-  canvas.drawRRect(pillRect, ui.Paint()..color = _cardBg);
-  canvas.drawRRect(
-    pillRect,
-    ui.Paint()
-      ..style = ui.PaintingStyle.stroke
-      ..strokeWidth = 1
-      ..color = _borderCol,
-  );
-  final pb =
-      ui.ParagraphBuilder(ui.ParagraphStyle(textAlign: ui.TextAlign.left))
-        ..pushStyle(
-          ui.TextStyle(
-            fontFamily: 'StudioSans',
-            fontSize: 12,
-            color: _inkMuted,
-          ),
-        )
-        ..addText('lightness: ')
-        ..pop()
-        ..pushStyle(
-          ui.TextStyle(
-            fontFamily: 'StudioMono',
-            fontSize: 12,
-            fontWeight: ui.FontWeight.w700,
-            color: _ink,
-            fontFeatures: const [ui.FontFeature.tabularFigures()],
-          ),
-        )
-        ..addText('${l.round().toString().padLeft(2)}%');
-  final para = pb.build()..layout(const ui.ParagraphConstraints(width: pillW));
-  canvas.drawParagraph(
-    para,
-    ui.Offset(
-      width / 2 - para.maxIntrinsicWidth / 2,
-      height - 38 + pillH / 2 - para.height / 2,
-    ),
+  double t, {
+  required _SolidMesh hsluvMesh,
+  required _SolidMesh hslMesh,
+}) {
+  final yaw = 0.65 + 2 * math.pi * t;
+  final lightness = 62.5 + 22.5 * math.cos(2 * math.pi * t);
+  final hsluvCut = _sweep((h) => _hsluv(h, 100, lightness));
+  final hslCut = _sweep((h) => _hsl(h, 100, lightness));
+
+  _paintSolidComparison(
+    canvas,
+    yaw: yaw,
+    lightness: lightness,
+    readoutName: 'L*',
+    panels: [
+      (
+        name: 'HSLuv',
+        note: 'one lightness per height',
+        mesh: hsluvMesh,
+        slice: _Slice(
+          columns: hsluvMesh.columns,
+          lightness: lightness,
+          reachOf: (_) => 1.0,
+          colorOf: (h, s) => _hsluv(h, s, lightness),
+        ),
+        cut: hsluvCut,
+        readout: _rangeLabel(_range(hsluvCut.map(_lstar))),
+        ghost: null,
+        ribs: true,
+      ),
+      (
+        name: 'HSL',
+        note: 'yellow glows, blue sinks',
+        mesh: hslMesh,
+        slice: _Slice(
+          columns: hslMesh.columns,
+          lightness: lightness,
+          reachOf: (_) => 1.0,
+          colorOf: (h, s) => _hsl(h, s, lightness),
+        ),
+        cut: hslCut,
+        readout: _rangeLabel(_range(hslCut.map(_lstar))),
+        ghost: null,
+        ribs: true,
+      ),
+    ],
   );
 }
 
-ui.Color _toUiColor(List<double> rgb) => ui.Color.from(
-  alpha: 1.0,
-  red: rgb[0].clamp(0.0, 1.0),
-  green: rgb[1].clamp(0.0, 1.0),
-  blue: rgb[2].clamp(0.0, 1.0),
-);
+void _paintHpluvVsHsluvSolid(
+  ui.Canvas canvas,
+  double t, {
+  required _SolidMesh hsluvMesh,
+  required _SolidMesh hpluvMesh,
+  required double maxChroma,
+}) {
+  final yaw = 0.65 + 2 * math.pi * t;
+  final lightness = 62.5 + 22.5 * math.cos(2 * math.pi * t);
+  final outerReach = [
+    for (var c = 0; c < hsluvMesh.columns; c++)
+      Hsluv.maxChromaForLH(lightness, hsluvMesh.hueOf(c)) / maxChroma,
+  ];
+  final safeChroma = Hsluv.maxSafeChromaForL(lightness);
+  final hsluvChroma = [
+    for (var i = 0; i <= _ribbonSamples; i++)
+      Hsluv.maxChromaForLH(lightness, i * 360.0 / _ribbonSamples),
+  ];
 
-Future<void> _savePng(
-  ui.PictureRecorder recorder,
-  double width,
-  double height,
-  double dpr,
+  _paintSolidComparison(
+    canvas,
+    yaw: yaw,
+    lightness: lightness,
+    readoutName: 'C*',
+    cameraRadius: 0.68,
+    pitch: 0.48,
+    panels: [
+      (
+        name: 'HSLuv',
+        note: 'saturation reaches the sRGB edge',
+        mesh: hsluvMesh,
+        slice: _Slice(
+          columns: hsluvMesh.columns,
+          lightness: lightness,
+          reachOf: (h) => Hsluv.maxChromaForLH(lightness, h) / maxChroma,
+          colorOf: (h, s) => _hsluv(h, s, lightness),
+        ),
+        cut: _sweep((h) => _hsluv(h, 100, lightness)),
+        readout: _rangeLabel(_range(hsluvChroma)),
+        ghost: null,
+        ribs: false,
+      ),
+      (
+        name: 'HPLuv',
+        note: 'equal chroma for every hue',
+        mesh: hpluvMesh,
+        slice: _Slice(
+          columns: hpluvMesh.columns,
+          lightness: lightness,
+          reachOf: (_) => safeChroma / maxChroma,
+          colorOf: (h, s) => _hpluv(h, s, lightness),
+        ),
+        cut: _sweep((h) => _hpluv(h, 100, lightness)),
+        readout: '${safeChroma.round()}',
+        ghost: outerReach,
+        ribs: false,
+      ),
+    ],
+  );
+}
+
+const ui.Size _waveSize = ui.Size(_width, 420);
+
+void _paintWaveform(
+  ui.Canvas canvas,
+  double t, {
+  required List<ui.Color> hslSweep,
+  required List<ui.Color> hsluvSweep,
+}) {
+  _paintSheet(canvas, _waveSize);
+  _divider(
+    canvas,
+    const ui.Offset(0.5, 210),
+    const ui.Offset(_width - 0.5, 210),
+  );
+
+  final hue = t * 360.0;
+  final rows = [
+    (
+      name: 'HSL',
+      note: 'lightness jumps with hue',
+      color: _hsl(hue, 88, 62),
+      sweep: hslSweep,
+      top: 0.0,
+    ),
+    (
+      name: 'HSLuv',
+      note: 'lightness holds steady',
+      color: _hsluv(hue, 88, 62),
+      sweep: hsluvSweep,
+      top: 210.0,
+    ),
+  ];
+
+  for (final row in rows) {
+    final top = row.top;
+    final lstar = _lstar(row.color);
+
+    // Specimen: the colour and its gray, as one chip.
+    final chip = ui.Rect.fromLTWH(_pad, top + 30, 104, 150);
+    canvas.save();
+    canvas.clipRRect(
+      ui.RRect.fromRectAndRadius(chip, const ui.Radius.circular(14)),
+    );
+    canvas.drawRect(
+      ui.Rect.fromLTRB(chip.left, chip.top, chip.right, chip.bottom - 42),
+      ui.Paint()..color = row.color,
+    );
+    canvas.drawRect(
+      ui.Rect.fromLTRB(chip.left, chip.bottom - 42, chip.right, chip.bottom),
+      ui.Paint()..color = _grayOf(lstar),
+    );
+    canvas.restore();
+    _text(
+      canvas,
+      [
+        (
+          'L* ',
+          _mono(
+            10.5,
+            color: lstar > 55
+                ? _bg.withValues(alpha: 0.6)
+                : _fg.withValues(alpha: 0.7),
+          ),
+        ),
+        (
+          lstar.round().toString(),
+          _mono(10.5, color: lstar > 55 ? _bg : _fg, bold: true),
+        ),
+      ],
+      x: chip.left + 12,
+      baseline: chip.bottom - 16,
+    );
+
+    const contentLeft = _pad + 104 + 28;
+    const contentRight = _width - _pad;
+    final nameWidth = _text(
+      canvas,
+      [(row.name, _display(20))],
+      x: contentLeft,
+      baseline: top + 48,
+    );
+    _text(
+      canvas,
+      [('s 88  l 62  ·  ${row.note}', _mono(10.5))],
+      x: contentLeft + nameWidth + 12,
+      baseline: top + 47,
+    );
+    _text(
+      canvas,
+      [('hue ', _mono(10.5)), ('${_pad3(hue)}°', _mono(10.5, color: _fg))],
+      x: contentRight,
+      baseline: top + 47,
+      anchor: _Anchor.end,
+    );
+
+    final ribbon = ui.Rect.fromLTRB(
+      contentLeft,
+      top + 64,
+      contentRight,
+      top + 98,
+    );
+    _paintTwinRibbon(canvas, ribbon, row.sweep, twinHeight: 12, radius: 7);
+
+    final plot = ui.Rect.fromLTRB(
+      contentLeft,
+      top + 112,
+      contentRight,
+      top + 180,
+    );
+    for (final level in [0.0, 50.0, 100.0]) {
+      final y = plot.bottom - plot.height * level / 100;
+      canvas.drawLine(
+        ui.Offset(plot.left, y),
+        ui.Offset(plot.right, y),
+        _stroke(_hairline),
+      );
+    }
+    _text(
+      canvas,
+      [('L*', _mono(9, color: _faint))],
+      x: plot.left + 2,
+      baseline: plot.top - 3,
+    );
+
+    final curve = ui.Path();
+    for (var i = 0; i <= _ribbonSamples; i++) {
+      final x = plot.left + plot.width * i / _ribbonSamples;
+      final y = plot.bottom - plot.height * _lstar(row.sweep[i]) / 100;
+      if (i == 0) {
+        curve.moveTo(x, y);
+      } else {
+        curve.lineTo(x, y);
+      }
+    }
+    canvas.drawPath(
+      curve,
+      _stroke(_fg, 2)
+        ..strokeJoin = ui.StrokeJoin.round
+        ..shader = ui.Gradient.linear(
+          plot.centerLeft,
+          plot.centerRight,
+          row.sweep,
+          [for (var i = 0; i <= _ribbonSamples; i++) i / _ribbonSamples],
+        ),
+    );
+
+    final x = ribbon.left + ribbon.width * hue / 360;
+    final y = plot.bottom - plot.height * lstar / 100;
+    canvas.drawLine(
+      ui.Offset(x, ribbon.bottom + 2),
+      ui.Offset(x, plot.bottom),
+      _stroke(_fg.withValues(alpha: 0.22)),
+    );
+    final ribbonMid = ui.Offset(x, ribbon.top + (ribbon.height - 12) / 2);
+    canvas.drawCircle(ribbonMid, 8, _stroke(_fg, 2));
+    canvas.drawCircle(ui.Offset(x, y), 5.5, ui.Paint()..color = _bg);
+    canvas.drawCircle(ui.Offset(x, y), 4, ui.Paint()..color = _fg);
+  }
+}
+
+// Rendering -------------------------------------------------------------------
+
+Future<void> _render(
+  ui.Size size,
   String path,
+  void Function(ui.Canvas canvas) paint,
 ) async {
-  final pic = recorder.endRecording();
-  final img = await pic.toImage((width * dpr).toInt(), (height * dpr).toInt());
-  final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
-  img.dispose();
-  pic.dispose();
-  File(path).writeAsBytesSync(bytes!.buffer.asUint8List());
+  final recorder = ui.PictureRecorder();
+  final canvas = ui.Canvas(recorder)..scale(_dpr, _dpr);
+  paint(canvas);
+  final picture = recorder.endRecording();
+  final image = await picture.toImage(
+    (size.width * _dpr).round(),
+    (size.height * _dpr).round(),
+  );
+  final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+  File(path)
+    ..parent.createSync(recursive: true)
+    ..writeAsBytesSync(bytes!.buffer.asUint8List());
+  image.dispose();
+  picture.dispose();
+}
+
+Future<void> _renderFrames(
+  ui.Size size,
+  String name,
+  void Function(ui.Canvas canvas, double t) paint,
+) async {
+  for (var frame = 0; frame < _frames; frame++) {
+    final file = frame.toString().padLeft(4, '0');
+    await _render(
+      size,
+      'build/readme_frames/$name/frame_$file.png',
+      (canvas) => paint(canvas, frame / _frames),
+    );
+  }
 }
 
 Future<void> _loadFonts() async {
-  Future<void> tryLoad(String family, String path) async {
-    final file = File(path);
-    if (!file.existsSync()) return;
+  Future<void> load(String family, String file) async {
+    final font = File('build/readme_fonts/$file');
+    if (!font.existsSync()) {
+      throw StateError(
+        'Missing ${font.path}. Run ./tool/generate_assets.sh to fetch fonts.',
+      );
+    }
     final loader = FontLoader(family)
-      ..addFont(Future.value(ByteData.sublistView(file.readAsBytesSync())));
+      ..addFont(Future.value(ByteData.sublistView(font.readAsBytesSync())));
     await loader.load();
   }
 
-  await tryLoad('StudioSans', '/System/Library/Fonts/SFNS.ttf');
-  await tryLoad('StudioMono', '/System/Library/Fonts/SFNSMono.ttf');
+  await load('Display', 'Manrope.ttf');
+  await load('Mono', 'DMMono-Regular.ttf');
+  await load('MonoMedium', 'DMMono-Medium.ttf');
 }
 
 void main() {
   test('render hsluv README assets', () async {
     await _loadFonts();
 
-    // 1. Hero banner (`assets/logo.png`).
-    {
-      const width = 760.0;
-      const height = 210.0;
-      const dpr = 2.0;
-      const obsidian = ui.Color(0xFF12141A);
-      const obsidianBorder = ui.Color(0xFF292C36);
-      const cream = ui.Color(0xFFF6F4EE);
-      const mutedCream = ui.Color(0xFF9EA0A8);
+    await _render(_heroSize, 'assets/logo.png', _paintHero);
 
-      final recorder = ui.PictureRecorder();
-      final canvas = ui.Canvas(recorder)..scale(dpr, dpr);
-
-      final bgRect = ui.RRect.fromRectAndRadius(
-        const ui.Rect.fromLTWH(2, 2, width - 4, height - 4),
-        const ui.Radius.circular(24),
-      );
-      canvas.drawRRect(bgRect, ui.Paint()..color = obsidian);
-      canvas.drawRRect(
-        bgRect,
-        ui.Paint()
-          ..style = ui.PaintingStyle.stroke
-          ..strokeWidth = 1.5
-          ..color = obsidianBorder,
-      );
-
-      const cx = 132.0;
-      const cy = height / 2;
-      const outerRadius = 64.0;
-      final geom = ColorPicker.getPickerGeometry(66.0);
-      final badgeScale = outerRadius / geom.outerCircleRadius;
-
-      const ringSteps = 120;
-      for (var i = 0; i < ringSteps; i++) {
-        final a0 = (i / ringSteps) * 2 * math.pi;
-        final a1 = ((i + 1.5) / ringSteps) * 2 * math.pi;
-        final hue = i * 360.0 / ringSteps;
-        canvas.drawArc(
-          ui.Rect.fromCircle(
-            center: const ui.Offset(cx, cy),
-            radius: outerRadius + 4,
-          ),
-          a0,
-          a1 - a0,
-          false,
-          ui.Paint()
-            ..style = ui.PaintingStyle.stroke
-            ..strokeWidth = 3.5
-            ..color = _toUiColor(Hsluv.hsluvToRgb([hue, 92.0, 68.0])),
-        );
-      }
-
-      final polyPath = ui.Path();
-      for (var i = 0; i < geom.vertices.length; i++) {
-        final px = cx + geom.vertices[i].x * badgeScale;
-        final py = cy - geom.vertices[i].y * badgeScale;
-        if (i == 0) {
-          polyPath.moveTo(px, py);
-        } else {
-          polyPath.lineTo(px, py);
-        }
-      }
-      polyPath.close();
-
-      final sweepColors = [
-        for (var i = 0; i <= 72; i++)
-          _toUiColor(Hsluv.hsluvToRgb([(i * 5.0) % 360.0, 95.0, 68.0])),
-      ];
-      canvas.save();
-      canvas.clipPath(polyPath);
-      canvas.drawCircle(
-        const ui.Offset(cx, cy),
-        outerRadius,
-        ui.Paint()
-          ..shader = ui.Gradient.sweep(const ui.Offset(cx, cy), sweepColors, [
-            for (var i = 0; i <= 72; i++) i / 72,
-          ]),
-      );
-      canvas.drawCircle(
-        const ui.Offset(cx, cy),
-        outerRadius,
-        ui.Paint()
-          ..shader = ui.Gradient.radial(
-            const ui.Offset(cx, cy),
-            outerRadius * 0.9,
-            [const ui.Color(0xFFFFFFFF), const ui.Color(0x00FFFFFF)],
-            const [0.0, 0.85],
-          ),
-      );
-      canvas.restore();
-
-      final innerR = geom.innerCircleRadius * badgeScale;
-      canvas.drawCircle(
-        const ui.Offset(cx, cy),
-        innerR,
-        ui.Paint()
-          ..style = ui.PaintingStyle.stroke
-          ..strokeWidth = 2.0
-          ..color = const ui.Color(0xFFFFFFFF).withValues(alpha: 0.9),
-      );
-
-      _drawText(
+    final hsluvCylinder = _SolidMesh(
+      columns: 72,
+      reachOf: (_, _) => 1.0,
+      colorOf: (h, l) => _hsluv(h, 100, l),
+    );
+    final hslCylinder = _SolidMesh(
+      columns: 72,
+      reachOf: (_, _) => 1.0,
+      colorOf: (h, l) => _hsl(h, 100, l),
+    );
+    await _renderFrames(
+      _solidSize,
+      'hsluv_vs_hsl_solid',
+      (canvas, t) => _paintHslVsHsluvSolid(
         canvas,
-        'HSLuv',
-        const ui.Offset(244, 54),
-        style: ui.TextStyle(
-          fontFamily: 'StudioSans',
-          fontSize: 48,
-          fontWeight: ui.FontWeight.w700,
-          color: cream,
-          letterSpacing: -1.0,
-        ),
-      );
-      _drawText(
+        t,
+        hsluvMesh: hsluvCylinder,
+        hslMesh: hslCylinder,
+      ),
+    );
+
+    var maxChroma = 0.0;
+    for (var l = 5.0; l <= 95.0; l += 2.5) {
+      final g = ColorPicker.getPickerGeometry(l);
+      maxChroma = math.max(maxChroma, g.outerCircleRadius);
+    }
+    final hsluvGamut = _SolidMesh(
+      columns: 180,
+      reachOf: (l, h) => Hsluv.maxChromaForLH(l, h) / maxChroma,
+      colorOf: (h, l) => _hsluv(h, 100, l),
+    );
+    final hpluvSpindle = _SolidMesh(
+      columns: 180,
+      reachOf: (l, _) => Hsluv.maxSafeChromaForL(l) / maxChroma,
+      colorOf: (h, l) => _hpluv(h, 100, l),
+    );
+    await _renderFrames(
+      _solidSize,
+      'hpluv_vs_hsluv_solid',
+      (canvas, t) => _paintHpluvVsHsluvSolid(
         canvas,
-        'Perceptually uniform color space for Dart & Flutter',
-        const ui.Offset(246, 114),
-        style: ui.TextStyle(
-          fontFamily: 'StudioSans',
-          fontSize: 16,
-          color: mutedCream,
-        ),
-      );
+        t,
+        hsluvMesh: hsluvGamut,
+        hpluvMesh: hpluvSpindle,
+        maxChroma: maxChroma,
+      ),
+    );
 
-      for (var i = 0; i < 8; i++) {
-        final hue = i * 45.0;
-        final c = _toUiColor(Hsluv.hsluvToRgb([hue, 88.0, 68.0]));
-        canvas.drawRRect(
-          ui.RRect.fromRectAndRadius(
-            ui.Rect.fromLTWH(246 + i * 32.0, 149, 24, 9),
-            const ui.Radius.circular(999),
-          ),
-          ui.Paint()..color = c,
-        );
-      }
-
-      await _savePng(recorder, width, height, dpr, 'assets/logo.png');
-    }
-
-    // 2. 3D HSLuv vs HSL cylinder solid (`build/readme_frames/hsluv_vs_hsl_solid`).
-    {
-      final outDir = Directory('build/readme_frames/hsluv_vs_hsl_solid')
-        ..createSync(recursive: true);
-
-      final hsluvMesh = _SolidMesh(
-        columns: 72,
-        reachOf: (_, _) => 1.0,
-        colorOf: (h, l) => _toUiColor(Hsluv.hsluvToRgb([h, 100.0, l])),
-      );
-      final hslMesh = _SolidMesh(
-        columns: 72,
-        reachOf: (_, _) => 1.0,
-        colorOf: (h, l) => HSLColor.fromAHSL(1.0, h, 1.0, l / 100.0).toColor(),
-      );
-
-      const width = 760.0;
-      const height = 430.0;
-      const dpr = 2.0;
-      const frames = 150;
-
-      for (var frame = 0; frame < frames; frame++) {
-        final t = frame / frames;
-        final yaw = 0.65 + 2 * math.pi * t;
-        final lightness = 62.5 + 22.5 * math.cos(2 * math.pi * t);
-
-        final recorder = ui.PictureRecorder();
-        final canvas = ui.Canvas(recorder)..scale(dpr, dpr);
-        canvas.drawRect(
-          const ui.Rect.fromLTWH(0, 0, width, height),
-          ui.Paint()..color = _paper,
-        );
-
-        const panelGap = 16.0;
-        const outerPad = 18.0;
-        const panelWidth = (width - outerPad * 2 - panelGap) / 2;
-        const panelHeight = height - outerPad - 52;
-        const panelRadius = ui.Radius.circular(18);
-
-        for (final left in [outerPad, outerPad + panelWidth + panelGap]) {
-          final rr = ui.RRect.fromRectAndRadius(
-            ui.Rect.fromLTWH(left, outerPad, panelWidth, panelHeight),
-            panelRadius,
-          );
-          canvas.drawRRect(rr, ui.Paint()..color = _cardBg);
-          canvas.drawRRect(
-            rr,
-            ui.Paint()
-              ..style = ui.PaintingStyle.stroke
-              ..strokeWidth = 1
-              ..color = _borderCol,
-          );
-        }
-
-        const solidSize = ui.Size(panelWidth - 20, panelHeight - 66);
-        _paintSolid(
-          canvas,
-          _Camera(
-            yaw: yaw,
-            size: solidSize,
-            offset: const ui.Offset(outerPad + 10, outerPad + 56),
-          ),
-          hsluvMesh,
-          _Slice(
-            columns: 72,
-            lightness: lightness,
-            reachOf: (_) => 1.0,
-            colorOf: (h, s) => _toUiColor(Hsluv.hsluvToRgb([h, s, lightness])),
-          ),
-          drawCageRibs: true,
-        );
-        _paintSolid(
-          canvas,
-          _Camera(
-            yaw: yaw,
-            size: solidSize,
-            offset: const ui.Offset(
-              outerPad + panelWidth + panelGap + 10,
-              outerPad + 56,
-            ),
-          ),
-          hslMesh,
-          _Slice(
-            columns: 72,
-            lightness: lightness,
-            reachOf: (_) => 1.0,
-            colorOf: (h, s) => HSLColor.fromAHSL(
-              1.0,
-              h,
-              s / 100.0,
-              lightness / 100.0,
-            ).toColor(),
-          ),
-          drawCageRibs: true,
-        );
-
-        for (final (left, title, subtitle) in [
-          (outerPad, 'HSLuv', 'Uniform lightness'),
-          (outerPad + panelWidth + panelGap, 'HSL', 'Uneven brightness'),
-        ]) {
-          _drawText(
-            canvas,
-            title,
-            ui.Offset(left + panelWidth / 2, outerPad + 14),
-            align: ui.TextAlign.center,
-            style: ui.TextStyle(
-              fontFamily: 'StudioSans',
-              fontSize: 18,
-              fontWeight: ui.FontWeight.w700,
-              color: _ink,
-              letterSpacing: -0.3,
-            ),
-          );
-          _drawText(
-            canvas,
-            subtitle,
-            ui.Offset(left + panelWidth / 2, outerPad + 38),
-            align: ui.TextAlign.center,
-            style: ui.TextStyle(
-              fontFamily: 'StudioSans',
-              fontSize: 12,
-              fontWeight: ui.FontWeight.w500,
-              color: _inkMuted,
-            ),
-          );
-        }
-
-        _drawLightnessPill(canvas, width, height, lightness);
-        final name = frame.toString().padLeft(4, '0');
-        await _savePng(
-          recorder,
-          width,
-          height,
-          dpr,
-          '${outDir.path}/frame_$name.png',
-        );
-      }
-    }
-
-    // 3. 3D HSLuv vs HPLuv in CIELUV C* (`build/readme_frames/hpluv_vs_hsluv_solid`).
-    {
-      final outDir = Directory('build/readme_frames/hpluv_vs_hsluv_solid')
-        ..createSync(recursive: true);
-
-      var maxChroma = 0.0;
-      for (var l = 5.0; l <= 95.0; l += 2.5) {
-        final g = ColorPicker.getPickerGeometry(l);
-        if (g.outerCircleRadius > maxChroma) maxChroma = g.outerCircleRadius;
-      }
-
-      final hsluvMesh = _SolidMesh(
-        columns: 180,
-        reachOf: (l, h) => Hsluv.maxChromaForLH(l, h) / maxChroma,
-        colorOf: (h, l) => _toUiColor(Hsluv.hsluvToRgb([h, 100.0, l])),
-      );
-      final hpluvMesh = _SolidMesh(
-        columns: 180,
-        reachOf: (l, _) => Hsluv.maxSafeChromaForL(l) / maxChroma,
-        colorOf: (h, l) => _toUiColor(Hsluv.hpluvToRgb([h, 100.0, l])),
-      );
-
-      const width = 760.0;
-      const height = 430.0;
-      const dpr = 2.0;
-      const frames = 150;
-
-      for (var frame = 0; frame < frames; frame++) {
-        final t = frame / frames;
-        final yaw = 0.65 + 2 * math.pi * t;
-        final lightness = 62.5 + 22.5 * math.cos(2 * math.pi * t);
-
-        final recorder = ui.PictureRecorder();
-        final canvas = ui.Canvas(recorder)..scale(dpr, dpr);
-        canvas.drawRect(
-          const ui.Rect.fromLTWH(0, 0, width, height),
-          ui.Paint()..color = _paper,
-        );
-
-        const panelGap = 16.0;
-        const outerPad = 18.0;
-        const panelWidth = (width - outerPad * 2 - panelGap) / 2;
-        const panelHeight = height - outerPad - 52;
-        const panelRadius = ui.Radius.circular(18);
-
-        for (final left in [outerPad, outerPad + panelWidth + panelGap]) {
-          final rr = ui.RRect.fromRectAndRadius(
-            ui.Rect.fromLTWH(left, outerPad, panelWidth, panelHeight),
-            panelRadius,
-          );
-          canvas.drawRRect(rr, ui.Paint()..color = _cardBg);
-          canvas.drawRRect(
-            rr,
-            ui.Paint()
-              ..style = ui.PaintingStyle.stroke
-              ..strokeWidth = 1
-              ..color = _borderCol,
-          );
-        }
-
-        const solidSize = ui.Size(panelWidth - 16, panelHeight - 66);
-        final outerSliceReach = [
-          for (var c = 0; c < hsluvMesh.columns; c++)
-            Hsluv.maxChromaForLH(lightness, hsluvMesh.hueOf(c)) / maxChroma,
-        ];
-        final innerRadiusNorm = Hsluv.maxSafeChromaForL(lightness) / maxChroma;
-
-        _paintSolid(
-          canvas,
-          _Camera(
-            yaw: yaw,
-            size: solidSize,
-            offset: const ui.Offset(outerPad + 8, outerPad + 56),
-            radius: 0.68,
-            pitch: 0.48,
-          ),
-          hsluvMesh,
-          _Slice(
-            columns: hsluvMesh.columns,
-            lightness: lightness,
-            reachOf: (h) => Hsluv.maxChromaForLH(lightness, h) / maxChroma,
-            colorOf: (h, s) => _toUiColor(Hsluv.hsluvToRgb([h, s, lightness])),
-          ),
-        );
-        _paintSolid(
-          canvas,
-          _Camera(
-            yaw: yaw,
-            size: solidSize,
-            offset: const ui.Offset(
-              outerPad + panelWidth + panelGap + 8,
-              outerPad + 56,
-            ),
-            radius: 0.68,
-            pitch: 0.48,
-          ),
-          hpluvMesh,
-          _Slice(
-            columns: hpluvMesh.columns,
-            lightness: lightness,
-            reachOf: (_) => innerRadiusNorm,
-            colorOf: (h, s) => _toUiColor(Hsluv.hpluvToRgb([h, s, lightness])),
-          ),
-          ghostCageMesh: hsluvMesh,
-          ghostSliceReach: outerSliceReach,
-        );
-
-        for (final (left, title, subtitle) in [
-          (outerPad, 'HSLuv', 'CIELUV C* reaches sRGB edge'),
-          (
-            outerPad + panelWidth + panelGap,
-            'HPLuv',
-            'CIELUV C* stays equal (pastel)',
-          ),
-        ]) {
-          _drawText(
-            canvas,
-            title,
-            ui.Offset(left + panelWidth / 2, outerPad + 14),
-            align: ui.TextAlign.center,
-            style: ui.TextStyle(
-              fontFamily: 'StudioSans',
-              fontSize: 18,
-              fontWeight: ui.FontWeight.w700,
-              color: _ink,
-              letterSpacing: -0.3,
-            ),
-          );
-          _drawText(
-            canvas,
-            subtitle,
-            ui.Offset(left + panelWidth / 2, outerPad + 38),
-            align: ui.TextAlign.center,
-            style: ui.TextStyle(
-              fontFamily: 'StudioSans',
-              fontSize: 12,
-              fontWeight: ui.FontWeight.w500,
-              color: _inkMuted,
-            ),
-          );
-        }
-
-        _drawLightnessPill(canvas, width, height, lightness);
-        final name = frame.toString().padLeft(4, '0');
-        await _savePng(
-          recorder,
-          width,
-          height,
-          dpr,
-          '${outDir.path}/frame_$name.png',
-        );
-      }
-    }
-
-    // 4. HSL vs HSLuv hue & L* waveform (`build/readme_frames/hsl_vs_hsluv`).
-    {
-      final outDir = Directory('build/readme_frames/hsl_vs_hsluv')
-        ..createSync(recursive: true);
-
-      const width = 760.0;
-      const height = 430.0;
-      const dpr = 2.0;
-      const frames = 150;
-      const barSteps = 180;
-
-      final hslBarColors = [
-        for (var i = 0; i <= barSteps; i++)
-          HSLColor.fromAHSL(
-            1.0,
-            (i * 360.0 / barSteps) % 360.0,
-            0.88,
-            0.62,
-          ).toColor(),
-      ];
-      final hsluvBarColors = [
-        for (var i = 0; i <= barSteps; i++)
-          HSLuvColor.fromHSL(
-            (i * 360.0 / barSteps) % 360.0,
-            88.0,
-            62.0,
-          ).toColor(),
-      ];
-      final hslLstarCurve = [
-        for (var i = 0; i <= barSteps; i++)
-          Hsluv.yToL(hslBarColors[i].computeLuminance()),
-      ];
-      final hsluvLstarCurve = [
-        for (var i = 0; i <= barSteps; i++)
-          Hsluv.yToL(hsluvBarColors[i].computeLuminance()),
-      ];
-      final barStops = [for (var i = 0; i <= barSteps; i++) i / barSteps];
-
-      for (var frame = 0; frame < frames; frame++) {
-        final t = frame / frames;
-        final hue = (t * 360.0) % 360.0;
-        final hslColor = HSLColor.fromAHSL(1.0, hue, 0.88, 0.62).toColor();
-        final hsluvColor = HSLuvColor.fromHSL(hue, 88.0, 62.0).toColor();
-        final hslLstar = Hsluv.yToL(hslColor.computeLuminance());
-        final hsluvLstar = Hsluv.yToL(hsluvColor.computeLuminance());
-
-        final recorder = ui.PictureRecorder();
-        final canvas = ui.Canvas(recorder)..scale(dpr, dpr);
-        canvas.drawRect(
-          const ui.Rect.fromLTWH(0, 0, width, height),
-          ui.Paint()..color = _paper,
-        );
-
-        void paintWaveformCard({
-          required double topY,
-          required String title,
-          required String subtitle,
-          required ui.Color activeColor,
-          required double lStar,
-          required List<ui.Color> barColors,
-          required List<double> curve,
-        }) {
-          const padX = 18.0;
-          const cardW = width - padX * 2;
-          const cardH = 188.0;
-          final rr = ui.RRect.fromRectAndRadius(
-            ui.Rect.fromLTWH(padX, topY, cardW, cardH),
-            const ui.Radius.circular(18),
-          );
-          canvas.drawRRect(rr, ui.Paint()..color = _cardBg);
-          canvas.drawRRect(
-            rr,
-            ui.Paint()
-              ..style = ui.PaintingStyle.stroke
-              ..strokeWidth = 1
-              ..color = _borderCol,
-          );
-
-          const swatchW = 104.0;
-          final swatchX = padX + 20;
-          final swatchRect = ui.RRect.fromRectAndRadius(
-            ui.Rect.fromLTWH(swatchX, topY + 22, swatchW, 108),
-            const ui.Radius.circular(16),
-          );
-          canvas.drawRRect(swatchRect, ui.Paint()..color = activeColor);
-          canvas.drawRRect(
-            swatchRect,
-            ui.Paint()
-              ..style = ui.PaintingStyle.stroke
-              ..strokeWidth = 1
-              ..color = _ink.withValues(alpha: 0.1),
-          );
-
-          final statRect = ui.RRect.fromRectAndRadius(
-            ui.Rect.fromLTWH(swatchX, topY + 140, swatchW, 26),
-            const ui.Radius.circular(999),
-          );
-          canvas.drawRRect(statRect, ui.Paint()..color = _paper);
-          canvas.drawRRect(
-            statRect,
-            ui.Paint()
-              ..style = ui.PaintingStyle.stroke
-              ..strokeWidth = 1
-              ..color = _borderCol,
-          );
-          _drawText(
-            canvas,
-            'L*: ${lStar.round().toString().padLeft(2)}%',
-            ui.Offset(swatchX + swatchW / 2, topY + 146),
-            align: ui.TextAlign.center,
-            style: ui.TextStyle(
-              fontFamily: 'StudioMono',
-              fontSize: 12,
-              fontWeight: ui.FontWeight.w700,
-              color: _ink,
-              fontFeatures: const [ui.FontFeature.tabularFigures()],
-            ),
-          );
-
-          final contentX = swatchX + swatchW + 22;
-          final contentW = cardW - 40 - swatchW - 22;
-
-          _drawText(
-            canvas,
-            title,
-            ui.Offset(contentX, topY + 20),
-            style: ui.TextStyle(
-              fontFamily: 'StudioSans',
-              fontSize: 17,
-              fontWeight: ui.FontWeight.w700,
-              color: _ink,
-            ),
-          );
-          _drawText(
-            canvas,
-            subtitle,
-            ui.Offset(contentX + 74, topY + 23),
-            style: ui.TextStyle(
-              fontFamily: 'StudioSans',
-              fontSize: 12.5,
-              color: _inkMuted,
-            ),
-          );
-          _drawText(
-            canvas,
-            'hue ${hue.round().toString().padLeft(3)}°',
-            ui.Offset(contentX + contentW, topY + 23),
-            align: ui.TextAlign.right,
-            style: ui.TextStyle(
-              fontFamily: 'StudioMono',
-              fontSize: 12,
-              fontWeight: ui.FontWeight.w500,
-              color: _inkMuted,
-              fontFeatures: const [ui.FontFeature.tabularFigures()],
-            ),
-          );
-
-          const barH = 24.0;
-          final barTop = topY + 52;
-          final barRect = ui.RRect.fromRectAndRadius(
-            ui.Rect.fromLTWH(contentX, barTop, contentW, barH),
-            const ui.Radius.circular(999),
-          );
-          canvas.drawRRect(
-            barRect,
-            ui.Paint()
-              ..shader = ui.Gradient.linear(
-                ui.Offset(contentX, 0),
-                ui.Offset(contentX + contentW, 0),
-                barColors,
-                barStops,
-              ),
-          );
-          canvas.drawRRect(
-            barRect,
-            ui.Paint()
-              ..style = ui.PaintingStyle.stroke
-              ..strokeWidth = 1
-              ..color = _ink.withValues(alpha: 0.08),
-          );
-
-          final chartTop = topY + 92;
-          const chartH = 74.0;
-          final chartRect = ui.RRect.fromRectAndRadius(
-            ui.Rect.fromLTWH(contentX, chartTop, contentW, chartH),
-            const ui.Radius.circular(10),
-          );
-          canvas.drawRRect(chartRect, ui.Paint()..color = _paper);
-          canvas.drawRRect(
-            chartRect,
-            ui.Paint()
-              ..style = ui.PaintingStyle.stroke
-              ..strokeWidth = 1
-              ..color = _borderCol,
-          );
-
-          for (final level in [25.0, 50.0, 75.0]) {
-            final gy = chartTop + chartH * (1.0 - level / 100.0);
-            canvas.drawLine(
-              ui.Offset(contentX + 6, gy),
-              ui.Offset(contentX + contentW - 6, gy),
-              ui.Paint()
-                ..strokeWidth = 0.8
-                ..color = _borderCol,
-            );
-          }
-
-          final linePath = ui.Path();
-          final areaPath = ui.Path();
-          for (var i = 0; i <= barSteps; i++) {
-            final px = contentX + (i / barSteps) * contentW;
-            final py =
-                chartTop + chartH * (1.0 - curve[i].clamp(0.0, 100.0) / 100.0);
-            if (i == 0) {
-              linePath.moveTo(px, py);
-              areaPath.moveTo(px, chartTop + chartH);
-              areaPath.lineTo(px, py);
-            } else {
-              linePath.lineTo(px, py);
-              areaPath.lineTo(px, py);
-            }
-          }
-          areaPath
-            ..lineTo(contentX + contentW, chartTop + chartH)
-            ..close();
-
-          canvas.save();
-          canvas.clipRRect(chartRect);
-          canvas.drawPath(
-            areaPath,
-            ui.Paint()..color = activeColor.withValues(alpha: 0.18),
-          );
-          canvas.drawPath(
-            linePath,
-            ui.Paint()
-              ..style = ui.PaintingStyle.stroke
-              ..strokeWidth = 2.0
-              ..strokeJoin = ui.StrokeJoin.round
-              ..color = _ink.withValues(alpha: 0.85),
-          );
-          canvas.restore();
-
-          final curX = contentX + (hue / 360.0) * contentW;
-          final curY =
-              chartTop + chartH * (1.0 - lStar.clamp(0.0, 100.0) / 100.0);
-
-          canvas.drawLine(
-            ui.Offset(curX, barTop + barH),
-            ui.Offset(curX, chartTop + chartH),
-            ui.Paint()
-              ..strokeWidth = 1.1
-              ..color = _ink.withValues(alpha: 0.25),
-          );
-
-          final barCenter = ui.Offset(curX, barTop + barH / 2);
-          canvas.drawCircle(
-            barCenter,
-            9.5,
-            ui.Paint()..color = const ui.Color(0xFFFFFFFF),
-          );
-          canvas.drawCircle(barCenter, 6.0, ui.Paint()..color = activeColor);
-
-          canvas.drawCircle(
-            ui.Offset(curX, curY),
-            6.5,
-            ui.Paint()..color = const ui.Color(0xFFFFFFFF),
-          );
-          canvas.drawCircle(
-            ui.Offset(curX, curY),
-            4.5,
-            ui.Paint()..color = _ink,
-          );
-
-          _drawText(
-            canvas,
-            'perceived lightness (L*)',
-            ui.Offset(contentX + 8, chartTop + chartH - 18),
-            style: ui.TextStyle(
-              fontFamily: 'StudioSans',
-              fontSize: 10.5,
-              fontWeight: ui.FontWeight.w500,
-              color: _inkMuted,
-            ),
-          );
-        }
-
-        paintWaveformCard(
-          topY: 18,
-          title: 'HSL',
-          subtitle: 'S: 88%  L: 62% · lightness fluctuates',
-          activeColor: hslColor,
-          lStar: hslLstar,
-          barColors: hslBarColors,
-          curve: hslLstarCurve,
-        );
-        paintWaveformCard(
-          topY: 224,
-          title: 'HSLuv',
-          subtitle: 'S: 88%  L: 62% · constant lightness',
-          activeColor: hsluvColor,
-          lStar: hsluvLstar,
-          barColors: hsluvBarColors,
-          curve: hsluvLstarCurve,
-        );
-
-        final name = frame.toString().padLeft(4, '0');
-        await _savePng(
-          recorder,
-          width,
-          height,
-          dpr,
-          '${outDir.path}/frame_$name.png',
-        );
-      }
-    }
-  });
+    final hslSweep = _sweep((h) => _hsl(h, 88, 62));
+    final hsluvSweep = _sweep((h) => _hsluv(h, 88, 62));
+    await _renderFrames(
+      _waveSize,
+      'hsl_vs_hsluv',
+      (canvas, t) =>
+          _paintWaveform(canvas, t, hslSweep: hslSweep, hsluvSweep: hsluvSweep),
+    );
+  }, timeout: Timeout.none);
 }
